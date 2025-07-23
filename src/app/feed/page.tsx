@@ -1,7 +1,14 @@
 import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { FeedLayout } from '@/components/layouts/feed-layout'
+import { PostComposer } from '@/components/ui/post-composer'
+import { TrendingSidebar } from '@/components/ui/trending-sidebar'
+import { InteractiveFeed } from '@/components/feed/interactive-feed'
+import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Sparkles } from 'lucide-react'
+import { getMockPosts } from '@/lib/mock-data'
 
 export const metadata = {
   title: 'Feed | Community Platform',
@@ -15,54 +22,71 @@ export default async function FeedPage() {
     redirect('/auth/signin')
   }
 
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-2xl mx-auto space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">Welcome to your Feed</h1>
-          <p className="text-muted-foreground mt-2">
-            Hello, {session.user.name}! Your community feed will appear here.
-          </p>
-        </div>
+  // Get mock posts for demonstration
+  const posts = getMockPosts(10)
+  const currentUser = session.user
 
-        <Card>
-          <CardHeader>
-            <CardTitle>🎉 Authentication Success!</CardTitle>
-            <CardDescription>
-              You have successfully signed in to the community platform.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <p><strong>Name:</strong> {session.user.name}</p>
-              <p><strong>Username:</strong> @{session.user.username}</p>
-              <p><strong>Email:</strong> {session.user.email}</p>
-              <p><strong>Role:</strong> {session.user.role}</p>
+  // Sidebar content
+  const sidebar = <TrendingSidebar />
+
+  return (
+    <FeedLayout sidebar={sidebar}>
+      <div className="space-y-6">
+        {/* Welcome Message */}
+        <Card className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center w-12 h-12 rounded-full bg-primary/10">
+                <Sparkles className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold">
+                  Welcome back, {session.user.name}! 👋
+                </h1>
+                <p className="text-muted-foreground text-sm">
+                  Catch up with your community and share what&apos;s on your mind.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Coming Soon</CardTitle>
-            <CardDescription>
-              The social feed with posts, likes, and comments will be implemented in the next tasks.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground">
-              Stay tuned for more features including:
-            </p>
-            <ul className="list-disc list-inside mt-2 space-y-1 text-sm text-muted-foreground">
-              <li>Create and share posts</li>
-              <li>Like and comment on posts</li>
-              <li>Follow other users</li>
-              <li>Real-time notifications</li>
-              <li>User profiles and MBTI types</li>
-            </ul>
-          </CardContent>
-        </Card>
+        {/* Create Post */}
+        <PostComposer
+          currentUser={{
+            id: currentUser.id,
+            name: currentUser.name || null,
+            username: currentUser.username || '',
+            image: currentUser.image || null,
+          }}
+          onSubmit={(content, imageUrl, visibility) => {
+            console.log('Creating post:', { content, imageUrl, visibility })
+            // TODO: Implement post creation
+          }}
+        />
+
+        {/* Interactive Feed */}
+        <InteractiveFeed
+          initialPosts={posts}
+          currentUserId={currentUser.id}
+        />
       </div>
-    </div>
+
+      {/* Floating Action Button for Mobile */}
+      <FloatingActionButton
+        onCreatePost={() => {
+          console.log('Create post from FAB')
+          // TODO: Scroll to post composer or open modal
+        }}
+        onAddImage={() => {
+          console.log('Add image from FAB')
+          // TODO: Open image picker
+        }}
+        onAddEmoji={() => {
+          console.log('Add emoji from FAB')
+          // TODO: Open emoji picker
+        }}
+      />
+    </FeedLayout>
   )
 }

@@ -5,6 +5,7 @@ import { authOptions } from '@/lib/auth'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Navbar } from '@/components/layout/navbar'
+import { MobileNav } from '@/components/layout/mobile-nav'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -31,7 +32,14 @@ export default async function RootLayout({
           <SessionProvider session={session}>
             <div className="min-h-screen bg-background">
               <Navbar />
-              <main>{children}</main>
+              <main className="pb-16 md:pb-0">{children}</main>
+              {session && (
+                <MobileNav 
+                  userId={session.user.id}
+                  username={session.user.username}
+                  notificationCount={3}
+                />
+              )}
             </div>
           </SessionProvider>
         </ThemeProvider>

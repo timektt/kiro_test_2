@@ -3,13 +3,10 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
-import { useTheme } from 'next-themes'
 import { 
   User, 
   Settings, 
   LogOut, 
-  Moon, 
-  Sun, 
   Menu, 
   X,
   Home,
@@ -20,6 +17,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,7 +30,6 @@ import { cn } from '@/lib/utils'
 
 export function Navbar() {
   const { data: session, status } = useSession()
-  const { theme, setTheme } = useTheme()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOut = async () => {
@@ -91,16 +88,7 @@ export function Navbar() {
           {/* Right side */}
           <div className="flex items-center space-x-4">
             {/* Theme Toggle */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="h-9 w-9 px-0"
-            >
-              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span className="sr-only">Toggle theme</span>
-            </Button>
+            <ThemeToggle />
 
             {/* Authentication */}
             {status === 'loading' ? (
