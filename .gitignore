@@ -1,0 +1,74 @@
+# 📦 Node modules
+node_modules/
+
+# ⚙️ Build Output
+.next/
+dist/
+out/
+
+# 💻 System Files
+.DS_Store
+Thumbs.db
+
+# 🧪 Logs & Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.log
+
+# 📁 Env Files
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# 💾 Prisma Files
+/prisma/dev.db
+/prisma/dev.db-journal
+*.sqlite
+*.sqlite-journal
+*.db
+*.db-journal
+
+# 🧠 AI หรือ Model Cache
+__pycache__/
+*.pth
+*.ckpt
+*.pt
+*.safetensors
+*.onnx
+*.mlmodel
+
+# 📸 Upload / Static Output (แล้วแต่ใช้หรือไม่)
+public/uploads/
+public/output/
+
+# 🐳 Docker (ถ้ามีใช้)
+docker-compose.override.yml
+*.pid
+
+# 📤 Uploadthing (หรือบริการ upload ใดๆ)
+.uploadthing
+
+# 🔒 Firebase Admin Key (ถ้ามี)
+firebase-adminsdk.json
+serviceAccountKey.json
+
+# 🧪 Test Coverage
+coverage/
+.nyc_output/
+
+# 🧑‍💻 IDE
+.vscode/
+.idea/
+*.swp
+
+# ✨ Optional: OS + Editor
+*.bak
+*.tmp
+*.temp
+*.orig
+*.sublime-project
+*.sublime-workspace
