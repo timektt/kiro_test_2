@@ -13,7 +13,19 @@
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
     "db:setup": "tsx scripts/migrate-and-seed.ts",
-    "db:reset": "prisma migrate reset --force && npm run db:seed"
+    "db:reset": "prisma migrate reset --force && npm run db:seed",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest src/__tests__/components src/__tests__/hooks src/__tests__/lib src/__tests__/stores",
+    "test:integration": "jest src/__tests__/api src/__tests__/integration",
+    "test:components": "jest src/__tests__/components",
+    "test:hooks": "jest src/__tests__/hooks",
+    "test:api": "jest src/__tests__/api",
+    "test:stores": "jest src/__tests__/stores",
+    "test:lib": "jest src/__tests__/lib",
+    "test:all": "tsx scripts/run-tests.ts",
+    "test:ci": "jest --coverage --watchAll=false --passWithNoTests"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",

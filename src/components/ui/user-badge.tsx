@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { getMBTIColorClass, getMBTIInfo } from '@/lib/mbti'
 import type { User, MBTIType } from '@/types'
 
 interface UserBadgeProps {
@@ -33,28 +34,7 @@ const sizeConfig = {
   },
 }
 
-const mbtiColors: Record<MBTIType, string> = {
-  // Analysts
-  INTJ: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  INTP: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  ENTJ: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  ENTP: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-  // Diplomats
-  INFJ: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  INFP: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  ENFJ: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  ENFP: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  // Sentinels
-  ISTJ: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  ISFJ: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  ESTJ: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  ESFJ: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  // Explorers
-  ISTP: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  ISFP: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  ESTP: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-  ESFP: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-}
+
 
 const roleColors = {
   USER: 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200',
@@ -98,9 +78,10 @@ export function UserBadge({
           {showMBTI && user.mbti && (
             <Badge 
               variant="secondary" 
-              className={cn('text-xs px-1.5 py-0.5', mbtiColors[user.mbti.type])}
+              className={cn('text-xs px-1.5 py-0.5', getMBTIColorClass(user.mbti.type))}
+              title={`${user.mbti.type} - ${getMBTIInfo(user.mbti.type).name}`}
             >
-              {user.mbti.type}
+              {getMBTIInfo(user.mbti.type).emoji} {user.mbti.type}
             </Badge>
           )}
           {showRole && user.role !== 'USER' && (
