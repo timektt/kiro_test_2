@@ -18,6 +18,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
+import { NotificationDropdown } from '@/components/ui/notification-dropdown'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { cn } from '@/lib/utils'
 
 export function Navbar() {
   const { data: session, status } = useSession()
@@ -87,6 +87,9 @@ export function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center space-x-4">
+            {/* Notifications */}
+            {session && <NotificationDropdown />}
+            
             {/* Theme Toggle */}
             <ThemeToggle />
 

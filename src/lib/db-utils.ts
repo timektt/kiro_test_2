@@ -232,7 +232,8 @@ export async function createNotification(
   userId: string,
   type: 'LIKE' | 'COMMENT' | 'FOLLOW' | 'MENTION' | 'SYSTEM',
   message: string,
-  relatedId?: string
+  relatedId?: string,
+  actorId?: string
 ) {
   return await prisma.notification.create({
     data: {
@@ -240,6 +241,7 @@ export async function createNotification(
       type,
       message,
       relatedId,
+      actorId,
     },
   })
 }

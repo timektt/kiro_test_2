@@ -2,13 +2,11 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { FeedLayout } from '@/components/layouts/feed-layout'
-import { PostComposer } from '@/components/ui/post-composer'
 import { TrendingSidebar } from '@/components/ui/trending-sidebar'
-import { InteractiveFeed } from '@/components/feed/interactive-feed'
+import { RealTimeFeed } from '@/components/feed/real-time-feed'
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Sparkles } from 'lucide-react'
-import { getMockPosts } from '@/lib/mock-data'
 
 export const metadata = {
   title: 'Feed | Community Platform',
@@ -21,10 +19,6 @@ export default async function FeedPage() {
   if (!session) {
     redirect('/auth/signin')
   }
-
-  // Get mock posts for demonstration
-  const posts = getMockPosts(10)
-  const currentUser = session.user
 
   // Sidebar content
   const sidebar = <TrendingSidebar />
@@ -51,25 +45,8 @@ export default async function FeedPage() {
           </CardContent>
         </Card>
 
-        {/* Create Post */}
-        <PostComposer
-          currentUser={{
-            id: currentUser.id,
-            name: currentUser.name || null,
-            username: currentUser.username || '',
-            image: currentUser.image || null,
-          }}
-          onSubmit={(content, imageUrl, visibility) => {
-            console.log('Creating post:', { content, imageUrl, visibility })
-            // TODO: Implement post creation
-          }}
-        />
-
-        {/* Interactive Feed */}
-        <InteractiveFeed
-          initialPosts={posts}
-          currentUserId={currentUser.id}
-        />
+        {/* Real-time Feed with integrated post composer */}
+        <RealTimeFeed />
       </div>
 
       {/* Floating Action Button for Mobile */}

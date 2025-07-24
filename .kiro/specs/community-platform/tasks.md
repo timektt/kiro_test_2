@@ -36,7 +36,6 @@
 
 - [x] 6. User Profile System
 
-
 - [x] 6.1 Profile Data Management
   - Create user profile API routes for CRUD operations
   - Implement Zod validation schemas for profile data
@@ -55,39 +54,42 @@
   - Implement profile viewing for other users
   - _Requirements: 4.5_
 
-- [ ] 7. Social Feed System
-- [ ] 7.1 Post Creation and Management
+- [x] 7. Social Feed System
+
+- [x] 7.1 Post Creation and Management
   - Create post composition component with text and image support
   - Implement post creation API with validation
   - Build post display card component with author information
   - _Requirements: 3.2_
 
-- [ ] 7.2 Feed Display and Pagination
+- [x] 7.2 Feed Display and Pagination
   - Create main feed component with chronological post ordering
   - Implement pagination or infinite scroll functionality
   - Add loading states and skeleton components
   - _Requirements: 3.5, 9.3_
 
-- [ ] 7.3 Like System
+- [x] 7.3 Like System
   - Implement like/unlike functionality for posts
   - Create like button component with optimistic updates
   - Build like count display and user interaction tracking
   - _Requirements: 3.3_
 
-- [ ] 7.4 Comment System
+- [x] 7.4 Comment System
   - Create comment creation and display components
   - Implement comment API routes with validation
   - Build nested comment display with chronological ordering
   - _Requirements: 3.4, 3.6_
 
-- [ ] 8. Notification System
-- [ ] 8.1 Notification Data Layer
+- [x] 8. Notification System
+
+
+- [x] 8.1 Notification Data Layer
   - Create notification API routes for CRUD operations
   - Implement notification creation triggers for likes, comments, follows
   - Build notification marking as read functionality
   - _Requirements: 5.1, 5.2, 5.3, 5.5_
 
-- [ ] 8.2 Notification UI Components
+- [x] 8.2 Notification UI Components
   - Create notification display component with different types
   - Implement notification dropdown/panel in navigation
   - Build notification list with chronological ordering
