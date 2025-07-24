@@ -16,6 +16,8 @@ export type User = {
     posts: number
     followers: number
     following: number
+    likes: number
+    comments: number
   }
 }
 

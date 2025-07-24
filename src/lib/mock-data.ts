@@ -30,6 +30,8 @@ export const mockUsers: Array<User & { mbti?: { type: MBTIType } | null }> = [
       posts: 24,
       followers: 156,
       following: 89,
+      likes: 342,
+      comments: 128,
     },
   },
   {
@@ -60,6 +62,8 @@ export const mockUsers: Array<User & { mbti?: { type: MBTIType } | null }> = [
       posts: 18,
       followers: 203,
       following: 124,
+      likes: 289,
+      comments: 156,
     },
   },
   {
@@ -89,6 +93,8 @@ export const mockUsers: Array<User & { mbti?: { type: MBTIType } | null }> = [
       posts: 31,
       followers: 98,
       following: 67,
+      likes: 198,
+      comments: 89,
     },
   },
   {
@@ -117,6 +123,8 @@ export const mockUsers: Array<User & { mbti?: { type: MBTIType } | null }> = [
       posts: 12,
       followers: 45,
       following: 23,
+      likes: 67,
+      comments: 34,
     },
   },
 ]
