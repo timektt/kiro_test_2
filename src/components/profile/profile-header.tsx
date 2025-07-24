@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { FollowButton } from '@/components/ui/follow-button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -217,14 +218,10 @@ export function ProfileHeader({
                 </>
               ) : (
                 <>
-                  <Button
-                    onClick={handleFollowToggle}
-                    disabled={isFollowLoading}
-                    variant={isFollowing ? 'outline' : 'default'}
-                  >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    {isFollowing ? 'Unfollow' : 'Follow'}
-                  </Button>
+                  <FollowButton
+                    userId={user.id}
+                    username={user.username}
+                  />
                   
                   <Button variant="outline" onClick={onMessage}>
                     <MessageCircle className="mr-2 h-4 w-4" />

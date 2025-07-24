@@ -1,12 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { FileText, Heart, MessageSquare, Users, TrendingUp, Bookmark } from 'lucide-react'
+import { FileText, Heart, MessageSquare, Users, UserCheck, TrendingUp, Bookmark } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { PostItem } from '@/components/ui/post-item'
 import { EmptyState } from '@/components/ui/empty-state'
 import { ProfileActivity } from '@/components/profile/profile-activity'
+import { FollowersList } from '@/components/profile/followers-list'
+import { FollowingList } from '@/components/profile/following-list'
 import { cn } from '@/lib/utils'
 import type { User, Post } from '@/types'
 
@@ -37,6 +39,16 @@ const tabs = [
     id: 'posts',
     label: 'Posts',
     icon: FileText,
+  },
+  {
+    id: 'followers',
+    label: 'Followers',
+    icon: Users,
+  },
+  {
+    id: 'following',
+    label: 'Following',
+    icon: UserCheck,
   },
   {
     id: 'likes',
@@ -112,6 +124,22 @@ export function ProfileTabs({
               />
             )}
           </div>
+        )
+
+      case 'followers':
+        return (
+          <FollowersList
+            userId={user.id}
+            username={user.username}
+          />
+        )
+
+      case 'following':
+        return (
+          <FollowingList
+            userId={user.id}
+            username={user.username}
+          />
         )
 
       case 'likes':
@@ -197,6 +225,16 @@ export function ProfileTabs({
                   {tab.id === 'posts' && (
                     <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">
                       {user._count?.posts || 0}
+                    </span>
+                  )}
+                  {tab.id === 'followers' && (
+                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">
+                      {user._count?.followers || 0}
+                    </span>
+                  )}
+                  {tab.id === 'following' && (
+                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">
+                      {user._count?.following || 0}
                     </span>
                   )}
                 </Button>

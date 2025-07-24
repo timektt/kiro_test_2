@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { SessionProvider } from '@/components/providers/session-provider'
+import { StoreProvider } from '@/components/providers/store-provider'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Navbar } from '@/components/layout/navbar'
 import { MobileNav } from '@/components/layout/mobile-nav'
@@ -30,17 +31,19 @@ export default async function RootLayout({
           storageKey="community-platform-theme"
         >
           <SessionProvider session={session}>
-            <div className="min-h-screen bg-background">
-              <Navbar />
-              <main className="pb-16 md:pb-0">{children}</main>
-              {session && (
-                <MobileNav 
-                  userId={session.user.id}
-                  username={session.user.username}
-                  notificationCount={3}
-                />
-              )}
-            </div>
+            <StoreProvider>
+              <div className="min-h-screen bg-background">
+                <Navbar />
+                <main className="pb-16 md:pb-0">{children}</main>
+                {session && (
+                  <MobileNav 
+                    userId={session.user.id}
+                    username={session.user.username}
+                    notificationCount={3}
+                  />
+                )}
+              </div>
+            </StoreProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>
