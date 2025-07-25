@@ -9,8 +9,23 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Sparkles } from 'lucide-react'
 
 export const metadata = {
-  title: 'Feed | Community Platform',
-  description: 'Your personalized community feed',
+  title: 'Community Feed',
+  description: 'Stay connected with your community. Discover new posts, engage with content, and share your thoughts with like-minded people.',
+  keywords: ['feed', 'community', 'posts', 'social', 'updates', 'timeline', 'content'],
+  openGraph: {
+    title: 'Community Feed | Community Platform',
+    description: 'Stay connected with your community. Discover new posts, engage with content, and share your thoughts.',
+    type: 'website',
+    url: '/feed',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Community Feed | Community Platform',
+    description: 'Stay connected with your community. Discover new posts and engage with content.',
+  },
+  alternates: {
+    canonical: '/feed',
+  },
 }
 
 export default async function FeedPage() {

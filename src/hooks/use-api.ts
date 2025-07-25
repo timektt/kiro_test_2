@@ -16,7 +16,7 @@ const defaultFetcher = async (url: string) => {
 }
 
 // Generic API hook with error handling and loading states
-export function useAPI<T = any>(
+export function useApi<T = any>(
   key: string | null,
   fetcher = defaultFetcher,
   options?: SWRConfiguration
@@ -33,7 +33,7 @@ export function useAPI<T = any>(
       errorRetryInterval: 1000,
       onError: (error) => {
         if (options?.onError) {
-          options.onError(error)
+          options.onError(error, key, { revalidate: true })
         } else {
           addToast({
             type: 'error',

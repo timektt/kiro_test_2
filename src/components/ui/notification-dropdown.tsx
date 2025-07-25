@@ -14,7 +14,6 @@ import { EmptyState } from '@/components/ui/empty-state'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuHeader,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
@@ -180,4 +179,120 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button
-          variant=\"ghost\"\n          size=\"sm\"\n          className={cn('relative h-9 w-9 p-0', className)}\n        >\n          <Bell className=\"h-4 w-4\" />\n          {unreadCount > 0 && (\n            <Badge \n              variant=\"destructive\" \n              className=\"absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center\"\n            >\n              {unreadCount > 99 ? '99+' : unreadCount}\n            </Badge>\n          )}\n        </Button>\n      </DropdownMenuTrigger>\n      <DropdownMenuContent \n        align=\"end\" \n        className=\"w-80 p-0\"\n        sideOffset={8}\n      >\n        {/* Header */}\n        <div className=\"flex items-center justify-between p-4 border-b\">\n          <h3 className=\"font-semibold text-sm\">Notifications</h3>\n          <div className=\"flex items-center gap-2\">\n            {unreadCount > 0 && (\n              <Button\n                variant=\"ghost\"\n                size=\"sm\"\n                onClick={handleMarkAllAsRead}\n                disabled={isMarkingAllRead}\n                className=\"h-8 px-2 text-xs\"\n              >\n                <CheckCheck className=\"h-3 w-3 mr-1\" />\n                Mark all read\n              </Button>\n            )}\n            <Link href=\"/notifications\">\n              <Button variant=\"ghost\" size=\"sm\" className=\"h-8 px-2 text-xs\">\n                <Settings className=\"h-3 w-3 mr-1\" />\n                Settings\n              </Button>\n            </Link>\n          </div>\n        </div>\n\n        {/* Content */}\n        <div className=\"max-h-96\">\n          {isLoading ? (\n            <div className=\"p-4 text-center text-sm text-muted-foreground\">\n              Loading notifications...\n            </div>\n          ) : error ? (\n            <div className=\"p-4 text-center text-sm text-destructive\">\n              Failed to load notifications\n            </div>\n          ) : notifications.length === 0 ? (\n            <div className=\"p-8\">\n              <EmptyState\n                icon={Bell}\n                title=\"No notifications\"\n                description=\"You're all caught up!\"\n                compact\n              />\n            </div>\n          ) : (\n            <ScrollArea className=\"max-h-96\">\n              {notifications.map((notification) => (\n                <NotificationItem\n                  key={notification.id}\n                  notification={notification}\n                  onMarkAsRead={handleMarkAsRead}\n                  onMarkAsUnread={handleMarkAsUnread}\n                  onDelete={handleDelete}\n                  className=\"border-b-0\"\n                />\n              ))}\n            </ScrollArea>\n          )}\n        </div>\n\n        {/* Footer */}\n        {notifications.length > 0 && (\n          <>\n            <Separator />\n            <div className=\"p-3 text-center\">\n              <Link href=\"/notifications\">\n                <Button variant=\"ghost\" size=\"sm\" className=\"text-xs\">\n                  View all notifications\n                </Button>\n              </Link>\n            </div>\n          </>\n        )}\n      </DropdownMenuContent>\n    </DropdownMenu>\n  )\n}"
+          variant="ghost"
+          size="sm"
+          className={cn('relative h-9 w-9 p-0', className)}
+          aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
+          aria-expanded={isOpen}
+          aria-haspopup="menu"
+        >
+          <Bell className="h-4 w-4" />
+          {unreadCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-1 -right-1 h-5 w-5 p-0 text-xs flex items-center justify-center"
+              aria-label={`${unreadCount} unread notifications`}
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </Badge>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent 
+        align="end" 
+        className="w-80 p-0"
+        sideOffset={8}
+        role="menu"
+        aria-label="Notifications menu"
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="font-semibold text-sm" id="notifications-heading">Notifications</h3>
+          <div className="flex items-center gap-2">
+            {unreadCount > 0 && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleMarkAllAsRead}
+                disabled={isMarkingAllRead}
+                className="h-8 px-2 text-xs"
+                aria-label="Mark all notifications as read"
+              >
+                <CheckCheck className="h-3 w-3 mr-1" />
+                Mark all read
+              </Button>
+            )}
+            <Link href="/notifications">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-8 px-2 text-xs"
+                aria-label="Open notification settings"
+              >
+                <Settings className="h-3 w-3 mr-1" />
+                Settings
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="max-h-96" role="region" aria-labelledby="notifications-heading">
+          {isLoading ? (
+            <div className="p-4 text-center text-sm text-muted-foreground" role="status" aria-live="polite">
+              Loading notifications...
+            </div>
+          ) : error ? (
+            <div className="p-4 text-center text-sm text-destructive" role="alert">
+              Failed to load notifications
+            </div>
+          ) : notifications.length === 0 ? (
+            <div className="p-8">
+              <EmptyState
+                icon={Bell}
+                title="No notifications"
+                description="You're all caught up!"
+                compact
+              />
+            </div>
+          ) : (
+            <ScrollArea className="max-h-96">
+              <ul role="list" aria-label="Notification list">
+                {notifications.map((notification) => (
+                  <li key={notification.id} role="listitem">
+                    <NotificationItem
+                      notification={notification}
+                      onMarkAsRead={handleMarkAsRead}
+                      onMarkAsUnread={handleMarkAsUnread}
+                      onDelete={handleDelete}
+                      className="border-b-0"
+                    />
+                  </li>
+                ))}
+              </ul>
+            </ScrollArea>
+          )}
+        </div>
+
+        {/* Footer */}
+        {notifications.length > 0 && (
+          <>
+            <Separator />
+            <div className="p-3 text-center">
+              <Link href="/notifications">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-xs"
+                  aria-label="View all notifications in full page"
+                >
+                  View all notifications
+                </Button>
+              </Link>
+            </div>
+          </>
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}

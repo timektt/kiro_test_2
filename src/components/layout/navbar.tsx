@@ -53,9 +53,22 @@ export function Navbar() {
   ]
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+    <>
+      {/* Skip to main content link for accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 bg-primary text-primary-foreground px-4 py-2 rounded-md"
+      >
+        Skip to main content
+      </a>
+      
+      <nav 
+        className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        role="navigation"
+        aria-label="Main navigation"
+      >
+        <div className="container mx-auto px-4">
+          <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
@@ -76,8 +89,9 @@ export function Navbar() {
                     key={item.href}
                     href={item.href}
                     className="flex items-center space-x-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={`Navigate to ${item.label}`}
                   >
-                    <Icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" aria-hidden="true" />
                     <span>{item.label}</span>
                   </Link>
                 )
@@ -101,7 +115,12 @@ export function Navbar() {
                 {/* User Menu */}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Button 
+                      variant="ghost" 
+                      className="relative h-9 w-9 rounded-full"
+                      aria-label={`User menu for ${session.user.name || session.user.username}`}
+                      aria-haspopup="menu"
+                    >
                       <Avatar className="h-9 w-9">
                         <AvatarImage 
                           src={session.user.image || undefined} 

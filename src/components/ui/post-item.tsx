@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo, useCallback, useMemo } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Heart, MessageCircle, Share, MoreHorizontal, Bookmark } from 'lucide-react'
@@ -39,7 +39,7 @@ interface PostItemProps {
   className?: string
 }
 
-export function PostItem({
+export const PostItem = memo<PostItemProps>(({
   post,
   currentUserId,
   onLike,
@@ -47,37 +47,47 @@ export function PostItem({
   onShare,
   onBookmark,
   className,
-}: PostItemProps) {
+}) => {
   const [isLiked, setIsLiked] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likeCount, setLikeCount] = useState(post._count?.likes || 0)
 
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     if (onLike) {
       onLike(post.id)
     }
     setIsLiked(!isLiked)
     setLikeCount(prev => isLiked ? prev - 1 : prev + 1)
-  }
+  }, [onLike, post.id, isLiked])
 
-  const handleComment = () => {
+  const handleComment = useCallback(() => {
     if (onComment) {
       onComment(post.id)
     }
-  }
+  }, [onComment, post.id])
 
-  const handleShare = () => {
+  const handleShare = useCallback(() => {
     if (onShare) {
       onShare(post.id)
     }
-  }
+  }, [onShare, post.id])
 
-  const handleBookmark = () => {
+  const handleBookmark = useCallback(() => {
     if (onBookmark) {
       onBookmark(post.id)
     }
     setIsBookmarked(!isBookmarked)
-  }
+  }, [onBookmark, post.id, isBookmarked])
+
+  const formattedTime = useMemo(() => 
+    formatRelativeTime(post.createdAt), 
+    [post.createdAt]
+  )
+
+  const commentCount = useMemo(() => 
+    post._count?.comments || 0, 
+    [post._count?.comments]
+  )
 
   const isOwnPost = currentUserId === post.authorId
 
@@ -88,7 +98,7 @@ export function PostItem({
           <UserBadge user={post.author} size="md" showMBTI />
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
-              {formatRelativeTime(post.createdAt)}
+              {formattedTime}
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -163,7 +173,7 @@ export function PostItem({
               >
                 <Link href={`/post/${post.id}`}>
                   <MessageCircle className="h-4 w-4" />
-                  <span className="text-sm">{post._count?.comments || 0}</span>
+                  <span className="text-sm">{commentCount}</span>
                 </Link>
               </Button>
 
@@ -194,4 +204,6 @@ export function PostItem({
       </CardContent>
     </Card>
   )
-}
+})
+
+PostItem.displayName = 'PostItem'

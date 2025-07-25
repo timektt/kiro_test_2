@@ -2,13 +2,14 @@ import { Star, Quote } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import Image from 'next/image'
 
 const testimonials = [
   {
     name: 'Sarah Chen',
     role: 'Software Engineer',
     mbti: 'INTJ',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+    avatar: '/avatars/sarah-chen.jpg',
     content: 'Finally found a platform where I can connect with people who actually understand how I think. The MBTI matching is incredibly accurate!',
     rating: 5
   },
@@ -16,7 +17,7 @@ const testimonials = [
     name: 'Marcus Johnson',
     role: 'Creative Director',
     mbti: 'ENFP',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    avatar: '/avatars/marcus-johnson.jpg',
     content: 'The community here is amazing. I\'ve made genuine friendships and found collaborators for my creative projects. The personality insights are spot-on.',
     rating: 5
   },
@@ -24,7 +25,7 @@ const testimonials = [
     name: 'Emily Rodriguez',
     role: 'Psychology Student',
     mbti: 'INFJ',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    avatar: '/avatars/emily-rodriguez.jpg',
     content: 'As someone studying psychology, I appreciate how thoughtfully the MBTI system is integrated. It\'s not just a gimmick - it really helps with meaningful connections.',
     rating: 5
   },
@@ -32,7 +33,7 @@ const testimonials = [
     name: 'David Kim',
     role: 'Entrepreneur',
     mbti: 'ENTJ',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face',
+    avatar: '/avatars/david-kim.jpg',
     content: 'Great for networking and finding like-minded individuals. The ranking system motivates me to contribute quality content and engage meaningfully.',
     rating: 5
   },
@@ -40,7 +41,7 @@ const testimonials = [
     name: 'Lisa Thompson',
     role: 'Teacher',
     mbti: 'ESFJ',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+    avatar: '/avatars/lisa-thompson.jpg',
     content: 'I love how supportive and understanding this community is. Everyone respects different personality types and communication styles.',
     rating: 5
   },
@@ -48,7 +49,7 @@ const testimonials = [
     name: 'Alex Rivera',
     role: 'Data Analyst',
     mbti: 'ISTP',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    avatar: '/avatars/alex-rivera.jpg',
     content: 'The platform is well-designed and intuitive. I appreciate the focus on quality conversations over mindless scrolling.',
     rating: 5
   }
@@ -107,12 +108,16 @@ export function TestimonialsSection() {
 
                   {/* Author */}
                   <div className="flex items-center gap-3">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-                      <AvatarFallback>
-                        {testimonial.name.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="relative h-12 w-12 rounded-full overflow-hidden">
+                      <Image
+                        src={testimonial.avatar}
+                        alt={`${testimonial.name} avatar`}
+                        fill
+                        className="object-cover"
+                        sizes="48px"
+                        priority={index < 3}
+                      />
+                    </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">
                         <h4 className="font-semibold">{testimonial.name}</h4>

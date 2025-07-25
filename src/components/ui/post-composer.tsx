@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo, useCallback, useMemo } from 'react'
+import Image from 'next/image'
 import { ImageIcon, Smile, X, Globe, Users, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -28,20 +29,20 @@ interface PostComposerProps {
   disabled?: boolean
 }
 
-export function PostComposer({
+export const PostComposer = memo<PostComposerProps>(({
   currentUser,
   onSubmit,
   placeholder = "What's on your mind?",
   className,
   disabled = false,
-}: PostComposerProps) {
+}) => {
   const [content, setContent] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [visibility, setVisibility] = useState<'public' | 'followers' | 'private'>('public')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [showImageInput, setShowImageInput] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!content.trim() || isSubmitting || disabled) return
@@ -60,24 +61,45 @@ export function PostComposer({
     } finally {
       setIsSubmitting(false)
     }
-  }
+  }, [content, isSubmitting, disabled, onSubmit, imageUrl, visibility])
 
-  const getInitials = (name: string) => {
+  const getInitials = useCallback((name: string) => {
     return name
       .split(' ')
       .map(word => word[0])
       .join('')
       .toUpperCase()
       .slice(0, 2)
-  }
+  }, [])
 
-  const visibilityIcons = {
+  const visibilityIcons = useMemo(() => ({
     public: Globe,
     followers: Users,
     private: Lock,
-  }
+  }), [])
 
   const VisibilityIcon = visibilityIcons[visibility]
+
+  const canSubmit = useMemo(() => 
+    content.trim().length > 0 && !isSubmitting && !disabled,
+    [content, isSubmitting, disabled]
+  )
+
+  const handleImageToggle = useCallback(() => {
+    setShowImageInput(prev => !prev)
+  }, [])
+
+  const handleImageUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setImageUrl(e.target.value)
+  }, [])
+
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value)
+  }, [])
+
+  const handleVisibilityChange = useCallback((value: 'public' | 'followers' | 'private') => {
+    setVisibility(value)
+  }, [])
 
   if (!currentUser) {
     return null
@@ -96,7 +118,10 @@ export function PostComposer({
           <div className="flex-1">
             <p className="font-medium text-sm">{currentUser.name || currentUser.username}</p>
             <Select value={visibility} onValueChange={(value: any) => setVisibility(value)}>
-              <SelectTrigger className="w-auto h-auto p-0 border-none shadow-none text-xs text-muted-foreground">
+              <SelectTrigger 
+                className="w-auto h-auto p-0 border-none shadow-none text-xs text-muted-foreground"
+                aria-label="Select post visibility"
+              >
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -160,9 +185,11 @@ export function PostComposer({
               </div>
               {imageUrl && (
                 <div className="relative">
-                  <img
+                  <Image
                     src={imageUrl}
                     alt="Preview"
+                    width={500}
+                    height={256}
                     className="w-full max-h-64 object-cover rounded-lg"
                     onError={() => setImageUrl('')}
                   />
@@ -219,4 +246,6 @@ export function PostComposer({
       </CardContent>
     </Card>
   )
-}
+})
+
+PostComposer.displayName = 'PostComposer'

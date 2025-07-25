@@ -112,6 +112,19 @@ const nextConfig = {
 
       // Module concatenation
       config.optimization.concatenateModules = true
+
+      // Enable tree shaking for specific packages
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'lodash': 'lodash-es',
+      }
+
+      // Dead code elimination
+      config.optimization.innerGraph = true
+      config.optimization.providedExports = true
+
+      // Minimize unused code
+      config.optimization.mangleExports = 'size'
     }
 
     // Bundle analyzer (uncomment to analyze bundle)

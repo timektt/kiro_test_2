@@ -19,12 +19,48 @@ export async function generateMetadata({ params }: ProfilePageProps) {
   if (!user) {
     return {
       title: 'User Not Found | Community Platform',
+      description: 'The requested user profile could not be found.',
     }
   }
 
+  const displayName = user.name || user.username
+  const description = user.bio || `View ${displayName}'s profile, posts, and activity on Community Platform. Connect and discover shared interests.`
+
   return {
-    title: `${user.name || user.username} (@${user.username}) | Community Platform`,
-    description: user.bio || `View ${user.name || user.username}'s profile on Community Platform`,
+    title: `${displayName} (@${user.username})`,
+    description,
+    keywords: [
+      'profile', 'user', user.username, displayName,
+      'community', 'posts', 'social', 'MBTI', user.mbti?.type || 'personality'
+    ].filter(Boolean),
+    openGraph: {
+      title: `${displayName} (@${user.username}) | Community Platform`,
+      description,
+      type: 'profile',
+      url: `/profile/${user.username}`,
+      images: user.image ? [
+        {
+          url: user.image,
+          width: 400,
+          height: 400,
+          alt: `${displayName}'s profile picture`,
+        }
+      ] : [],
+      profile: {
+        firstName: user.name?.split(' ')[0],
+        lastName: user.name?.split(' ').slice(1).join(' '),
+        username: user.username,
+      },
+    },
+    twitter: {
+      card: 'summary',
+      title: `${displayName} (@${user.username})`,
+      description,
+      images: user.image ? [user.image] : [],
+    },
+    alternates: {
+      canonical: `/profile/${user.username}`,
+    },
   }
 }
 

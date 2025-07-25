@@ -40,12 +40,27 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, onKeyDown, ...props }, ref) => {
+    const handleKeyDown = React.useCallback((event: React.KeyboardEvent<HTMLButtonElement>) => {
+      // Handle Enter and Space keys for accessibility
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault()
+        const target = event.currentTarget
+        if (target && !target.disabled) {
+          target.click()
+        }
+      }
+      
+      // Call custom onKeyDown if provided
+      onKeyDown?.(event)
+    }, [onKeyDown])
+
     const Comp = asChild ? Slot : "button"
     return (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        onKeyDown={handleKeyDown}
         {...props}
       />
     )

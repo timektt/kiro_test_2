@@ -15,6 +15,7 @@
     "db:generate": "prisma generate",
     "db:seed": "tsx prisma/seed.ts",
     "db:setup": "tsx scripts/migrate-and-seed.ts",
+    "db:setup:production": "tsx scripts/production-db-setup.ts",
     "db:reset": "prisma migrate reset --force && npm run db:seed",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -36,6 +37,10 @@
     "health-check": "curl -f http://localhost:3000/api/health || exit 1",
     "validate-env": "node scripts/validate-env.js",
     "validate-deployment": "node scripts/post-deploy-validation.js",
+    "validate-requirements": "node scripts/validate-requirements.js",
+    "performance-audit": "node scripts/performance-audit.js",
+    "test-auth": "tsx scripts/test-auth-providers.ts",
+    "final-check": "node scripts/final-integration-check.js",
     "precommit": "npm run lint && npm run test:ci",
     "postinstall": "prisma generate"
   },

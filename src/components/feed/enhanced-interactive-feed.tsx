@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, memo, useCallback, useMemo } from 'react'
 import { PostItem } from '@/components/ui/post-item'
 import { FeedFilter } from '@/components/ui/feed-filter'
 import { LoadingFeed } from '@/components/ui/loading-feed'
@@ -13,9 +13,11 @@ import { useUIStore } from '@/stores/ui-store'
 
 interface EnhancedInteractiveFeedProps {
   currentUserId: string
+  realTime?: boolean
+  className?: string
 }
 
-export function EnhancedInteractiveFeed({ currentUserId }: EnhancedInteractiveFeedProps) {
+export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ currentUserId, realTime, className }) => {
   const {
     feedType,
     sortBy,
@@ -42,10 +44,10 @@ export function EnhancedInteractiveFeed({ currentUserId }: EnhancedInteractiveFe
   const { toggleLike, isToggling } = useLikePost()
   
   // Combine real posts with optimistic posts
-  const allPosts = [...optimisticPosts, ...posts]
+  const allPosts = useMemo(() => [...optimisticPosts, ...posts], [optimisticPosts, posts])
   
   // Handle filter changes
-  const handleFilterChange = (filter: string) => {
+  const handleFilterChange = useCallback((filter: string) => {
     if (filter === 'home') {
       setFeedType('following')
     } else if (filter === 'discover') {
@@ -227,4 +229,6 @@ export function EnhancedInteractiveFeed({ currentUserId }: EnhancedInteractiveFe
       )}
     </div>
   )
-}
+})
+
+EnhancedInteractiveFeed.displayName = 'EnhancedInteractiveFeed'

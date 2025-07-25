@@ -1,12 +1,89 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense, memo, useMemo } from 'react'
 import { useRankings, useRankingStats } from '@/hooks/use-rankings'
-import { RankingBoard } from '@/components/rankings/ranking-board'
+import dynamic from 'next/dynamic'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TrendingUp, Users, Trophy, Activity } from 'lucide-react'
+
+// Dynamic import for ranking board
+const RankingBoard = dynamic(
+  () => import('@/components/rankings/ranking-board').then(mod => ({ default: mod.RankingBoard })),
+  {
+    loading: () => (
+      <div className="space-y-4">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />
+        ))}
+      </div>
+    ),
+    ssr: false,
+  }
+)
+
+const StatsOverview = memo(({ stats }: { stats: any }) => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-blue-100 rounded-lg">
+            <Users className="w-5 h-5 text-blue-600" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
+            <div className="text-sm text-muted-foreground">Total Users</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-green-100 rounded-lg">
+            <Activity className="w-5 h-5 text-green-600" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold">{stats.activeUsers.toLocaleString()}</div>
+            <div className="text-sm text-muted-foreground">Active Users</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-yellow-100 rounded-lg">
+            <Trophy className="w-5 h-5 text-yellow-600" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold">{stats.topPerformers.length}</div>
+            <div className="text-sm text-muted-foreground">Top Performers</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    <Card>
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-purple-100 rounded-lg">
+            <TrendingUp className="w-5 h-5 text-purple-600" />
+          </div>
+          <div>
+            <div className="text-2xl font-bold">{Object.keys(stats.categoryStats).length}</div>
+            <div className="text-sm text-muted-foreground">Categories</div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+))
+
+StatsOverview.displayName = 'StatsOverview'
 
 export default function RankingsPage() {
   const { rankings, isLoading: rankingsLoading } = useRankings()
@@ -24,63 +101,15 @@ export default function RankingsPage() {
 
         {/* Stats Overview */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
-                    <Users className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">Total Users</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-green-100 rounded-lg">
-                    <Activity className="w-5 h-5 text-green-600" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{stats.activeUsers.toLocaleString()}</div>
-                    <div className="text-sm text-muted-foreground">Active Users</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-yellow-100 rounded-lg">
-                    <Trophy className="w-5 h-5 text-yellow-600" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{stats.topPerformers.length}</div>
-                    <div className="text-sm text-muted-foreground">Top Performers</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-purple-100 rounded-lg">
-                    <TrendingUp className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="text-2xl font-bold">{Object.keys(stats.categoryStats).length}</div>
-                    <div className="text-sm text-muted-foreground">Categories</div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          <Suspense fallback={
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
+              ))}
+            </div>
+          }>
+            <StatsOverview stats={stats} />
+          </Suspense>
         )}
 
         <Tabs defaultValue="leaderboard" className="space-y-6">
@@ -91,7 +120,15 @@ export default function RankingsPage() {
           </TabsList>
 
           <TabsContent value="leaderboard">
-            <RankingBoard rankings={rankings} isLoading={rankingsLoading} />
+            <Suspense fallback={
+              <div className="space-y-4">
+                {Array.from({ length: 10 }).map((_, i) => (
+                  <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />
+                ))}
+              </div>
+            }>
+              <RankingBoard rankings={rankings} isLoading={rankingsLoading} />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="categories" className="space-y-6">

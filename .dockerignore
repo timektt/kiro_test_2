@@ -1,0 +1,17 @@
+node_modules
+.git
+.env
+*.log
+Dockerfile
+README.md
+``` |
+| ⚠️ **Prisma Binary Platform** | ถ้าจะ deploy ขึ้น server OS อื่น ต้องระวังว่า `npx prisma generate` ใช้ binary สำหรับ Alpine หรือไม่ <br>✅ อาจเพิ่ม `binaryTargets` ใน `schema.prisma`:
+```ts
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
+}
+``` |
+| ⚠️ **ไม่มี HEALTHCHECK** | ควรเพิ่มคำสั่ง `HEALTHCHECK` ใน `runner` stage เช่น:
+```dockerfile
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
