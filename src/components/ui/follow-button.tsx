@@ -100,7 +100,7 @@ export function FollowButton({
   if (error) {
     return (
       <Button
-        variant=\"outline\"
+        variant="outline"
         size={size}
         disabled
         className={cn('opacity-50', className)}
@@ -124,7 +124,7 @@ export function FollowButton({
     >
       {isLoading ? (
         <>
-          <Loader2 className=\"h-4 w-4 mr-2 animate-spin\" />
+          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
           {isFollowing ? 'Unfollowing...' : 'Following...'}
         </>
       ) : (
@@ -132,17 +132,17 @@ export function FollowButton({
           {showIcon && (
             <>
               {isFollowing ? (
-                <UserMinus className=\"h-4 w-4 mr-2\" />
+                <UserMinus className="h-4 w-4 mr-2" />
               ) : (
-                <UserPlus className=\"h-4 w-4 mr-2\" />
+                <UserPlus className="h-4 w-4 mr-2" />
               )}
             </>
           )}
-          <span className=\"group-hover:hidden\">
+          <span className="group-hover:hidden">
             {isFollowing ? 'Following' : 'Follow'}
           </span>
           {isFollowing && (
-            <span className=\"hidden group-hover:inline\">
+            <span className="hidden group-hover:inline">
               Unfollow{username ? ` ${username}` : ''}
             </span>
           )}

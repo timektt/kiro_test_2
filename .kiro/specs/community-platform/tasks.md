@@ -139,7 +139,6 @@
   - _Requirements: 8.2, 8.3_
 
 - [x] 13. Performance Optimization
-
   - Implement image optimization with Next.js Image component
 
   - Add database query optimization and indexing
@@ -190,4 +189,10 @@
   - Validate all requirements are met and functioning
   - _Requirements: All requirements validation_
 
-  Task 18: Final Fixes for Imports, Warnings, and Audit Improvements
+  ## Task 17 - Fix All Broken Imports & Missing Files
+Status: Not Started
+Goal: Identify and create any missing components, utils, or route handlers used in `@/` imports that are not yet implemented.
+Priority: High
+
+
+  ## Task 18: Final Fixes for Imports, Warnings, and Audit Improvements

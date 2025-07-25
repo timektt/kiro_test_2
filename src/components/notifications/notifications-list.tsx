@@ -1,15 +1,15 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
-import { Bell, Filter, CheckCheck, Trash2 } from 'lucide-react'
+import { Bell, Filter, CheckCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { NotificationItem } from '@/components/ui/notification-item'
 import { EmptyState } from '@/components/ui/empty-state'
-import { LoadingFeed } from '@/components/ui/loading-feed'
+import { LoadingSkeleton } from '@/components/ui/loading-skeleton'
 import {
   Select,
   SelectContent,
@@ -96,7 +96,7 @@ export function NotificationsList({ className }: NotificationsListProps) {
   )
 
   // Update notifications when data changes
-  useState(() => {
+  useEffect(() => {
     if (data?.notifications) {
       if (page === 1) {
         setAllNotifications(data.notifications)
@@ -107,7 +107,7 @@ export function NotificationsList({ className }: NotificationsListProps) {
   }, [data, page])
 
   // Reset when tab changes
-  useState(() => {
+  useEffect(() => {
     setPage(1)
     setAllNotifications([])
   }, [currentTab])
@@ -228,8 +228,8 @@ export function NotificationsList({ className }: NotificationsListProps) {
     return (
       <EmptyState
         icon={Bell}
-        title=\"Authentication Required\"
-        description=\"Please sign in to view your notifications\"
+        title="Authentication Required"
+        description="Please sign in to view your notifications"
       />
     )
   }
@@ -238,7 +238,7 @@ export function NotificationsList({ className }: NotificationsListProps) {
     return (
       <EmptyState
         icon={Bell}
-        title=\"Error Loading Notifications\"
+        title="Error Loading Notifications"
         description={error.message || 'Failed to load notifications'}
       />
     )
@@ -248,65 +248,65 @@ export function NotificationsList({ className }: NotificationsListProps) {
     <div className={className}>
       <Card>
         <CardHeader>
-          <div className=\"flex items-center justify-between\">
-            <CardTitle className=\"flex items-center gap-2\">
-              <Bell className=\"h-5 w-5\" />
+          <div className="flex items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+              <Bell className="h-5 w-5" />
               Notifications
               {data?.unreadCount ? (
-                <span className=\"text-sm font-normal text-muted-foreground\">
+                <span className="text-sm font-normal text-muted-foreground">
                   ({data.unreadCount} unread)
                 </span>
               ) : null}
             </CardTitle>
-            <div className=\"flex items-center gap-2\">
+            <div className="flex items-center gap-2">
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger className=\"w-32\">
-                  <Filter className=\"h-4 w-4 mr-2\" />
+                <SelectTrigger className="w-32">
+                  <Filter className="h-4 w-4 mr-2" />
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=\"all\">All Types</SelectItem>
-                  <SelectItem value=\"LIKE\">Likes</SelectItem>
-                  <SelectItem value=\"COMMENT\">Comments</SelectItem>
-                  <SelectItem value=\"FOLLOW\">Follows</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
+                  <SelectItem value="LIKE">Likes</SelectItem>
+                  <SelectItem value="COMMENT">Comments</SelectItem>
+                  <SelectItem value="FOLLOW">Follows</SelectItem>
                 </SelectContent>
               </Select>
               {data?.unreadCount ? (
                 <Button
-                  variant=\"outline\"
-                  size=\"sm\"
+                  variant="outline"
+                  size="sm"
                   onClick={handleMarkAllAsRead}
                   disabled={isMarkingAllRead}
                 >
-                  <CheckCheck className=\"h-4 w-4 mr-2\" />
+                  <CheckCheck className="h-4 w-4 mr-2" />
                   Mark all read
                 </Button>
               ) : null}
             </div>
           </div>
         </CardHeader>
-        <CardContent className=\"p-0\">
+        <CardContent className="p-0">
           <Tabs value={currentTab} onValueChange={handleTabChange}>
-            <div className=\"px-6 pb-4\">
-              <TabsList className=\"grid w-full grid-cols-2\">
-                <TabsTrigger value=\"all\">All</TabsTrigger>
-                <TabsTrigger value=\"unread\">
+            <div className="px-6 pb-4">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="all">All</TabsTrigger>
+                <TabsTrigger value="unread">
                   Unread {data?.unreadCount ? `(${data.unreadCount})` : ''}
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent value={currentTab} className=\"mt-0\">
+            <TabsContent value={currentTab} className="mt-0">
               {isLoading && allNotifications.length === 0 ? (
-                <LoadingFeed />
+                <LoadingSkeleton />
               ) : filteredNotifications.length === 0 ? (
-                <div className=\"p-8\">
+                <div className="p-8">
                   <EmptyState
                     icon={Bell}
                     title={currentTab === 'unread' ? 'No unread notifications' : 'No notifications'}
                     description={
                       currentTab === 'unread' 
-                        ? \"You're all caught up!\" 
+                        ? "You're all caught up!" 
                         : 'Notifications will appear here when you receive likes, comments, or follows.'
                     }
                   />
@@ -325,4 +325,25 @@ export function NotificationsList({ className }: NotificationsListProps) {
 
                   {/* Load More */}
                   {data?.pagination.hasMore && (
-                    <div className=\"p-6 text-center border-t\">\n                      <Button \n                        variant=\"outline\" \n                        onClick={handleLoadMore}\n                        disabled={isLoadingMore}\n                      >\n                        {isLoadingMore ? 'Loading...' : 'Load More'}\n                      </Button>\n                      <p className=\"text-xs text-muted-foreground mt-2\">\n                        Showing {filteredNotifications.length} of {data.pagination.total} notifications\n                      </p>\n                    </div>\n                  )}\n                </div>\n              )}\n            </TabsContent>\n          </Tabs>\n        </CardContent>\n      </Card>\n    </div>\n  )\n}"
+                    <div className="p-6 text-center border-t">
+                      <Button 
+                        variant="outline" 
+                        onClick={handleLoadMore}
+                        disabled={isLoadingMore}
+                      >
+                        {isLoadingMore ? 'Loading...' : 'Load More'}
+                      </Button>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Showing {filteredNotifications.length} of {data.pagination.total} notifications
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

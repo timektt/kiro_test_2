@@ -16,7 +16,7 @@ export default async function NotificationsPage() {
   }
 
   return (
-    <div className=\"container max-w-4xl mx-auto py-8\">
+    <div className="container max-w-4xl mx-auto py-8">
       <NotificationsList />
     </div>
   )

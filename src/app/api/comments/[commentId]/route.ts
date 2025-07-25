@@ -8,6 +8,14 @@ export async function GET(
   { params }: { params: { commentId: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
     const comment = await prisma.comment.findUnique({
       where: { id: params.commentId },
       include: {
@@ -23,6 +31,8 @@ export async function GET(
           select: {
             id: true,
             content: true,
+            isPublic: true,
+            authorId: true,
           },
         },
       },
@@ -32,6 +42,16 @@ export async function GET(
       return NextResponse.json(
         { error: 'Comment not found' },
         { status: 404 }
+      )
+    }
+
+    // Check access to private posts
+    if (!comment.post.isPublic && 
+        comment.post.authorId !== session.user.id && 
+        comment.authorId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Access denied' },
+        { status: 403 }
       )
     }
 
@@ -60,7 +80,7 @@ export async function PUT(
 
     const { content } = await request.json()
 
-    // Check if comment exists and user owns it
+    // Check if comment exists and user owns it or is admin
     const existingComment = await prisma.comment.findUnique({
       where: { id: params.commentId },
     })
@@ -72,16 +92,22 @@ export async function PUT(
       )
     }
 
-    if (existingComment.authorId !== session.user.id) {
+    const isOwner = existingComment.authorId === session.user.id
+    const isAdmin = session.user.role === 'ADMIN'
+
+    if (!isOwner && !isAdmin) {
       return NextResponse.json(
-        { error: 'Forbidden' },
+        { error: 'Access denied' },
         { status: 403 }
       )
     }
 
     const updatedComment = await prisma.comment.update({
       where: { id: params.commentId },
-      data: { content },
+      data: { 
+        content,
+        updatedAt: new Date()
+      },
       include: {
         author: {
           select: {
@@ -117,7 +143,7 @@ export async function DELETE(
       )
     }
 
-    // Check if comment exists and user owns it
+    // Check if comment exists and user owns it or is admin
     const existingComment = await prisma.comment.findUnique({
       where: { id: params.commentId },
     })
@@ -129,9 +155,12 @@ export async function DELETE(
       )
     }
 
-    if (existingComment.authorId !== session.user.id) {
+    const isOwner = existingComment.authorId === session.user.id
+    const isAdmin = session.user.role === 'ADMIN'
+
+    if (!isOwner && !isAdmin) {
       return NextResponse.json(
-        { error: 'Forbidden' },
+        { error: 'Access denied' },
         { status: 403 }
       )
     }
@@ -140,7 +169,10 @@ export async function DELETE(
       where: { id: params.commentId },
     })
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Comment deleted successfully' 
+    })
   } catch (error) {
     console.error('Error deleting comment:', error)
     return NextResponse.json(

@@ -45,6 +45,9 @@ import {
 import { EmptyState } from '@/components/ui/empty-state'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { cn } from '@/lib/utils'
+import page from '@/app/page'
+import page from '@/app/page'
+import page from '@/app/page'
 
 interface User {
   id: string
@@ -206,18 +209,18 @@ export function UserManagement({ adminUser }: UserManagementProps) {
     return (
       <EmptyState
         icon={Users}
-        title=\"Error Loading Users\"
+        title="Error Loading Users"
         description={error.message || 'Failed to load users'}
       />
     )
   }
 
   return (
-    <div className=\"space-y-6\">
+    <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className=\"text-3xl font-bold\">User Management</h1>
-        <p className=\"text-muted-foreground\">
+        <h1 className="text-3xl font-bold">User Management</h1>
+        <p className="text-muted-foreground">
           Manage users, roles, and account status
         </p>
       </div>
@@ -225,24 +228,24 @@ export function UserManagement({ adminUser }: UserManagementProps) {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className=\"text-lg\">Filters</CardTitle>
+          <CardTitle className="text-lg">Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className=\"flex flex-col sm:flex-row gap-4\">
+          <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
-            <div className=\"relative flex-1\">
-              <Search className=\"absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground\" />
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder=\"Search users by username, name, or email...\"
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
-                className=\"pl-10\"
+                className="pl-10"
               />
             </div>
 
             {/* Role Filter */}
             <Select value={roleFilter} onValueChange={(value) => handleFilterChange('role', value)}>
-              <SelectTrigger className=\"w-full sm:w-40\">
+              <SelectTrigger className="w-full sm:w-40">
                 <SelectValue placeholder=\"Role\" />
               </SelectTrigger>
               <SelectContent>
@@ -255,7 +258,7 @@ export function UserManagement({ adminUser }: UserManagementProps) {
 
             {/* Status Filter */}
             <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
-              <SelectTrigger className=\"w-full sm:w-40\">
+              <SelectTrigger className="w-full sm:w-40">
                 <SelectValue placeholder=\"Status\" />
               </SelectTrigger>
               <SelectContent>
@@ -271,21 +274,21 @@ export function UserManagement({ adminUser }: UserManagementProps) {
       {/* Users List */}
       <Card>
         <CardHeader>
-          <CardTitle className=\"flex items-center gap-2\">
-            <Users className=\"h-5 w-5\" />
+          <CardTitle className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
             Users
             {data?.pagination.total && (
-              <span className=\"text-sm font-normal text-muted-foreground\">
+              <span className="text-sm font-normal text-muted-foreground">
                 ({data.pagination.total} total)
               </span>
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className=\"p-0\">
+        <CardContent className="p-0">
           {isLoading ? (
             <LoadingFeed />
           ) : !data?.users?.length ? (
-            <div className=\"p-8\">
+            <div className="p-8">
               <EmptyState
                 icon={Users}
                 title=\"No users found\"
@@ -297,11 +300,11 @@ export function UserManagement({ adminUser }: UserManagementProps) {
               {data.users.map((user: User) => (
                 <div
                   key={user.id}
-                  className=\"flex items-center justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors\"
+                  className="flex items-center justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
                 >
-                  <div className=\"flex items-center gap-4 flex-1 min-w-0\">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
                     {/* Avatar */}
-                    <Avatar className=\"h-12 w-12\">
+                    <Avatar className="h-12 w-12">
                       <AvatarImage src={user.image || undefined} />
                       <AvatarFallback>
                         {user.name?.[0] || user.username[0]}
@@ -309,29 +312,29 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                     </Avatar>
 
                     {/* User Info */}
-                    <div className=\"flex-1 min-w-0\">
-                      <div className=\"flex items-center gap-2 mb-1\">
-                        <h3 className=\"font-semibold truncate\">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold truncate">
                           {user.name || user.username}
                         </h3>
                         <Badge variant={getRoleBadgeVariant(user.role)}>
                           {user.role}
                         </Badge>
                         {!user.isActive && (
-                          <Badge variant=\"outline\" className=\"text-red-600\">
+                          <Badge variant=\"outline\" className="text-red-600">
                             Inactive
                           </Badge>
                         )}
                         {user.mbti && (
-                          <Badge variant=\"secondary\" className=\"text-xs\">
+                          <Badge variant=\"secondary\" className="text-xs">
                             {user.mbti.type}
                           </Badge>
                         )}
                       </div>
-                      <p className=\"text-sm text-muted-foreground mb-1\">
+                      <p className="text-sm text-muted-foreground mb-1">
                         @{user.username} • {user.email}
                       </p>
-                      <div className=\"flex items-center gap-4 text-xs text-muted-foreground\">
+                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span>{user._count.posts} posts</span>
                         <span>{user._count.followers} followers</span>
                         <span>{user._count.following} following</span>
@@ -341,47 +344,47 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                   </div>
 
                   {/* Actions */}
-                  <div className=\"flex-shrink-0 ml-4\">
+                  <div className="flex-shrink-0 ml-4">
                     {user.id !== adminUser.id && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant=\"ghost\" size=\"sm\" className=\"h-8 w-8 p-0\">
-                            <MoreHorizontal className=\"h-4 w-4\" />
+                          <Button variant=\"ghost\" size=\"sm\" className="h-8 w-8 p-0">
+                            <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align=\"end\" className=\"w-48\">
+                        <DropdownMenuContent align=\"end\" className="w-48">
                           <DropdownMenuItem onClick={() => setSelectedUser(user)}>
-                            <Eye className=\"h-4 w-4 mr-2\" />
+                            <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           {user.isActive ? (
                             <DropdownMenuItem 
                               onClick={() => setActionDialog({ type: 'deactivate', user })}
-                              className=\"text-yellow-600\"
+                              className="text-yellow-600"
                             >
-                              <UserX className=\"h-4 w-4 mr-2\" />
+                              <UserX className="h-4 w-4 mr-2" />
                               Deactivate
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem 
                               onClick={() => setActionDialog({ type: 'activate', user })}
-                              className=\"text-green-600\"
+                              className="text-green-600"
                             >
-                              <UserCheck className=\"h-4 w-4 mr-2\" />
+                              <UserCheck className="h-4 w-4 mr-2" />
                               Activate
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem onClick={() => setActionDialog({ type: 'changeRole', user })}>
-                            <Shield className=\"h-4 w-4 mr-2\" />
+                            <Shield className="h-4 w-4 mr-2" />
                             Change Role
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem 
                             onClick={() => setActionDialog({ type: 'delete', user })}
-                            className=\"text-destructive\"
+                            className="text-destructive"
                           >
-                            <Trash2 className=\"h-4 w-4 mr-2\" />
+                            <Trash2 className="h-4 w-4 mr-2" />
                             Delete User
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -393,14 +396,14 @@ export function UserManagement({ adminUser }: UserManagementProps) {
 
               {/* Pagination */}
               {data.pagination.hasMore && (
-                <div className=\"p-6 text-center border-t\">
+                <div className="p-6 text-center border-t">
                   <Button 
                     variant=\"outline\" 
                     onClick={() => setPage(page + 1)}
                   >
                     Load More Users
                   </Button>
-                  <p className=\"text-xs text-muted-foreground mt-2\">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Showing {data.users.length} of {data.pagination.total} users
                   </p>
                 </div>

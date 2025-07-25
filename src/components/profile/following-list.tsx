@@ -173,33 +173,33 @@ export function FollowingList({ userId, username, className }: FollowingListProp
     <div className={className}>
       <Card>
         <CardHeader>
-          <CardTitle className=\"flex items-center gap-2\">
-            <UserCheck className=\"h-5 w-5\" />
+          <CardTitle className="flex items-center gap-2">
+            <UserCheck className="h-5 w-5" />
             Following
             {data?.pagination.total ? (
-              <span className=\"text-sm font-normal text-muted-foreground\">
+              <span className="text-sm font-normal text-muted-foreground">
                 ({data.pagination.total})
               </span>
             ) : null}
           </CardTitle>
           
           {/* Search */}
-          <div className=\"relative\">
-            <Search className=\"absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground\" />
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder=\"Search following...\"
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
-              className=\"pl-10\"
+              className="pl-10"
             />
           </div>
         </CardHeader>
         
-        <CardContent className=\"p-0\">
+        <CardContent className="p-0">
           {isLoading && allFollowing.length === 0 ? (
             <LoadingFeed />
           ) : allFollowing.length === 0 ? (
-            <div className=\"p-8\">
+            <div className="p-8">
               <EmptyState
                 icon={UserCheck}
                 title={searchQuery ? 'No users found' : `${username || 'This user'} isn't following anyone yet`}
@@ -215,12 +215,12 @@ export function FollowingList({ userId, username, className }: FollowingListProp
               {allFollowing.map((user) => (
                 <div
                   key={user.id}
-                  className=\"flex items-center justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors\"
+                  className="flex items-center justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
                 >
-                  <div className=\"flex items-center gap-3 flex-1 min-w-0\">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
                     {/* Avatar */}
                     <Link href={`/profile/${user.username}`}>
-                      <Avatar className=\"h-12 w-12\">
+                      <Avatar className="h-12 w-12">
                         <AvatarImage src={user.image || undefined} />
                         <AvatarFallback>
                           {user.name?.[0] || user.username[0]}
@@ -229,38 +229,38 @@ export function FollowingList({ userId, username, className }: FollowingListProp
                     </Link>
 
                     {/* User Info */}
-                    <div className=\"flex-1 min-w-0\">
+                    <div className="flex-1 min-w-0">
                       <Link 
                         href={`/profile/${user.username}`}
-                        className=\"block hover:text-primary transition-colors\"
+                        className="block hover:text-primary transition-colors"
                       >
-                        <div className=\"flex items-center gap-2\">
-                          <h3 className=\"font-semibold truncate\">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold truncate">
                             {user.name || user.username}
                           </h3>
                           {user.mbti && (
-                            <Badge variant=\"secondary\" className=\"text-xs\">
+                            <Badge variant=\"secondary\" className="text-xs">
                               {user.mbti.type}
                             </Badge>
                           )}
                           {!user.isActive && (
-                            <Badge variant=\"outline\" className=\"text-xs\">
+                            <Badge variant=\"outline\" className="text-xs">
                               Inactive
                             </Badge>
                           )}
                         </div>
-                        <p className=\"text-sm text-muted-foreground\">
+                        <p className="text-sm text-muted-foreground">
                           @{user.username}
                         </p>
                         {user.bio && (
-                          <p className=\"text-sm text-muted-foreground mt-1 line-clamp-2\">
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
                             {user.bio}
                           </p>
                         )}
                       </Link>
 
                       {/* Stats */}
-                      <div className=\"flex items-center gap-4 mt-2 text-xs text-muted-foreground\">
+                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                         <span>{user._count.posts} posts</span>
                         <span>{user._count.followers} followers</span>
                         <span>{user._count.following} following</span>
@@ -269,7 +269,7 @@ export function FollowingList({ userId, username, className }: FollowingListProp
                   </div>
 
                   {/* Follow Button */}
-                  <div className=\"flex-shrink-0 ml-4\">
+                  <div className="flex-shrink-0 ml-4">
                     <FollowButton
                       userId={user.id}
                       username={user.username}
@@ -282,7 +282,7 @@ export function FollowingList({ userId, username, className }: FollowingListProp
 
               {/* Load More */}
               {data?.pagination.hasMore && (
-                <div className=\"p-6 text-center border-t\">
+                <div className="p-6 text-center border-t">
                   <Button 
                     variant=\"outline\" 
                     onClick={handleLoadMore}
@@ -290,14 +290,14 @@ export function FollowingList({ userId, username, className }: FollowingListProp
                   >
                     {isLoadingMore ? (
                       <>
-                        <Loader2 className=\"h-4 w-4 mr-2 animate-spin\" />
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                         Loading...
                       </>
                     ) : (
                       'Load More'
                     )}
                   </Button>
-                  <p className=\"text-xs text-muted-foreground mt-2\">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Showing {allFollowing.length} of {data.pagination.total} following
                   </p>
                 </div>
