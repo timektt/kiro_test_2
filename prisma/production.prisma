@@ -1,0 +1,212 @@
+// Production Prisma Configuration
+// This file contains production-specific database settings
+
+generator client {
+  provider = "prisma-client-js"
+  // Production optimizations
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+  previewFeatures = ["jsonProtocol", "metrics", "tracing"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+  
+  // Connection pool settings for production
+  relationMode = "prisma"
+}
+
+// User model with production optimizations
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String?   @unique
+  name          String?
+  bio           String?
+  avatar        String?
+  location      String?
+  website       String?
+  mbtiType      String?
+  isAdmin       Boolean   @default(false)
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  followers     Follow[] @relation("UserFollowers")
+  following     Follow[] @relation("UserFollowing")
+  notifications Notification[]
+
+  // Indexes for production performance
+  @@index([email])
+  @@index([username])
+  @@index([createdAt])
+  @@index([isAdmin])
+  @@map("users")
+}
+
+// Account model for NextAuth
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@map("accounts")
+}
+
+// Session model for NextAuth
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expires])
+  @@map("sessions")
+}
+
+// Verification token model for NextAuth
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@index([expires])
+  @@map("verificationtokens")
+}
+
+// Post model with production optimizations
+model Post {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  image     String?
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments Comment[]
+  likes    Like[]
+
+  // Indexes for production performance
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@map("posts")
+}
+
+// Comment model with production optimizations
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  postId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  // Indexes for production performance
+  @@index([postId])
+  @@index([authorId])
+  @@index([createdAt])
+  @@map("comments")
+}
+
+// Like model with production optimizations
+model Like {
+  id     String @id @default(cuid())
+  postId String
+  userId String
+
+  // Relations
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Unique constraint to prevent duplicate likes
+  @@unique([postId, userId])
+  @@index([postId])
+  @@index([userId])
+  @@map("likes")
+}
+
+// Follow model with production optimizations
+model Follow {
+  id          String @id @default(cuid())
+  followerId  String
+  followingId String
+
+  // Relations
+  follower  User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  // Unique constraint to prevent duplicate follows
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@map("follows")
+}
+
+// Notification model with production optimizations
+model Notification {
+  id        String            @id @default(cuid())
+  type      NotificationType
+  message   String
+  read      Boolean           @default(false)
+  userId    String
+  createdAt DateTime          @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes for production performance
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([type])
+  @@map("notifications")
+}
+
+// Notification types enum
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
+  SYSTEM
+}
+
+// Production-specific indexes for performance
+// These are additional indexes that can be created manually for better performance
+
+// Composite indexes for common queries
+// CREATE INDEX CONCURRENTLY idx_posts_author_created ON posts(author_id, created_at DESC);
+// CREATE INDEX CONCURRENTLY idx_comments_post_created ON comments(post_id, created_at DESC);
+// CREATE INDEX CONCURRENTLY idx_notifications_user_read_created ON notifications(user_id, read, created_at DESC);
+// CREATE INDEX CONCURRENTLY idx_likes_post_user ON likes(post_id, user_id);
+// CREATE INDEX CONCURRENTLY idx_follows_follower_following ON follows(follower_id, following_id);

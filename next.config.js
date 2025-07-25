@@ -18,6 +18,9 @@ const nextConfig = {
     serverComponentsExternalPackages: ['prisma', '@prisma/client'],
   },
 
+  // Production output configuration
+  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+
   // Image optimization
   images: {
     domains: [
