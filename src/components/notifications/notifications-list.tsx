@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { NotificationItem } from '@/components/ui/notification-item'
 import { EmptyState } from '@/components/ui/empty-state'
-import { LoadingSkeleton } from '@/components/ui/loading-skeleton'
+import { Skeleton } from '@/components/ui/loading-skeleton'
 import {
   Select,
   SelectContent,
@@ -298,7 +298,17 @@ export function NotificationsList({ className }: NotificationsListProps) {
 
             <TabsContent value={currentTab} className="mt-0">
               {isLoading && allNotifications.length === 0 ? (
-                <LoadingSkeleton />
+                <div className="p-6 space-y-4">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <div key={i} className="flex items-start gap-3 p-4 border-b">
+                      <Skeleton className="h-8 w-8 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               ) : filteredNotifications.length === 0 ? (
                 <div className="p-8">
                   <EmptyState

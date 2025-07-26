@@ -6,6 +6,9 @@ node_modules/
 dist/
 out/
 
+integration-report.md
+
+
 # 💻 System Files
 .DS_Store
 Thumbs.db

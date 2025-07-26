@@ -36,6 +36,11 @@ interface PostItemProps {
   onComment?: (postId: string) => void
   onShare?: (postId: string) => void
   onBookmark?: (postId: string) => void
+  onEdit?: (postId: string) => void
+  onDelete?: (postId: string) => void
+  onReport?: (postId: string) => void
+  onHide?: (postId: string) => void
+  onBlock?: (userId: string) => void
   className?: string
 }
 
@@ -46,6 +51,11 @@ export const PostItem = memo<PostItemProps>(({
   onComment,
   onShare,
   onBookmark,
+  onEdit,
+  onDelete,
+  onReport,
+  onHide,
+  onBlock,
   className,
 }) => {
   const [isLiked, setIsLiked] = useState(false)
@@ -79,6 +89,36 @@ export const PostItem = memo<PostItemProps>(({
     setIsBookmarked(!isBookmarked)
   }, [onBookmark, post.id, isBookmarked])
 
+  const handleEdit = useCallback(() => {
+    if (onEdit) {
+      onEdit(post.id)
+    }
+  }, [onEdit, post.id])
+
+  const handleDelete = useCallback(() => {
+    if (onDelete) {
+      onDelete(post.id)
+    }
+  }, [onDelete, post.id])
+
+  const handleReport = useCallback(() => {
+    if (onReport) {
+      onReport(post.id)
+    }
+  }, [onReport, post.id])
+
+  const handleHide = useCallback(() => {
+    if (onHide) {
+      onHide(post.id)
+    }
+  }, [onHide, post.id])
+
+  const handleBlock = useCallback(() => {
+    if (onBlock) {
+      onBlock(post.author.id)
+    }
+  }, [onBlock, post.author.id])
+
   const formattedTime = useMemo(() => 
     formatRelativeTime(post.createdAt), 
     [post.createdAt]
@@ -109,16 +149,27 @@ export const PostItem = memo<PostItemProps>(({
               <DropdownMenuContent align="end">
                 {isOwnPost ? (
                   <>
-                    <DropdownMenuItem>Edit post</DropdownMenuItem>
-                    <DropdownMenuItem className="text-destructive">
+                    <DropdownMenuItem onClick={handleEdit}>
+                      Edit post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={handleDelete}
+                      className="text-destructive"
+                    >
                       Delete post
                     </DropdownMenuItem>
                   </>
                 ) : (
                   <>
-                    <DropdownMenuItem>Report post</DropdownMenuItem>
-                    <DropdownMenuItem>Hide post</DropdownMenuItem>
-                    <DropdownMenuItem>Block user</DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleReport}>
+                      Report post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleHide}>
+                      Hide post
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleBlock}>
+                      Block user
+                    </DropdownMenuItem>
                   </>
                 )}
               </DropdownMenuContent>
@@ -192,6 +243,7 @@ export const PostItem = memo<PostItemProps>(({
               variant="ghost"
               size="sm"
               onClick={handleBookmark}
+              aria-label="Bookmark post"
               className={cn(
                 'text-muted-foreground hover:text-yellow-500',
                 isBookmarked && 'text-yellow-500'

@@ -236,7 +236,7 @@ export function UserManagement({ adminUser }: UserManagementProps) {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder=\"Search users by username, name, or email...\"
+                placeholder="Search users by username, name, or email..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10"
@@ -246,25 +246,25 @@ export function UserManagement({ adminUser }: UserManagementProps) {
             {/* Role Filter */}
             <Select value={roleFilter} onValueChange={(value) => handleFilterChange('role', value)}>
               <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder=\"Role\" />
+                <SelectValue placeholder="Role" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value=\"ALL\">All Roles</SelectItem>
-                <SelectItem value=\"USER\">User</SelectItem>
-                <SelectItem value=\"MODERATOR\">Moderator</SelectItem>
-                <SelectItem value=\"ADMIN\">Admin</SelectItem>
+                <SelectItem value="ALL">All Roles</SelectItem>
+                <SelectItem value="USER">User</SelectItem>
+                <SelectItem value="MODERATOR">Moderator</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
               </SelectContent>
             </Select>
 
             {/* Status Filter */}
             <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
               <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder=\"Status\" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value=\"ALL\">All Status</SelectItem>
-                <SelectItem value=\"ACTIVE\">Active</SelectItem>
-                <SelectItem value=\"INACTIVE\">Inactive</SelectItem>
+                <SelectItem value="ALL">All Status</SelectItem>
+                <SelectItem value="ACTIVE">Active</SelectItem>
+                <SelectItem value="INACTIVE">Inactive</SelectItem>
               </SelectContent>
             </Select>
           </div>
