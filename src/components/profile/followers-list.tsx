@@ -310,3 +310,4 @@ export function FollowersList({ userId, username, className }: FollowersListProp
   )
 }
 
+export default FollowersList

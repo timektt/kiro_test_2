@@ -114,3 +114,4 @@ export function UserBadge({
   return content
 }
 
+export default UserBadge

@@ -210,3 +210,4 @@ export function MBTIQuickSelector({ selectedType, onSelect, disabled = false }: 
   )
 }
 
+export default MBTISelector

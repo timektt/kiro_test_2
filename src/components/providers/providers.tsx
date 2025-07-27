@@ -29,3 +29,4 @@ export function Providers({ children, session }: ProvidersProps) {
   )
 }
 
+export default Providers

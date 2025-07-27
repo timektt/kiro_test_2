@@ -192,3 +192,4 @@ export function MBTIStats({ mbti, stats }: MBTIStatsProps) {
   )
 }
 
+export default MBTIProfile

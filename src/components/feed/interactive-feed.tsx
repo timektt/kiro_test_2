@@ -190,3 +190,4 @@ export function InteractiveFeed({ initialPosts, currentUserId }: InteractiveFeed
   )
 }
 
+export default InteractiveFeed

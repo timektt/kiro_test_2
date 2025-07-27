@@ -123,3 +123,4 @@ export function StatsSection() {
   )
 }
 
+export default StatsSection

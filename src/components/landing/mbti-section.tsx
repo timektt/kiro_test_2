@@ -184,3 +184,4 @@ export function MBTISection() {
   )
 }
 
+export default MBTISection

@@ -16,7 +16,7 @@ const LoadingSpinner = () => (
 export const AdminDashboard = dynamic(
   () => import('@/components/admin/admin-dashboard').then(mod => ({ default: mod.AdminDashboard })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false, // Admin components don't need SSR
   }
 )
@@ -24,7 +24,7 @@ export const AdminDashboard = dynamic(
 export const UserManagement = dynamic(
   () => import('@/components/admin/user-management').then(mod => ({ default: mod.UserManagement })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false,
   }
 )
@@ -32,7 +32,7 @@ export const UserManagement = dynamic(
 export const ContentModeration = dynamic(
   () => import('@/components/admin/content-moderation').then(mod => ({ default: mod.ContentModeration })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false,
   }
 )
@@ -41,48 +41,46 @@ export const ContentModeration = dynamic(
 export const RankingBoard = dynamic(
   () => import('@/components/rankings/ranking-board').then(mod => ({ default: mod.RankingBoard })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
   }
 )
 
 export const MBTISelector = dynamic(
   () => import('@/components/identity/mbti-selector').then(mod => ({ default: mod.MBTISelector })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
   }
 )
 
 export const ProfileEditForm = dynamic(
   () => import('@/components/profile/profile-edit-form').then(mod => ({ default: mod.ProfileEditForm })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
   }
 )
 
 // Chart components - loaded only when needed
 export const AnalyticsChart = dynamic(
-  () => import('@/components/analytics/chart').catch(() => ({ default: () => <div>Chart not available</div> })),
+  () => Promise.resolve({ default: () => <div>Chart not available</div> }),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false,
   }
 )
 
 // Modal components - loaded on demand
 export const PostComposerModal = dynamic(
-  () => import('@/components/modals/post-composer-modal').catch(() => ({ 
-    default: () => import('@/components/ui/post-composer').then(mod => ({ default: mod.PostComposer }))
-  })),
+  () => import('@/components/ui/post-composer').then(mod => ({ default: mod.PostComposer })),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
   }
 )
 
 // Settings components - loaded when accessed
 export const SettingsPanel = dynamic(
-  () => import('@/components/settings/settings-panel').catch(() => ({ default: () => <div>Settings not available</div> })),
+  () => Promise.resolve({ default: () => <div>Settings not available</div> }),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false,
   }
 )
@@ -103,18 +101,18 @@ export const NotificationsList = dynamic(
 
 // Search components - loaded when search is used
 export const SearchResults = dynamic(
-  () => import('@/components/search/search-results').catch(() => ({ default: () => <div>Search not available</div> })),
+  () => Promise.resolve({ default: () => <div>Search not available</div> }),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false,
   }
 )
 
 // File upload components - loaded when needed
 export const FileUploader = dynamic(
-  () => import('@/components/upload/file-uploader').catch(() => ({ default: () => <div>Upload not available</div> })),
+  () => Promise.resolve({ default: () => <div>Upload not available</div> }),
   {
-    loading: LoadingSpinner,
+    loading: () => <LoadingSpinner />,
     ssr: false,
   }
 )
@@ -133,7 +131,7 @@ export function createDynamicComponent<T extends ComponentType<any>>(
       default: options.fallback || (() => <div>Component not available</div>) 
     })),
     {
-      loading: options.loading || LoadingSpinner,
+      loading: options.loading || (() => <LoadingSpinner />),
       ssr: options.ssr !== false,
     }
   )

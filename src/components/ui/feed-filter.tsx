@@ -77,3 +77,4 @@ export function FeedFilter({ currentFilter, onFilterChange, className }: FeedFil
   )
 }
 
+export default FeedFilter

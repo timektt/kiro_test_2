@@ -12,9 +12,9 @@ export const metadata = {
 export default async function SignInPage() {
   const session = await getServerSession(authOptions)
 
-  // Redirect if already authenticated
+  // Redirect if already authenticated - go to homepage instead of feed to avoid potential loops
   if (session) {
-    redirect('/feed')
+    redirect('/')
   }
 
   return (

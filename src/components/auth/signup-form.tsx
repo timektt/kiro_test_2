@@ -60,7 +60,7 @@ export function SignUpForm() {
       if (signInResult?.error) {
         setError('Account created but failed to sign in. Please try signing in manually.')
       } else if (signInResult?.ok) {
-        router.push('/feed')
+        router.push('/')
         router.refresh()
       }
     } catch (error) {
@@ -217,3 +217,4 @@ export function SignUpForm() {
   )
 }
 
+export default SignUpForm

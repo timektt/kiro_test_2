@@ -190,3 +190,4 @@ export function AdminLayout({ children, adminUser }: AdminLayoutProps) {
   )
 }
 
+export default AdminLayout

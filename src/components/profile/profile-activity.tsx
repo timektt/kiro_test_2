@@ -270,3 +270,4 @@ export function ProfileActivity({ user, className }: ProfileActivityProps) {
   )
 }
 
+export default ProfileActivity

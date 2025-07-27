@@ -358,3 +358,4 @@ export function NotificationsList({ className }: NotificationsListProps) {
   )
 }
 
+export default NotificationsList

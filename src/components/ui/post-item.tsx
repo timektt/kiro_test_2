@@ -260,3 +260,4 @@ export const PostItem = memo<PostItemProps>(({
 
 PostItem.displayName = 'PostItem'
 
+export default PostItem

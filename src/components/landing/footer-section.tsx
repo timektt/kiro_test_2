@@ -209,3 +209,4 @@ export function FooterSection() {
   )
 }
 
+export default FooterSection

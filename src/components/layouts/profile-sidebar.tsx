@@ -224,3 +224,4 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
   )
 }
 
+export default ProfileSidebar

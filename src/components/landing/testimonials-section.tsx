@@ -151,3 +151,4 @@ export function TestimonialsSection() {
     </section>
   )
 }
+export default TestimonialsSection

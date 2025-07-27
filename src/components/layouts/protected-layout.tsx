@@ -33,3 +33,4 @@ export async function ProtectedLayout({
   return <>{children}</>
 }
 
+export default ProtectedLayout

@@ -82,3 +82,4 @@ export function MBTITooltip({ mbti, children }: MBTITooltipProps) {
   )
 }
 
+export default MBTIBadge

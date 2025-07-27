@@ -16,3 +16,4 @@ export function SessionProvider({ children, session }: SessionProviderProps) {
   )
 }
 
+export default SessionProvider

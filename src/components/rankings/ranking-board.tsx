@@ -257,3 +257,4 @@ function formatPeriod(period: string): string {
 
 
 
+export default RankingBoard

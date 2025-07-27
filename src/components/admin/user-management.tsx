@@ -480,3 +480,4 @@ export function UserManagement({ adminUser }: UserManagementProps) {
   )
 }
 
+export default UserManagement

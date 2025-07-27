@@ -54,3 +54,4 @@ export const RealTimeFeed = memo<RealTimeFeedProps>(({ userId, className }) => {
 
 RealTimeFeed.displayName = 'RealTimeFeed'
 
+export default RealTimeFeed

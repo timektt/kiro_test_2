@@ -20,6 +20,9 @@ export function SignInForm() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/feed'
   
+  // Prevent redirect loops by ensuring callbackUrl is not the signin page
+  const safeCallbackUrl = callbackUrl === '/auth/signin' ? '/feed' : callbackUrl
+  
   const [isLoading, setIsLoading] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -48,7 +51,7 @@ export function SignInForm() {
       } else if (result?.ok) {
         // Refresh session and redirect
         await getSession()
-        router.push(callbackUrl)
+        router.push(safeCallbackUrl)
         router.refresh()
       }
     } catch (error) {
@@ -63,7 +66,7 @@ export function SignInForm() {
     setError(null)
 
     try {
-      await signIn(provider, { callbackUrl })
+      await signIn(provider, { callbackUrl: safeCallbackUrl })
     } catch (error) {
       setError('Failed to sign in with OAuth provider')
       setIsLoading(false)
@@ -182,3 +185,4 @@ export function SignInForm() {
   )
 }
 
+export default SignInForm

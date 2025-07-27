@@ -233,3 +233,4 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
 
 EnhancedInteractiveFeed.displayName = 'EnhancedInteractiveFeed'
 
+export default EnhancedInteractiveFeed

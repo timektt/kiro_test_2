@@ -46,7 +46,13 @@ const quickStats = [
   }
 ]
 
-export function CTASection() {
+import { Session } from 'next-auth'
+
+interface CTASectionProps {
+  session?: Session | null
+}
+
+export function CTASection({ session }: CTASectionProps) {
   return (
     <section className="py-20 lg:py-32 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
       <div className="container mx-auto px-4">
@@ -90,30 +96,52 @@ export function CTASection() {
 
             {/* Primary CTA */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                <Link href="/auth/signup">
-                  Join the Community
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              
-              <Button variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                <Link href="/auth/signin">
-                  Sign In
-                </Link>
-              </Button>
+              {session ? (
+                // Authenticated user - show feed and profile buttons
+                <>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                    <Link href="/feed">
+                      Go to Feed
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  
+                  <Button variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                    <Link href={`/profile/${session.user.username || session.user.id}`}>
+                      View Profile
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                // Unauthenticated user - show signup/signin buttons
+                <>
+                  <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                    <Link href="/auth/signup">
+                      Join the Community
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Link>
+                  </Button>
+                  
+                  <Button variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                    <Link href="/auth/signin">
+                      Sign In
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
-          {/* Auth Options */}
-          <Card className="bg-background/50 backdrop-blur-sm border-2">
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold mb-2">Multiple Ways to Join</h3>
-                <p className="text-muted-foreground">
-                  Choose your preferred sign-up method and get started in seconds
-                </p>
-              </div>
+          {/* Auth Options - only show for unauthenticated users */}
+          {!session && (
+            <Card className="bg-background/50 backdrop-blur-sm border-2">
+              <CardContent className="p-8">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold mb-2">Multiple Ways to Join</h3>
+                  <p className="text-muted-foreground">
+                    Choose your preferred sign-up method and get started in seconds
+                  </p>
+                </div>
 
               <div className="grid md:grid-cols-3 gap-6">
                 {authOptions.map((option, index) => {
@@ -144,8 +172,9 @@ export function CTASection() {
                   </Link>
                 </p>
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Security & Trust */}
           <div className="text-center mt-12 space-y-4">
@@ -170,3 +199,4 @@ export function CTASection() {
   )
 }
 
+export default CTASection

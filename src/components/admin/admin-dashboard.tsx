@@ -279,3 +279,4 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
   )
 }
 
+export default AdminDashboard

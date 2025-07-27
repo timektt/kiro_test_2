@@ -250,3 +250,4 @@ export const PostComposer = memo<PostComposerProps>(({
 
 PostComposer.displayName = 'PostComposer'
 
+export default PostComposer

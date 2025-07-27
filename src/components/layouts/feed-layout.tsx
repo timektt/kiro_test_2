@@ -28,3 +28,4 @@ export function FeedLayout({ children, sidebar, className }: FeedLayoutProps) {
   )
 }
 
+export default FeedLayout

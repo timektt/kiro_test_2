@@ -79,3 +79,4 @@ export function QuickStats({
   )
 }
 
+export default QuickStats

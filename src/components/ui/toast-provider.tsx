@@ -99,3 +99,4 @@ export function ToastProvider() {
   )
 }
 
+export default ToastProvider

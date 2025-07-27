@@ -36,3 +36,4 @@ export function LoadingFeed({ count = 5 }: LoadingFeedProps) {
   )
 }
 
+export default LoadingFeed

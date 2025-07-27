@@ -2,8 +2,14 @@ import Link from 'next/link'
 import { ArrowRight, Play, Sparkles, Users, MessageSquare } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Session } from 'next-auth'
 
-export function HeroSection() {
+interface HeroSectionProps {
+  session?: Session | null
+}
+
+export function HeroSection({ session }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       {/* Background decoration */}
@@ -37,17 +43,44 @@ export function HeroSection() {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-8">
-            <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-              <Link href="/auth/signup">
-                Start Your Journey
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            
-            <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-full">
-              <Play className="mr-2 h-5 w-5" />
-              Watch Demo
-            </Button>
+            {session ? (
+              // Authenticated user - show welcome message and feed button
+              <div className="flex flex-col items-center gap-4">
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar className="h-12 w-12">
+                    <AvatarImage src={session.user.image || undefined} alt={session.user.name || 'User'} />
+                    <AvatarFallback>
+                      {session.user.name?.[0] || session.user.email?.[0] || 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="text-left">
+                    <p className="text-lg font-semibold">Welcome back, {session.user.name || 'there'}! 👋</p>
+                    <p className="text-muted-foreground">Ready to connect with your community?</p>
+                  </div>
+                </div>
+                <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                  <Link href="/feed">
+                    Go to Feed
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+              </div>
+            ) : (
+              // Unauthenticated user - show signup/demo buttons
+              <>
+                <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                  <Link href="/auth/signup">
+                    Start Your Journey
+                    <ArrowRight className="ml-2 h-5 w-5" />
+                  </Link>
+                </Button>
+                
+                <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-full">
+                  <Play className="mr-2 h-5 w-5" />
+                  Watch Demo
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Social Proof */}
@@ -107,3 +140,4 @@ export function HeroSection() {
   )
 }
 
+export default HeroSection
