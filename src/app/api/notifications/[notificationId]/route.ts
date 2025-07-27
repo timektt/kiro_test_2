@@ -20,18 +20,12 @@ export async function GET(
     const notification = await prisma.notification.findUnique({
       where: { id: params.notificationId },
       include: {
-        actor: {
+        user: {
           select: {
             id: true,
             username: true,
             name: true,
             image: true,
-          },
-        },
-        post: {
-          select: {
-            id: true,
-            content: true,
           },
         },
       },
@@ -99,28 +93,21 @@ export async function PUT(
     }
 
     const body = await request.json()
-    const { isRead } = body
+    const { read } = body
 
     // Update notification
     const updatedNotification = await prisma.notification.update({
       where: { id: params.notificationId },
       data: {
-        isRead: Boolean(isRead),
-        readAt: Boolean(isRead) ? new Date() : null,
+        read: Boolean(read),
       },
       include: {
-        actor: {
+        user: {
           select: {
             id: true,
             username: true,
             name: true,
             image: true,
-          },
-        },
-        post: {
-          select: {
-            id: true,
-            content: true,
           },
         },
       },

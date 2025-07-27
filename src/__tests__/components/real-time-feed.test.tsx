@@ -72,7 +72,11 @@ const mockFeedData = {
 describe('RealTimeFeed', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
   })
 
   it('should render posts correctly', async () => {
@@ -132,7 +136,11 @@ describe('RealTimeFeed', () => {
   })
 
   it('should show authentication required when not logged in', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: null, 
+      status: 'unauthenticated',
+      update: jest.fn()
+    })
 
     render(<RealTimeFeed />)
 
@@ -309,7 +317,7 @@ describe('RealTimeFeed', () => {
       mutate: jest.fn(),
     })
 
-    render(<RealTimeFeed userId=\"user-1\" />)
+    render(<RealTimeFeed userId="user-1" />)
 
     expect(useSWR).toHaveBeenCalledWith(
       '/api/posts?page=1&limit=10&userId=user-1',
@@ -326,7 +334,7 @@ describe('RealTimeFeed', () => {
       mutate: jest.fn(),
     })
 
-    render(<RealTimeFeed userId=\"user-1\" />)
+    render(<RealTimeFeed userId="user-1" />)
 
     expect(screen.queryByPlaceholderText(/what's on your mind/i)).not.toBeInTheDocument()
   })

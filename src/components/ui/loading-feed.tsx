@@ -35,3 +35,4 @@ export function LoadingFeed({ count = 5 }: LoadingFeedProps) {
     </div>
   )
 }
+

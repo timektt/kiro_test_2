@@ -162,8 +162,8 @@ export function useFollowUser() {
   const { addToast } = useUIStore()
   
   const { trigger: triggerFollow, isMutating: isFollowing } = useSWRMutation(
-    (userId: string) => `/api/users/${userId}/follow`,
-    followUser,
+    '/api/users/follow',
+    (url: string, { arg }: { arg: string }) => followUser(`/api/users/${arg}/follow`),
     {
       onError: (error, key) => {
         // Revert optimistic update on error
@@ -179,8 +179,8 @@ export function useFollowUser() {
   )
   
   const { trigger: triggerUnfollow, isMutating: isUnfollowing } = useSWRMutation(
-    (userId: string) => `/api/users/${userId}/follow`,
-    unfollowUser,
+    '/api/users/unfollow',
+    (url: string, { arg }: { arg: string }) => unfollowUser(`/api/users/${arg}/follow`),
     {
       onError: (error, key) => {
         // Revert optimistic update on error
@@ -318,3 +318,4 @@ export function useSearchUsers(query: string, filters?: { mbti?: string }) {
     mutate,
   }
 }
+

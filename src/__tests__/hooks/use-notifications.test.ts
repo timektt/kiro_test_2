@@ -253,7 +253,7 @@ describe('useNotifications', () => {
       await result.current.loadMore()
     })
 
-    expect(global.fetch).toHaveBeenCalledWith('/api/notifications?page=2&limit=10')
+    expect(global.fetch).toHaveBeenCalledWith('/api/notifications?page=2&limit=20')
     expect(mockMutate).toHaveBeenCalled()
   })
 

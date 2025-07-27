@@ -81,3 +81,4 @@ export function MBTITooltip({ mbti, children }: MBTITooltipProps) {
     </div>
   )
 }
+

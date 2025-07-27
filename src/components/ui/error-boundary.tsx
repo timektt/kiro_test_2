@@ -140,3 +140,4 @@ export function withErrorBoundary<P extends object>(
 
   return WrappedComponent
 }
+

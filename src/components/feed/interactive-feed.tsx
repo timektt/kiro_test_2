@@ -189,3 +189,4 @@ export function InteractiveFeed({ initialPosts, currentUserId }: InteractiveFeed
     </div>
   )
 }
+

@@ -183,3 +183,4 @@ export const TrendingSidebar = memo<TrendingSidebarProps>(({ className }) => {
 })
 
 TrendingSidebar.displayName = 'TrendingSidebar'
+

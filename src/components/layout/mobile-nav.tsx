@@ -90,3 +90,4 @@ export function MobileNav({ userId, username, notificationCount = 0 }: MobileNav
     </nav>
   )
 }
+

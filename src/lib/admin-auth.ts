@@ -116,9 +116,18 @@ export function createAdminHandler(
   permission: 'USER_MANAGEMENT' | 'CONTENT_MODERATION' | 'SYSTEM_SETTINGS'
 ) {
   return function (
-    handler: (request: NextRequest, adminUser: AdminUser) => Promise<NextResponse>
+    handler: (request: NextRequest, adminUser: AdminUser, context?: any) => Promise<NextResponse>
   ) {
-    return withAdminAuth(async (request: NextRequest, adminUser: AdminUser) => {
+    return async (request: NextRequest, context?: any) => {
+      const adminUser = await checkAdminAuth()
+      
+      if (!adminUser) {
+        return NextResponse.json(
+          { error: 'Admin access required' },
+          { status: 403 }
+        )
+      }
+
       if (!hasAdminPermission(adminUser, permission)) {
         return NextResponse.json(
           { error: 'Insufficient permissions' },
@@ -126,7 +135,8 @@ export function createAdminHandler(
         )
       }
 
-      return handler(request, adminUser)
-    })
+      return handler(request, adminUser, context)
+    }
   }
 }
+

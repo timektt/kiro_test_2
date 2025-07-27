@@ -249,3 +249,119 @@ export function useCommentReplies(commentId: string, page = 1, limit = 10) {
     mutate,
   }
 }
+
+// Main useComments hook that matches test expectations
+export function useComments(postId: string | null) {
+  const { addToast } = useUIStore()
+  
+  const { data, error, isLoading, mutate } = useSWR(
+    postId ? `/api/posts/${postId}/comments` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      onError: (error) => {
+        addToast({
+          type: 'error',
+          title: 'Failed to load comments',
+          description: error.message,
+        })
+      },
+    }
+  )
+
+  const comments = data?.comments || []
+  const total = data?.total || 0
+
+  // Create comment function
+  const createComment = async (content: string) => {
+    if (!postId) return
+    
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content }),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to create comment')
+      }
+      
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to create comment')
+      }
+      
+      // Refresh the data
+      await mutate()
+      
+      addToast({
+        type: 'success',
+        title: 'Comment added successfully',
+      })
+      
+      return result.data
+    } catch (error) {
+      addToast({
+        type: 'error',
+        title: 'Failed to add comment',
+        description: error instanceof Error ? error.message : 'Unknown error',
+      })
+      throw error
+    }
+  }
+
+  // Delete comment function
+  const deleteComment = async (commentId: string) => {
+    if (!postId) return
+    
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments/${commentId}`, {
+        method: 'DELETE',
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete comment')
+      }
+      
+      const result = await response.json()
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to delete comment')
+      }
+      
+      // Refresh the data
+      await mutate()
+      
+      addToast({
+        type: 'success',
+        title: 'Comment deleted successfully',
+      })
+      
+      return result.data
+    } catch (error) {
+      addToast({
+        type: 'error',
+        title: 'Failed to delete comment',
+        description: error instanceof Error ? error.message : 'Unknown error',
+      })
+      throw error
+    }
+  }
+
+  // Refresh function
+  const refresh = async () => {
+    return await mutate()
+  }
+
+  return {
+    comments,
+    total,
+    isLoading,
+    error,
+    mutate,
+    createComment,
+    deleteComment,
+    refresh,
+  }
+}
+

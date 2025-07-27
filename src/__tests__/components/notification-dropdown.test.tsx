@@ -14,6 +14,7 @@ const mockSession = {
     username: 'testuser',
     email: 'test@example.com',
   },
+  expires: '2024-12-31T23:59:59.999Z',
 }
 
 const mockNotifications = [
@@ -73,14 +74,28 @@ describe('NotificationDropdown', () => {
   })
 
   it('should not render when user is not authenticated', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: null })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: null, 
+      status: 'unauthenticated',
+      update: jest.fn()
+    })
+    ;(useSWR as jest.Mock).mockReturnValue({
+      data: null,
+      error: null,
+      isLoading: false,
+      mutate: jest.fn(),
+    })
 
     const { container } = render(<NotificationDropdown />)
     expect(container.firstChild).toBeNull()
   })
 
   it('should render notification bell with unread count', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: mockNotificationData,
       error: null,
@@ -95,7 +110,11 @@ describe('NotificationDropdown', () => {
   })
 
   it('should show loading state', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: null,
       error: null,
@@ -112,7 +131,11 @@ describe('NotificationDropdown', () => {
   })
 
   it('should show error state', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: null,
       error: new Error('Failed to fetch'),
@@ -129,7 +152,11 @@ describe('NotificationDropdown', () => {
   })
 
   it('should show empty state when no notifications', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: { ...mockNotificationData, notifications: [], unreadCount: 0 },
       error: null,
@@ -143,11 +170,15 @@ describe('NotificationDropdown', () => {
     fireEvent.click(screen.getByRole('button'))
     
     expect(screen.getByText('No notifications')).toBeInTheDocument()
-    expect(screen.getByText(\"You're all caught up!\")).toBeInTheDocument()
+    expect(screen.getByText("You're all caught up!")).toBeInTheDocument()
   })
 
   it('should display notifications correctly', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: mockNotificationData,
       error: null,
@@ -168,7 +199,11 @@ describe('NotificationDropdown', () => {
 
   it('should handle mark all as read', async () => {
     const mockMutate = jest.fn()
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: mockNotificationData,
       error: null,
@@ -203,7 +238,11 @@ describe('NotificationDropdown', () => {
 
   it('should auto-mark notifications as read when dropdown opens', async () => {
     const mockMutate = jest.fn()
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: mockNotificationData,
       error: null,
@@ -236,7 +275,11 @@ describe('NotificationDropdown', () => {
   })
 
   it('should show View all notifications link', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: mockNotificationData,
       error: null,
@@ -255,7 +298,11 @@ describe('NotificationDropdown', () => {
   })
 
   it('should not show unread count badge when no unread notifications', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: { ...mockNotificationData, unreadCount: 0 },
       error: null,
@@ -269,7 +316,11 @@ describe('NotificationDropdown', () => {
   })
 
   it('should show 99+ for high unread counts', () => {
-    ;(useSession as jest.Mock).mockReturnValue({ data: mockSession })
+    ;(useSession as jest.Mock).mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
     ;(useSWR as jest.Mock).mockReturnValue({
       data: { ...mockNotificationData, unreadCount: 150 },
       error: null,

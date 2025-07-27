@@ -255,15 +255,5 @@ function formatPeriod(period: string): string {
   return period
 }
 
-const getRankingInfo = (type: RankingType) => {
-  const info = {
-    POSTS_LIKES: { name: 'Most Liked', description: 'Users with the most likes', icon: '❤️' },
-    POSTS_COUNT: { name: 'Most Active', description: 'Users with the most posts', icon: '📝' },
-    COMMENTS_COUNT: { name: 'Most Engaged', description: 'Users with the most comments', icon: '💬' },
-    FOLLOWERS_COUNT: { name: 'Most Followed', description: 'Users with the most followers', icon: '👥' },
-    ENGAGEMENT: { name: 'Overall Engagement', description: 'Combined engagement score', icon: '🌟' },
-    WEEKLY_ACTIVE: { name: 'Weekly Champion', description: 'Most active this week', icon: '🏆' },
-    MONTHLY_ACTIVE: { name: 'Monthly Champion', description: 'Most active this month', icon: '👑' }
-  }
-  return info[type]
-}
+
+

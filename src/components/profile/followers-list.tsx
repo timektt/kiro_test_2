@@ -153,8 +153,8 @@ export function FollowersList({ userId, username, className }: FollowersListProp
     return (
       <EmptyState
         icon={Users}
-        title=\"Authentication Required\"
-        description=\"Please sign in to view followers\"
+        title="Authentication Required"
+        description="Please sign in to view followers"
       />
     )
   }
@@ -163,7 +163,7 @@ export function FollowersList({ userId, username, className }: FollowersListProp
     return (
       <EmptyState
         icon={Users}
-        title=\"Error Loading Followers\"
+        title="Error Loading Followers"
         description={error.message || 'Failed to load followers'}
       />
     )
@@ -187,7 +187,7 @@ export function FollowersList({ userId, username, className }: FollowersListProp
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder=\"Search followers...\"
+              placeholder="Search followers..."
               value={searchQuery}
               onChange={(e) => handleSearch(e.target.value)}
               className="pl-10"
@@ -205,7 +205,7 @@ export function FollowersList({ userId, username, className }: FollowersListProp
                 title={searchQuery ? 'No followers found' : `${username || 'This user'} has no followers yet`}
                 description={
                   searchQuery 
-                    ? `No followers match \"${searchQuery}\"`
+                    ? `No followers match "${searchQuery}"`
                     : 'Followers will appear here when people start following.'
                 }
               />
@@ -239,12 +239,12 @@ export function FollowersList({ userId, username, className }: FollowersListProp
                             {follower.name || follower.username}
                           </h3>
                           {follower.mbti && (
-                            <Badge variant=\"secondary\" className="text-xs">
+                            <Badge variant="secondary" className="text-xs">
                               {follower.mbti.type}
                             </Badge>
                           )}
                           {!follower.isActive && (
-                            <Badge variant=\"outline\" className="text-xs">
+                            <Badge variant="outline" className="text-xs">
                               Inactive
                             </Badge>
                           )}
@@ -273,7 +273,7 @@ export function FollowersList({ userId, username, className }: FollowersListProp
                     <FollowButton
                       userId={follower.id}
                       username={follower.username}
-                      size=\"sm\"
+                      size="sm"
                       onFollowChange={(isFollowing) => handleFollowChange(follower.id, isFollowing)}
                     />
                   </div>
@@ -284,7 +284,7 @@ export function FollowersList({ userId, username, className }: FollowersListProp
               {data?.pagination.hasMore && (
                 <div className="p-6 text-center border-t">
                   <Button 
-                    variant=\"outline\" 
+                    variant="outline" 
                     onClick={handleLoadMore}
                     disabled={isLoadingMore}
                   >
@@ -309,3 +309,4 @@ export function FollowersList({ userId, username, className }: FollowersListProp
     </div>
   )
 }
+

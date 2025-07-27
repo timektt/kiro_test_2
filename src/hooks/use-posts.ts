@@ -267,8 +267,8 @@ export function useDeletePost() {
   const { addToast } = useUIStore()
   
   const { trigger, isMutating } = useSWRMutation(
-    (postId: string) => `/api/posts/${postId}`,
-    deletePost,
+    '/api/posts',
+    (url: string, { arg }: { arg: string }) => deletePost(`${url}/${arg}`),
     {
       onSuccess: (_, key) => {
         const postId = key.split('/').pop()!
@@ -300,8 +300,8 @@ export function useLikePost() {
   const { addToast } = useUIStore()
   
   const { trigger, isMutating } = useSWRMutation(
-    (postId: string) => `/api/posts/${postId}/like`,
-    toggleLike,
+    '/api/posts/like',
+    (url: string, { arg }: { arg: string }) => toggleLike(`/api/posts/${arg}/like`),
     {
       onError: (error, key) => {
         // Revert optimistic update on error
@@ -333,3 +333,4 @@ export function useLikePost() {
     isToggling: isMutating,
   }
 }
+

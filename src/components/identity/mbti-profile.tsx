@@ -191,3 +191,4 @@ export function MBTIStats({ mbti, stats }: MBTIStatsProps) {
     </Card>
   )
 }
+

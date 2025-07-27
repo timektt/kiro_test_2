@@ -357,3 +357,4 @@ export function NotificationsList({ className }: NotificationsListProps) {
     </div>
   )
 }
+

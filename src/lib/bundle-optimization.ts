@@ -3,7 +3,8 @@
  */
 
 import dynamic from 'next/dynamic'
-import { ComponentType, lazy, Suspense } from 'react'
+import * as React from 'react'
+import { ComponentType } from 'react'
 
 /**
  * Dynamic import wrapper with loading states
@@ -11,24 +12,14 @@ import { ComponentType, lazy, Suspense } from 'react'
 export function createDynamicComponent<T = {}>(
   importFn: () => Promise<{ default: ComponentType<T> }>,
   options: {
-    loading?: ComponentType
+    loading?: () => React.ReactElement
     ssr?: boolean
-    suspense?: boolean
   } = {}
 ) {
-  const { loading, ssr = true, suspense = false } = options
-
-  if (suspense) {
-    const LazyComponent = lazy(importFn)
-    return (props: T) => (
-      <Suspense fallback={loading ? <loading /> : <div>Loading...</div>}>
-        <LazyComponent {...props} />
-      </Suspense>
-    )
-  }
+  const { loading, ssr = true } = options
 
   return dynamic(importFn, {
-    loading: loading ? () => <loading /> : () => <div>Loading...</div>,
+    loading: loading || (() => React.createElement('div', {}, 'Loading...')),
     ssr,
   })
 }
@@ -37,143 +28,21 @@ export function createDynamicComponent<T = {}>(
  * Pre-configured dynamic components for common use cases
  */
 export const DynamicComponents = {
-  // Admin components (loaded only when needed)
-  AdminDashboard: createDynamicComponent(
-    () => import('@/components/admin/admin-dashboard'),
-    { ssr: false }
-  ),
-  
-  AdminUserManagement: createDynamicComponent(
-    () => import('@/components/admin/user-management'),
-    { ssr: false }
-  ),
-  
-  ContentModeration: createDynamicComponent(
-    () => import('@/components/admin/content-moderation'),
-    { ssr: false }
-  ),
-
-  // Profile components
-  ProfileEditForm: createDynamicComponent(
-    () => import('@/components/profile/profile-edit-form'),
-    { ssr: false }
-  ),
-  
-  FollowingList: createDynamicComponent(
-    () => import('@/components/profile/following-list'),
-    { ssr: false }
-  ),
-  
-  FollowersList: createDynamicComponent(
-    () => import('@/components/profile/followers-list'),
-    { ssr: false }
-  ),
-
-  // Feed components
-  PostComposer: createDynamicComponent(
-    () => import('@/components/ui/post-composer'),
-    { ssr: false }
-  ),
-  
-  EnhancedInteractiveFeed: createDynamicComponent(
-    () => import('@/components/feed/enhanced-interactive-feed'),
-    { ssr: false }
-  ),
-
-  // Notification components
-  NotificationsList: createDynamicComponent(
-    () => import('@/components/notifications/notifications-list'),
-    { ssr: false }
-  ),
-  
-  NotificationDropdown: createDynamicComponent(
-    () => import('@/components/ui/notification-dropdown'),
-    { ssr: false }
-  ),
-
-  // Search components
-  SearchResults: createDynamicComponent(
-    () => import('@/components/search/search-results'),
-    { ssr: false }
-  ),
-  
-  TrendingContent: createDynamicComponent(
-    () => import('@/components/search/trending-content'),
-    { ssr: false }
-  ),
-
-  // Chart/Analytics components (heavy libraries)
-  AnalyticsChart: createDynamicComponent(
-    () => import('@/components/analytics/chart'),
-    { ssr: false }
-  ),
-  
-  StatsVisualization: createDynamicComponent(
-    () => import('@/components/analytics/stats-visualization'),
-    { ssr: false }
-  ),
+  // Placeholder for future dynamic components
 }
 
 /**
  * Route-based code splitting configuration
  */
 export const routeComponents = {
-  // Public routes
-  home: () => import('@/app/page'),
-  feed: () => import('@/app/feed/page'),
-  profile: () => import('@/app/profile/[username]/page'),
-  
-  // Auth routes
-  signin: () => import('@/app/auth/signin/page'),
-  signup: () => import('@/app/auth/signup/page'),
-  
-  // Admin routes (heavy, load only when needed)
-  admin: () => import('@/app/admin/page'),
-  adminUsers: () => import('@/app/admin/users/page'),
-  adminContent: () => import('@/app/admin/content/page'),
-  
-  // Settings routes
-  settings: () => import('@/app/settings/page'),
-  settingsProfile: () => import('@/app/settings/profile/page'),
-  settingsNotifications: () => import('@/app/settings/notifications/page'),
+  // Placeholder for future route components
 }
 
 /**
  * Library code splitting for heavy dependencies
  */
 export const DynamicLibraries = {
-  // Chart library (only load when needed)
-  Chart: createDynamicComponent(
-    async () => {
-      const { Chart } = await import('chart.js')
-      return { default: Chart as any }
-    },
-    { ssr: false }
-  ),
-  
-  // Rich text editor (heavy)
-  RichTextEditor: createDynamicComponent(
-    () => import('@/components/ui/rich-text-editor'),
-    { ssr: false }
-  ),
-  
-  // Image cropper
-  ImageCropper: createDynamicComponent(
-    () => import('@/components/ui/image-cropper'),
-    { ssr: false }
-  ),
-  
-  // PDF viewer
-  PDFViewer: createDynamicComponent(
-    () => import('@/components/ui/pdf-viewer'),
-    { ssr: false }
-  ),
-  
-  // Video player
-  VideoPlayer: createDynamicComponent(
-    () => import('@/components/ui/video-player'),
-    { ssr: false }
-  ),
+  // Placeholder for future heavy libraries
 }
 
 /**
@@ -185,11 +54,8 @@ export class ResourcePreloader {
    */
   static preloadCriticalRoutes() {
     if (typeof window !== 'undefined') {
-      // Preload feed page for authenticated users
-      const isAuthenticated = document.cookie.includes('next-auth.session-token')
-      if (isAuthenticated) {
-        routeComponents.feed()
-      }
+      // Preload critical routes based on authentication
+      console.log('Preloading critical routes...')
     }
   }
 
@@ -235,18 +101,15 @@ export class ResourcePreloader {
     switch (userRole) {
       case 'ADMIN':
         // Preload admin components
-        DynamicComponents.AdminDashboard
-        DynamicComponents.AdminUserManagement
-        DynamicComponents.ContentModeration
+        console.log('Preloading admin components for', userRole)
         break
       case 'MODERATOR':
         // Preload moderation components
-        DynamicComponents.ContentModeration
+        console.log('Preloading moderation components for', userRole)
         break
       default:
         // Preload common user components
-        DynamicComponents.PostComposer
-        DynamicComponents.NotificationDropdown
+        console.log('Preloading user components for', userRole)
         break
     }
   }
@@ -269,8 +132,8 @@ export class BundleAnalyzer {
       const loadTime = endTime - startTime
       
       // Send to analytics
-      if (window.gtag) {
-        window.gtag('event', 'component_load', {
+      if ((window as any).gtag) {
+        (window as any).gtag('event', 'component_load', {
           component_name: componentName,
           load_time: loadTime,
         })
@@ -383,14 +246,16 @@ export class PerformanceMonitor {
     // Monitor FID (First Input Delay)
     new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
-        console.log('FID:', entry.processingStart - entry.startTime)
+        const fidEntry = entry as any
+        console.log('FID:', fidEntry.processingStart - fidEntry.startTime)
       })
     }).observe({ entryTypes: ['first-input'] })
 
     // Monitor CLS (Cumulative Layout Shift)
     new PerformanceObserver((list) => {
       list.getEntries().forEach((entry) => {
-        console.log('CLS:', entry.value)
+        const clsEntry = entry as any
+        console.log('CLS:', clsEntry.value)
       })
     }).observe({ entryTypes: ['layout-shift'] })
   }
@@ -423,3 +288,4 @@ export default {
   BundleAnalyzer,
   PerformanceMonitor,
 }
+

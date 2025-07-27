@@ -269,3 +269,4 @@ export function ProfileActivity({ user, className }: ProfileActivityProps) {
     </div>
   )
 }
+

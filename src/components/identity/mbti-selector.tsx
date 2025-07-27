@@ -209,3 +209,4 @@ export function MBTIQuickSelector({ selectedType, onSelect, disabled = false }: 
     </div>
   )
 }
+

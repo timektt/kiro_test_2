@@ -27,3 +27,4 @@ export function FeedLayout({ children, sidebar, className }: FeedLayoutProps) {
     </div>
   )
 }
+

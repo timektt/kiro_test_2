@@ -92,7 +92,7 @@ export const signUpSchema = z.object({
     .max(254, "Email address too long")
     .toLowerCase()
     .refine(email => !email.includes('+'), "Email aliases not allowed")
-    .refine(email => !/[<>\"'&]/g.test(email), "Email contains invalid characters"),
+    .refine(email => !/[<>"'&]/g.test(email), "Email contains invalid characters"),
   password: z.string()
     .min(8, "Password must be at least 8 characters")
     .max(128, "Password too long")
@@ -204,3 +204,4 @@ export type ApiSuccess<T> = {
   data: T
 }
 export type RateLimitConfig = z.infer<typeof rateLimitSchema>
+

@@ -12,6 +12,7 @@ interface EmptyStateProps {
     onClick: () => void
   }
   className?: string
+  compact?: boolean
 }
 
 export function EmptyState({
@@ -20,26 +21,42 @@ export function EmptyState({
   description,
   action,
   className,
+  compact = false,
 }: EmptyStateProps) {
   return (
     <Card className={cn('w-full', className)}>
-      <CardContent className="flex flex-col items-center justify-center py-12 px-6 text-center">
+      <CardContent className={cn(
+        'flex flex-col items-center justify-center text-center',
+        compact ? 'py-6 px-4' : 'py-12 px-6'
+      )}>
         {Icon && (
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <Icon className="h-8 w-8 text-muted-foreground" />
+          <div className={cn(
+            'flex items-center justify-center rounded-full bg-muted',
+            compact ? 'mb-2 h-12 w-12' : 'mb-4 h-16 w-16'
+          )}>
+            <Icon className={cn(
+              'text-muted-foreground',
+              compact ? 'h-6 w-6' : 'h-8 w-8'
+            )} />
           </div>
         )}
         
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
+        <h3 className={cn(
+          'font-semibold mb-2',
+          compact ? 'text-base' : 'text-lg'
+        )}>{title}</h3>
         
         {description && (
-          <p className="text-muted-foreground mb-6 max-w-sm">
+          <p className={cn(
+            'text-muted-foreground max-w-sm',
+            compact ? 'mb-3 text-sm' : 'mb-6'
+          )}>
             {description}
           </p>
         )}
         
         {action && (
-          <Button onClick={action.onClick}>
+          <Button onClick={action.onClick} size={compact ? 'sm' : 'default'}>
             {action.label}
           </Button>
         )}
@@ -47,3 +64,4 @@ export function EmptyState({
     </Card>
   )
 }
+

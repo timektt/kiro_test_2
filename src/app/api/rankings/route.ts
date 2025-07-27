@@ -282,3 +282,4 @@ function calculateScore(type: RankingType, user: any): number {
       return 0
   }
 }
+

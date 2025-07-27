@@ -296,3 +296,4 @@ export function NotificationDropdown({ className }: NotificationDropdownProps) {
     </DropdownMenu>
   )
 }
+

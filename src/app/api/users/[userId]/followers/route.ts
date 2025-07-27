@@ -37,7 +37,7 @@ export async function GET(
     }
 
     // Build where clause for search
-    let whereClause: any = {
+    const whereClause: any = {
       followingId: params.userId,
     }
 

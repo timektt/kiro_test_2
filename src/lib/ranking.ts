@@ -238,3 +238,4 @@ export function getRankEmoji(rank: number): string {
   if (rank <= 10) return '🏅'
   return '📊'
 }
+

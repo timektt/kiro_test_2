@@ -35,8 +35,8 @@ export function useRankings(
   )
 
   return {
-    rankings: data?.success ? data.data.rankings : {},
-    pagination: data?.success ? data.data.pagination : null,
+    rankings: data?.success && data.data ? data.data.rankings : {},
+    pagination: data?.success && data.data ? data.data.pagination : null,
     isLoading,
     error: error || (!data?.success ? data?.error : null),
     refresh: mutate
@@ -129,3 +129,4 @@ export function useTriggerRankingCalculation() {
 
   return { triggerCalculation }
 }
+

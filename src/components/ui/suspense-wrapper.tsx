@@ -193,3 +193,4 @@ export function withSuspense<P extends object>(
   SuspenseComponent.displayName = `withSuspense(${Component.displayName || Component.name})`
   return SuspenseComponent
 }
+

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { PostItem } from '@/components/ui/post-item'
 
 const mockPost = {
@@ -11,10 +11,17 @@ const mockPost = {
   updatedAt: new Date('2024-01-01T10:00:00Z'),
   author: {
     id: 'user-2',
-    name: 'Post Author',
     username: 'postauthor',
+    email: 'postauthor@example.com',
+    name: 'Post Author',
     image: null,
+    bio: null,
+    socialLinks: null,
     role: 'USER' as const,
+    isActive: true,
+    createdAt: new Date('2024-01-01T10:00:00Z'),
+    updatedAt: new Date('2024-01-01T10:00:00Z'),
+    mbti: null,
   },
   _count: {
     likes: 5,
@@ -84,7 +91,25 @@ describe('PostItem', () => {
   })
 
   it('should handle image display when imageUrl is provided', () => {
-    const postWithImage = { ...mockPost, imageUrl: 'https://example.com/image.jpg' }
+    const postWithImage = { 
+      ...mockPost, 
+      imageUrl: 'https://example.com/image.jpg',
+      author: {
+        ...mockPost.author,
+        id: 'user-2',
+        username: 'postauthor',
+        email: 'postauthor@example.com',
+        name: 'Post Author',
+        image: null,
+        bio: null,
+        socialLinks: null,
+        role: 'USER' as const,
+        isActive: true,
+        createdAt: new Date('2024-01-01T10:00:00Z'),
+        updatedAt: new Date('2024-01-01T10:00:00Z'),
+        mbti: null,
+      }
+    }
     render(<PostItem post={postWithImage} />)
 
     const image = screen.getByRole('img')

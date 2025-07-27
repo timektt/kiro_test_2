@@ -116,3 +116,4 @@ export function useMBTIStats() {
     error: error || (!data?.success ? data?.error : null)
   }
 }
+

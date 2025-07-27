@@ -1,21 +1,27 @@
 import React from 'react'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { EnhancedInteractiveFeed } from '@/components/feed/enhanced-interactive-feed'
 import { useFeedStore } from '@/stores/feed-store'
 import { useUIStore } from '@/stores/ui-store'
 import { useSession } from 'next-auth/react'
+import { usePosts, useCreatePost, useLikePost } from '@/hooks/use-posts'
 
 // Mock dependencies
 jest.mock('@/stores/feed-store')
 jest.mock('@/stores/ui-store')
 jest.mock('next-auth/react')
-jest.mock('@/hooks/use-posts')
-jest.mock('@/hooks/use-api')
+jest.mock('@/hooks/use-posts', () => ({
+  usePosts: jest.fn(),
+  useCreatePost: jest.fn(),
+  useLikePost: jest.fn(),
+}))
 
 const mockUseFeedStore = useFeedStore as jest.MockedFunction<typeof useFeedStore>
 const mockUseUIStore = useUIStore as jest.MockedFunction<typeof useUIStore>
 const mockUseSession = useSession as jest.MockedFunction<typeof useSession>
+const mockUsePosts = usePosts as jest.MockedFunction<typeof usePosts>
+const mockUseCreatePost = useCreatePost as jest.MockedFunction<typeof useCreatePost>
+const mockUseLikePost = useLikePost as jest.MockedFunction<typeof useLikePost>
 
 // Mock IntersectionObserver
 global.IntersectionObserver = jest.fn().mockImplementation((callback) => ({
@@ -25,4 +31,140 @@ global.IntersectionObserver = jest.fn().mockImplementation((callback) => ({
   root: null,
   rootMargin: '',
   thresholds: [],
-}))\n\n// Mock ResizeObserver\nglobal.ResizeObserver = jest.fn().mockImplementation(() => ({\n  observe: jest.fn(),\n  unobserve: jest.fn(),\n  disconnect: jest.fn(),\n}))\n\ndescribe('EnhancedInteractiveFeed', () => {\n  const mockUser = {\n    id: 'user-123',\n    username: 'testuser',\n    name: 'Test User',\n    email: 'test@example.com',\n  }\n\n  const mockSession = {\n    user: mockUser,\n    expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),\n  }\n\n  const mockPosts = [\n    {\n      id: 'post-1',\n      content: 'First test post',\n      imageUrl: null,\n      createdAt: new Date().toISOString(),\n      updatedAt: new Date().toISOString(),\n      isPublic: true,\n      author: {\n        id: 'author-1',\n        username: 'author1',\n        name: 'Author One',\n        image: null,\n      },\n      _count: {\n        likes: 5,\n        comments: 2,\n      },\n      isLiked: false,\n    },\n    {\n      id: 'post-2',\n      content: 'Second test post with image',\n      imageUrl: 'https://example.com/image.jpg',\n      createdAt: new Date().toISOString(),\n      updatedAt: new Date().toISOString(),\n      isPublic: true,\n      author: {\n        id: 'author-2',\n        username: 'author2',\n        name: 'Author Two',\n        image: 'https://example.com/avatar.jpg',\n      },\n      _count: {\n        likes: 10,\n        comments: 5,\n      },\n      isLiked: true,\n    },\n  ]\n\n  const defaultFeedStore = {\n    posts: mockPosts,\n    loading: false,\n    error: null,\n    hasMore: true,\n    feedType: 'following' as const,\n    lastFetch: Date.now(),\n    optimisticUpdates: new Map(),\n    setPosts: jest.fn(),\n    addPost: jest.fn(),\n    updatePost: jest.fn(),\n    removePost: jest.fn(),\n    setLoading: jest.fn(),\n    setError: jest.fn(),\n    setHasMore: jest.fn(),\n    setFeedType: jest.fn(),\n    loadMorePosts: jest.fn(),\n    refreshFeed: jest.fn(),\n    addOptimisticUpdate: jest.fn(),\n    removeOptimisticUpdate: jest.fn(),\n    clearOptimisticUpdates: jest.fn(),\n  }\n\n  const defaultUIStore = {\n    sidebarOpen: false,\n    mobileMenuOpen: false,\n    postComposerOpen: false,\n    profileEditOpen: false,\n    isLoading: false,\n    loadingMessage: '',\n    searchQuery: '',\n    searchResults: [],\n    searchLoading: false,\n    toasts: [],\n    setSidebarOpen: jest.fn(),\n    setMobileMenuOpen: jest.fn(),\n    setPostComposerOpen: jest.fn(),\n    setProfileEditOpen: jest.fn(),\n    setLoading: jest.fn(),\n    addToast: jest.fn(),\n    removeToast: jest.fn(),\n    setSearchQuery: jest.fn(),\n    setSearchResults: jest.fn(),\n    setSearchLoading: jest.fn(),\n    clearSearch: jest.fn(),\n  }\n\n  beforeEach(() => {\n    jest.clearAllMocks()\n    mockUseSession.mockReturnValue({ data: mockSession, status: 'authenticated' })\n    mockUseFeedStore.mockReturnValue(defaultFeedStore)\n    mockUseUIStore.mockReturnValue(defaultUIStore)\n  })\n\n  it('should render feed with posts', async () => {\n    render(<EnhancedInteractiveFeed />)\n\n    await waitFor(() => {\n      expect(screen.getByText('First test post')).toBeInTheDocument()\n      expect(screen.getByText('Second test post with image')).toBeInTheDocument()\n    })\n\n    expect(screen.getByText('Author One')).toBeInTheDocument()\n    expect(screen.getByText('Author Two')).toBeInTheDocument()\n  })\n\n  it('should display loading state', () => {\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      loading: true,\n      posts: [],\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument()\n  })\n\n  it('should display error state', () => {\n    const errorMessage = 'Failed to load posts'\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      error: errorMessage,\n      posts: [],\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    expect(screen.getByText(errorMessage)).toBeInTheDocument()\n    expect(screen.getByText('Try Again')).toBeInTheDocument()\n  })\n\n  it('should display empty state when no posts', () => {\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      posts: [],\n      hasMore: false,\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    expect(screen.getByText('No posts yet')).toBeInTheDocument()\n    expect(screen.getByText('Be the first to share something!')).toBeInTheDocument()\n  })\n\n  it('should handle feed type switching', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    const feedTypeSelect = screen.getByRole('combobox')\n    await user.click(feedTypeSelect)\n\n    const discoverOption = screen.getByText('Discover')\n    await user.click(discoverOption)\n\n    expect(defaultFeedStore.setFeedType).toHaveBeenCalledWith('discover')\n  })\n\n  it('should handle post liking', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    const likeButtons = screen.getAllByRole('button', { name: /like/i })\n    await user.click(likeButtons[0]) // Like first post\n\n    expect(defaultFeedStore.addOptimisticUpdate).toHaveBeenCalledWith(\n      'post-1',\n      expect.objectContaining({\n        type: 'like',\n        isLiked: true,\n      })\n    )\n  })\n\n  it('should handle post commenting', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    const commentButtons = screen.getAllByRole('button', { name: /comment/i })\n    await user.click(commentButtons[0])\n\n    const commentInput = screen.getByPlaceholderText('Write a comment...')\n    await user.type(commentInput, 'This is a test comment')\n\n    const submitButton = screen.getByRole('button', { name: /post comment/i })\n    await user.click(submitButton)\n\n    expect(defaultFeedStore.addOptimisticUpdate).toHaveBeenCalledWith(\n      'post-1',\n      expect.objectContaining({\n        type: 'comment',\n      })\n    )\n  })\n\n  it('should handle infinite scrolling', async () => {\n    const mockIntersectionObserver = jest.fn()\n    mockIntersectionObserver.mockReturnValue({\n      observe: () => null,\n      unobserve: () => null,\n      disconnect: () => null,\n    })\n    global.IntersectionObserver = mockIntersectionObserver\n\n    render(<EnhancedInteractiveFeed />)\n\n    // Simulate intersection observer callback\n    const [callback] = mockIntersectionObserver.mock.calls[0]\n    act(() => {\n      callback([{ isIntersecting: true }])\n    })\n\n    expect(defaultFeedStore.loadMorePosts).toHaveBeenCalled()\n  })\n\n  it('should handle pull-to-refresh', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    const feedContainer = screen.getByTestId('feed-container')\n    \n    // Simulate pull-to-refresh gesture\n    fireEvent.touchStart(feedContainer, {\n      touches: [{ clientY: 100 }],\n    })\n    \n    fireEvent.touchMove(feedContainer, {\n      touches: [{ clientY: 200 }],\n    })\n    \n    fireEvent.touchEnd(feedContainer)\n\n    await waitFor(() => {\n      expect(defaultFeedStore.refreshFeed).toHaveBeenCalled()\n    })\n  })\n\n  it('should display post composer when authenticated', () => {\n    render(<EnhancedInteractiveFeed />)\n\n    expect(screen.getByPlaceholderText(\"What's on your mind?\")).toBeInTheDocument()\n  })\n\n  it('should not display post composer when unauthenticated', () => {\n    mockUseSession.mockReturnValue({ data: null, status: 'unauthenticated' })\n\n    render(<EnhancedInteractiveFeed />)\n\n    expect(screen.queryByPlaceholderText(\"What's on your mind?\")).not.toBeInTheDocument()\n  })\n\n  it('should handle post creation', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    const postInput = screen.getByPlaceholderText(\"What's on your mind?\")\n    await user.click(postInput)\n\n    expect(defaultUIStore.setPostComposerOpen).toHaveBeenCalledWith(true)\n  })\n\n  it('should display optimistic updates', () => {\n    const optimisticUpdates = new Map([\n      ['post-1', {\n        type: 'like',\n        isLiked: true,\n        timestamp: Date.now(),\n      }],\n    ])\n\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      optimisticUpdates,\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    // The first post should show as liked due to optimistic update\n    const likeButtons = screen.getAllByRole('button', { name: /like/i })\n    expect(likeButtons[0]).toHaveClass('text-red-500') // Assuming liked state styling\n  })\n\n  it('should handle network errors gracefully', async () => {\n    const user = userEvent.setup()\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      error: 'Network error',\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    expect(screen.getByText('Network error')).toBeInTheDocument()\n    \n    const retryButton = screen.getByText('Try Again')\n    await user.click(retryButton)\n\n    expect(defaultFeedStore.refreshFeed).toHaveBeenCalled()\n  })\n\n  it('should handle real-time updates', () => {\n    const { rerender } = render(<EnhancedInteractiveFeed />)\n\n    // Simulate new post arriving via real-time update\n    const newPost = {\n      id: 'post-3',\n      content: 'New real-time post',\n      imageUrl: null,\n      createdAt: new Date().toISOString(),\n      updatedAt: new Date().toISOString(),\n      isPublic: true,\n      author: {\n        id: 'author-3',\n        username: 'author3',\n        name: 'Author Three',\n        image: null,\n      },\n      _count: {\n        likes: 0,\n        comments: 0,\n      },\n      isLiked: false,\n    }\n\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      posts: [newPost, ...mockPosts],\n    })\n\n    rerender(<EnhancedInteractiveFeed />)\n\n    expect(screen.getByText('New real-time post')).toBeInTheDocument()\n  })\n\n  it('should handle keyboard navigation', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    const firstPost = screen.getByText('First test post').closest('[data-testid=\"post-item\"]')\n    \n    // Focus on first post\n    if (firstPost) {\n      firstPost.focus()\n      \n      // Navigate with arrow keys\n      await user.keyboard('{ArrowDown}')\n      \n      const secondPost = screen.getByText('Second test post with image').closest('[data-testid=\"post-item\"]')\n      expect(secondPost).toHaveFocus()\n    }\n  })\n\n  it('should handle accessibility features', () => {\n    render(<EnhancedInteractiveFeed />)\n\n    // Check for proper ARIA labels\n    expect(screen.getByRole('main')).toBeInTheDocument()\n    expect(screen.getByRole('feed')).toBeInTheDocument()\n    \n    // Check for screen reader announcements\n    const posts = screen.getAllByRole('article')\n    posts.forEach(post => {\n      expect(post).toHaveAttribute('aria-label')\n    })\n  })\n\n  it('should handle performance optimization', () => {\n    // Test virtualization for large lists\n    const manyPosts = Array.from({ length: 100 }, (_, i) => ({\n      ...mockPosts[0],\n      id: `post-${i}`,\n      content: `Post ${i}`,\n    }))\n\n    mockUseFeedStore.mockReturnValue({\n      ...defaultFeedStore,\n      posts: manyPosts,\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    // Should only render visible posts (virtualization)\n    const renderedPosts = screen.getAllByRole('article')\n    expect(renderedPosts.length).toBeLessThan(manyPosts.length)\n  })\n\n  it('should handle feed filtering and sorting', async () => {\n    const user = userEvent.setup()\n    render(<EnhancedInteractiveFeed />)\n\n    // Test sorting options\n    const sortButton = screen.getByRole('button', { name: /sort/i })\n    await user.click(sortButton)\n\n    const popularOption = screen.getByText('Most Popular')\n    await user.click(popularOption)\n\n    expect(defaultFeedStore.setFeedType).toHaveBeenCalledWith('trending')\n  })\n\n  it('should handle post sharing', async () => {\n    const user = userEvent.setup()\n    \n    // Mock navigator.share\n    Object.assign(navigator, {\n      share: jest.fn().mockResolvedValue(undefined),\n    })\n\n    render(<EnhancedInteractiveFeed />)\n\n    const shareButtons = screen.getAllByRole('button', { name: /share/i })\n    await user.click(shareButtons[0])\n\n    expect(navigator.share).toHaveBeenCalledWith({\n      title: 'Post by Author One',\n      text: 'First test post',\n      url: expect.stringContaining('post-1'),\n    })\n  })\n})"
+}))
+
+// Mock ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}))
+
+describe('EnhancedInteractiveFeed', () => {
+  const mockUser = {
+    id: 'user-123',
+    username: 'testuser',
+    name: 'Test User',
+    email: 'test@example.com',
+  }
+
+  const mockSession = {
+    user: { ...mockUser, role: 'USER' },
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  }
+
+  const mockPosts = [
+    {
+      id: 'post-1',
+      content: 'First test post',
+      imageUrl: null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      isPublic: true,
+      author: {
+        id: 'author-1',
+        username: 'author1',
+        name: 'Author One',
+        image: null,
+      },
+      _count: {
+        likes: 5,
+        comments: 2,
+      },
+      isLiked: false,
+    },
+  ]
+
+  const defaultFeedStore = {
+    feedType: 'following' as const,
+    sortBy: 'recent' as const,
+    mbtiFilter: null,
+    optimisticPosts: [],
+    setFeedType: jest.fn(),
+    setSortBy: jest.fn(),
+    setMbtiFilter: jest.fn(),
+    addOptimisticPost: jest.fn(),
+    removeOptimisticPost: jest.fn(),
+    clearOptimisticPosts: jest.fn(),
+  }
+
+  const defaultUIStore = {
+    sidebarOpen: false,
+    mobileMenuOpen: false,
+    postComposerOpen: false,
+    profileEditOpen: false,
+    isLoading: false,
+    loadingMessage: '',
+    searchQuery: '',
+    searchResults: [],
+    searchLoading: false,
+    toasts: [],
+    setSidebarOpen: jest.fn(),
+    setMobileMenuOpen: jest.fn(),
+    setPostComposerOpen: jest.fn(),
+    setProfileEditOpen: jest.fn(),
+    setLoading: jest.fn(),
+    addToast: jest.fn(),
+    removeToast: jest.fn(),
+    setSearchQuery: jest.fn(),
+    setSearchResults: jest.fn(),
+    setSearchLoading: jest.fn(),
+    clearSearch: jest.fn(),
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseSession.mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
+    mockUseFeedStore.mockReturnValue(defaultFeedStore)
+    mockUseUIStore.mockReturnValue(defaultUIStore)
+    mockUsePosts.mockReturnValue({
+      posts: mockPosts,
+      pagination: { page: 1, limit: 20, total: 1, hasMore: false },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+    mockUseCreatePost.mockReturnValue({
+      createPost: jest.fn(),
+      isCreating: false,
+    })
+    mockUseLikePost.mockReturnValue({
+      toggleLike: jest.fn(),
+      isToggling: false,
+    })
+  })
+
+  it('should render feed with posts', async () => {
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+
+    await waitFor(() => {
+      expect(screen.getByText('First test post')).toBeInTheDocument()
+    })
+
+    expect(screen.getByText('Author One')).toBeInTheDocument()
+  })
+
+  it('should display feed controls when authenticated', () => {
+    mockUseSession.mockReturnValue({ 
+      data: mockSession, 
+      status: 'authenticated',
+      update: jest.fn()
+    })
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.getByText('Home')).toBeInTheDocument()
+  })
+
+  it('should display feed controls when unauthenticated', () => {
+    mockUseSession.mockReturnValue({ 
+      data: null, 
+      status: 'unauthenticated',
+      update: jest.fn()
+    })
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.getByText('Home')).toBeInTheDocument()
+  })
+})

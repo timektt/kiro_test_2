@@ -3,7 +3,7 @@ import { createAdminHandler } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 
 export const GET = createAdminHandler('USER_MANAGEMENT')(
-  async (request: NextRequest) => {
+  async (request: NextRequest, adminUser) => {
     try {
       const { searchParams } = new URL(request.url)
       const page = parseInt(searchParams.get('page') || '1')
@@ -15,7 +15,7 @@ export const GET = createAdminHandler('USER_MANAGEMENT')(
       const skip = (page - 1) * limit
 
       // Build where clause
-      let whereClause: any = {}
+      const whereClause: any = {}
 
       if (search) {
         whereClause.OR = [
@@ -82,3 +82,4 @@ export const GET = createAdminHandler('USER_MANAGEMENT')(
     }
   }
 )
+

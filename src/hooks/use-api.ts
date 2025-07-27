@@ -1,4 +1,5 @@
-import useSWR, { SWRConfiguration } from 'swr'
+import { useCallback } from 'react'
+import useSWR, { SWRConfiguration, mutate } from 'swr'
 import useSWRMutation from 'swr/mutation'
 import { useUIStore } from '@/stores/ui-store'
 
@@ -191,14 +192,10 @@ export function useOptimisticUpdate<T>(
 
 // Hook for caching and prefetching
 export function usePrefetch() {
-  const prefetch = (key: string, fetcher = defaultFetcher) => {
+  const prefetch = useCallback((key: string, fetcher = defaultFetcher) => {
     // This will cache the data for future use
-    return useSWR(key, fetcher, {
-      revalidateOnMount: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    })
-  }
+    mutate(key, fetcher(key), false)
+  }, [])
   
   return { prefetch }
 }
@@ -225,3 +222,4 @@ export function useLoadingState() {
     withLoading,
   }
 }
+

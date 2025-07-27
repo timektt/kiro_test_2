@@ -55,7 +55,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
     } else if (filter === 'trending') {
       setFeedType('trending')
     }
-  }
+  }, [])
   
   // Handle sort changes
   const handleSortChange = (sort: 'recent' | 'popular') => {
@@ -232,3 +232,4 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
 })
 
 EnhancedInteractiveFeed.displayName = 'EnhancedInteractiveFeed'
+

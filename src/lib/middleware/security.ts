@@ -199,7 +199,7 @@ export class InputSanitizer {
    */
   static sanitizeGeneral(input: string): string {
     return input
-      .replace(/[<>\"'&]/g, '')
+      .replace(/[<>"'&]/g, '')
       .trim()
       .substring(0, 10000) // Limit length
   }
@@ -361,3 +361,4 @@ export function withSecurity(options: {
     }
   }
 }
+

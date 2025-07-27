@@ -3,7 +3,7 @@ import { createAdminHandler } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 
 export const GET = createAdminHandler('CONTENT_MODERATION')(
-  async (request: NextRequest) => {
+  async (request: NextRequest, adminUser) => {
     try {
       const { searchParams } = new URL(request.url)
       const page = parseInt(searchParams.get('page') || '1')
@@ -14,11 +14,11 @@ export const GET = createAdminHandler('CONTENT_MODERATION')(
 
       const skip = (page - 1) * limit
 
-      let results: any = { posts: [], comments: [], pagination: { page, limit, total: 0, hasMore: false } }
+      const results: any = { posts: [], comments: [], pagination: { page, limit, total: 0, hasMore: false } }
 
       if (type === 'ALL' || type === 'POSTS') {
         // Build where clause for posts
-        let postWhereClause: any = {}
+        const postWhereClause: any = {}
 
         if (search) {
           postWhereClause.content = {
@@ -70,7 +70,7 @@ export const GET = createAdminHandler('CONTENT_MODERATION')(
 
       if (type === 'ALL' || type === 'COMMENTS') {
         // Build where clause for comments
-        let commentWhereClause: any = {}
+        const commentWhereClause: any = {}
 
         if (search) {
           commentWhereClause.content = {
@@ -133,3 +133,4 @@ export const GET = createAdminHandler('CONTENT_MODERATION')(
     }
   }
 )
+

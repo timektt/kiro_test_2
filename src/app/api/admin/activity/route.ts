@@ -3,7 +3,7 @@ import { createAdminHandler } from '@/lib/admin-auth'
 import { prisma } from '@/lib/prisma'
 
 export const GET = createAdminHandler('SYSTEM_SETTINGS')(
-  async (request: NextRequest) => {
+  async (request: NextRequest, adminUser) => {
     try {
       const { searchParams } = new URL(request.url)
       const limit = parseInt(searchParams.get('limit') || '20')
@@ -72,3 +72,4 @@ export const GET = createAdminHandler('SYSTEM_SETTINGS')(
     }
   }
 )
+

@@ -45,9 +45,7 @@ import {
 import { EmptyState } from '@/components/ui/empty-state'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { cn } from '@/lib/utils'
-import page from '@/app/page'
-import page from '@/app/page'
-import page from '@/app/page'
+
 
 interface User {
   id: string
@@ -291,8 +289,8 @@ export function UserManagement({ adminUser }: UserManagementProps) {
             <div className="p-8">
               <EmptyState
                 icon={Users}
-                title=\"No users found\"
-                description=\"No users match your current filters\"
+                title="No users found"
+                description="No users match your current filters"
               />
             </div>
           ) : (
@@ -321,12 +319,12 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                           {user.role}
                         </Badge>
                         {!user.isActive && (
-                          <Badge variant=\"outline\" className="text-red-600">
+                          <Badge variant="outline" className="text-red-600">
                             Inactive
                           </Badge>
                         )}
                         {user.mbti && (
-                          <Badge variant=\"secondary\" className="text-xs">
+                          <Badge variant="secondary" className="text-xs">
                             {user.mbti.type}
                           </Badge>
                         )}
@@ -348,11 +346,11 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                     {user.id !== adminUser.id && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant=\"ghost\" size=\"sm\" className="h-8 w-8 p-0">
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align=\"end\" className="w-48">
+                        <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem onClick={() => setSelectedUser(user)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
@@ -398,7 +396,7 @@ export function UserManagement({ adminUser }: UserManagementProps) {
               {data.pagination.hasMore && (
                 <div className="p-6 text-center border-t">
                   <Button 
-                    variant=\"outline\" 
+                    variant="outline" 
                     onClick={() => setPage(page + 1)}
                   >
                     Load More Users
@@ -446,9 +444,9 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value=\"USER\">User</SelectItem>
-                  <SelectItem value=\"MODERATOR\">Moderator</SelectItem>
-                  <SelectItem value=\"ADMIN\">Admin</SelectItem>
+                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="MODERATOR">Moderator</SelectItem>
+                  <SelectItem value="ADMIN">Admin</SelectItem>
                 </SelectContent>
               </Select>
             )}
@@ -481,3 +479,4 @@ export function UserManagement({ adminUser }: UserManagementProps) {
     </div>
   )
 }
+

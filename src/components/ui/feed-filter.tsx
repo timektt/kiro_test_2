@@ -76,3 +76,4 @@ export function FeedFilter({ currentFilter, onFilterChange, className }: FeedFil
     </Card>
   )
 }
+
