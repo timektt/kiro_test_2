@@ -1,25 +1,23 @@
-import { withAuth } from "next-auth/middleware"
+import { NextResponse } from 'next/server'
+import { withAuth } from 'next-auth/middleware'
+
+console.log('[MIDDLEWARE]', 'RUNNING')
 
 export default withAuth(
   function middleware(req) {
-    // Add any additional middleware logic here
+    console.log('[MIDDLEWARE] URL:', req.nextUrl.pathname)
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
-        // Check if user is trying to access admin routes
-        if (req.nextUrl.pathname.startsWith("/admin")) {
+        const pathname = req.nextUrl.pathname
+        console.log('[MIDDLEWARE] Checking auth:', pathname)
+        
+        if (pathname.startsWith("/admin")) {
           return token?.role === "ADMIN"
         }
-        
-        // Check if user is trying to access protected routes
-        if (req.nextUrl.pathname.startsWith("/dashboard") || 
-            req.nextUrl.pathname.startsWith("/profile") ||
-            req.nextUrl.pathname.startsWith("/feed")) {
-          return !!token
-        }
-        
-        return true
+
+        return !!token
       },
     },
   }
@@ -30,13 +28,16 @@ export const config = {
     "/dashboard/:path*",
     "/profile/:path*", 
     "/feed/:path*",
+    "/notifications/:path*",
+    "/rankings/:path*",
+    "/identity/:path*",
     "/admin/:path*",
     "/api/posts/:path*",
     "/api/comments/:path*",
     "/api/likes/:path*",
     "/api/follows/:path*",
     "/api/notifications/:path*",
+    "/api/users/:path*",
     "/api/admin/:path*"
   ]
 }
-

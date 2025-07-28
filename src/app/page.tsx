@@ -1,12 +1,17 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { HeroSection } from '@/components/landing/hero-section';
+export const dynamic = 'force-dynamic'; // 🔥 บังคับไม่ใช้ static cache
+
+
+
 import { FeaturesSection } from '@/components/landing/features-section';
 import { StatsSection } from '@/components/landing/stats-section';
 import { TestimonialsSection } from '@/components/landing/testimonials-section';
 import { MBTISection } from '@/components/landing/mbti-section';
 import { CTASection } from '@/components/landing/cta-section';
 import { FooterSection } from '@/components/landing/footer-section';
+import { HeroSection } from '@/components/landing/hero-section';
+
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export const metadata = {
   title: 'Community Platform - Connect, Share, Grow',
@@ -97,7 +102,14 @@ export const metadata = {
 };
 
 export default async function HomePage() {
-  const session = await getServerSession(authOptions);
+  let session = null;
+
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.error('Error getting server session:', error);
+    // Continue with session = null - this is safe
+  }
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -146,23 +158,55 @@ export default async function HomePage() {
     },
   };
 
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
-        }}
-      />
-      <main className="min-h-screen bg-background">
-        <HeroSection session={session} />
-        <FeaturesSection />
-        <StatsSection />
-        <MBTISection />
-        <TestimonialsSection />
-        <CTASection session={session} />
-        <FooterSection />
+  try {
+    return (
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
+        <main className="min-h-screen bg-background">
+          <HeroSection session={session} />
+          <FeaturesSection />
+          <StatsSection />
+          <MBTISection />
+          <TestimonialsSection />
+          <CTASection session={session} />
+          <FooterSection />
+        </main>
+      </>
+    );
+  } catch (error) {
+    console.error('Error rendering homepage:', error);
+
+    // Fallback UI if anything fails
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background">
+        <div className="mx-auto max-w-md p-6 text-center">
+          <h1 className="mb-4 text-3xl font-bold">
+            Welcome to Community Platform
+          </h1>
+          <p className="mb-6 text-lg text-muted-foreground">
+            Connect with like-minded people and discover your personality tribe.
+          </p>
+          <div className="space-y-4">
+            <a
+              href="/auth/signup"
+              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Get Started
+            </a>
+            <a
+              href="/auth/signin"
+              className="ml-4 inline-flex h-10 items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+            >
+              Sign In
+            </a>
+          </div>
+        </div>
       </main>
-    </>
-  );
+    );
+  }
 }

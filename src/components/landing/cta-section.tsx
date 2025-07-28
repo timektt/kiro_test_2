@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, Mail, Github, Sparkles, Users, MessageSquare } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ServerButton } from '@/components/ui/server-button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 
@@ -99,34 +99,34 @@ export function CTASection({ session }: CTASectionProps) {
               {session ? (
                 // Authenticated user - show feed and profile buttons
                 <>
-                  <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                  <ServerButton asChild size="lg" className="text-lg px-8 py-6 rounded-full">
                     <Link href="/feed">
                       Go to Feed
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
-                  </Button>
+                  </ServerButton>
                   
-                  <Button variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                    <Link href={`/profile/${session.user.username || session.user.id}`}>
+                  <ServerButton variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                    <Link href={`/profile/${session?.user?.username || session?.user?.id || 'profile'}`}>
                       View Profile
                     </Link>
-                  </Button>
+                  </ServerButton>
                 </>
               ) : (
                 // Unauthenticated user - show signup/signin buttons
                 <>
-                  <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                  <ServerButton asChild size="lg" className="text-lg px-8 py-6 rounded-full">
                     <Link href="/auth/signup">
                       Join the Community
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Link>
-                  </Button>
+                  </ServerButton>
                   
-                  <Button variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                  <ServerButton variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
                     <Link href="/auth/signin">
                       Sign In
                     </Link>
-                  </Button>
+                  </ServerButton>
                 </>
               )}
             </div>

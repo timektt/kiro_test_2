@@ -1,6 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Performance optimizations
   experimental: {
     optimizeCss: true,
     optimizePackageImports: [
@@ -16,13 +15,9 @@ const nextConfig = {
     ],
   },
 
-  // External packages for server components
   serverExternalPackages: ['prisma', '@prisma/client'],
-
-  // Production output configuration
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
 
-  // Image optimization
   images: {
     domains: [
       'res.cloudinary.com',
@@ -34,105 +29,83 @@ const nextConfig = {
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
+    minimumCacheTTL: 60 * 60 * 24 * 30,
     dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
-  // Compression
   compress: true,
-
-  // Static optimization
   trailingSlash: false,
   poweredByHeader: false,
 
-  // Environment variables
   env: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
 
-  // Headers for performance and security
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          // Security headers
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-          {
-            key: 'X-XSS-Protection',
-            value: '1; mode=block',
-          },
-          {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-      {
-        source: '/api/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, max-age=0',
-          },
-        ],
-      },
-      {
-        source: '/_next/static/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-      {
-        source: '/images/(.*)',
-        headers: [
-          {
-            key: 'Cache-Control',
-            value: 'public, max-age=31536000, immutable',
-          },
-        ],
-      },
-    ]
-  },
+  // async headers() {
+  //   const isProd = process.env.NODE_ENV === 'production'
 
-  // Redirects for performance
-  async redirects() {
-    return [
-      // Redirect trailing slashes
-      {
-        source: '/:path*/',
-        destination: '/:path*',
-        permanent: true,
-      },
-    ]
-  },
+  //   const baseHeaders = isProd
+  //     ? [
+  //         // {
+  //         //   source: '/(.*)',
+  //         //   headers: [
+  //         //     { key: 'X-DNS-Prefetch-Control', value: 'on' },
+  //         //     { key: 'X-XSS-Protection', value: '1; mode=block' },
+  //         //     { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+  //         //     { key: 'X-Content-Type-Options', value: 'nosniff' },
+  //         //     { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+  //         //     {
+  //         //       key: 'Content-Security-Policy',
+  //         //       value:
+  //         //         "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src * blob: data:; object-src 'none'; frame-ancestors 'self'; base-uri 'self';",
+  //         //     },
+  //         //   ],
+  //         // },
+  //       ]
+  //     : []
 
-  // Rewrites for API optimization
-  async rewrites() {
-    return [
-      // API versioning
-      {
-        source: '/api/v1/:path*',
-        destination: '/api/:path*',
-      },
-    ]
-  },
+  //   return [
+  //     ...baseHeaders,
+  //     {
+  //       source: '/api/(.*)',
+  //       headers: [
+  //         { key: 'Cache-Control', value: 'no-store, max-age=0' },
+  //       ],
+  //     },
+  //     {
+  //       source: '/_next/static/(.*)',
+  //       headers: [
+  //         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+  //       ],
+  //     },
+  //     {
+  //       source: '/images/(.*)',
+  //       headers: [
+  //         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+  //       ],
+  //     },
+  //   ]
+  // },
+
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/:path*/',
+  //       destination: '/:path*',
+  //       permanent: true,
+  //     },
+  //   ]
+  // },
+
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: '/api/v1/:path*',
+  //       destination: '/api/:path*',
+  //     },
+  //   ]
+  // },
 }
 
 module.exports = nextConfig

@@ -8,10 +8,27 @@ type Preferences = {
   language: 'en' | 'th'
 }
 
+type User = {
+  id: string
+  username: string
+  name: string | null
+  email: string
+  image: string | null
+  bio: string | null
+  role: string
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 type UserState = {
+  currentUser: User | null
+  isAuthenticated: boolean
   preferences: Preferences
   followingUsers: Set<string>
   blockedUsers: Set<string>
+  setCurrentUser: (user: User) => void
+  setAuthenticated: (authenticated: boolean) => void
   clearUserData: () => void
 }
 
@@ -26,12 +43,22 @@ export const useUserStore = create<UserState>()(
   devtools(
     persist(
       (set) => ({
+        currentUser: null,
+        isAuthenticated: false,
         preferences: defaultPreferences,
         followingUsers: new Set(),
         blockedUsers: new Set(),
 
+        setCurrentUser: (user: User) =>
+          set({ currentUser: user }),
+
+        setAuthenticated: (authenticated: boolean) =>
+          set({ isAuthenticated: authenticated }),
+
         clearUserData: () =>
           set({
+            currentUser: null,
+            isAuthenticated: false,
             preferences: defaultPreferences,
             followingUsers: new Set(),
             blockedUsers: new Set(),
@@ -45,6 +72,8 @@ export const useUserStore = create<UserState>()(
           : undefined!, // ใช้ `undefined!` เพื่อบอกว่ามั่นใจจะไม่ run บน SSR
 
         partialize: (state) => ({
+          currentUser: state.currentUser,
+          isAuthenticated: state.isAuthenticated,
           preferences: state.preferences,
           followingUsers: Array.from(state.followingUsers),
           blockedUsers: Array.from(state.blockedUsers),

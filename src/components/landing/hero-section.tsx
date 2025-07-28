@@ -1,6 +1,7 @@
 import Link from 'next/link'
-import { ArrowRight, Play, Sparkles, Users, MessageSquare } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { ArrowRight, Sparkles, Users, MessageSquare } from 'lucide-react'
+import { ServerButton } from '@/components/ui/server-button'
+import { InteractiveDemoButton } from '@/components/ui/interactive-demo-button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Session } from 'next-auth'
@@ -58,27 +59,28 @@ export function HeroSection({ session }: HeroSectionProps) {
                     <p className="text-muted-foreground">Ready to connect with your community?</p>
                   </div>
                 </div>
-                <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                <ServerButton asChild size="lg" className="text-lg px-8 py-6 rounded-full">
                   <Link href="/feed">
                     Go to Feed
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
-                </Button>
+                </ServerButton>
               </div>
             ) : (
               // Unauthenticated user - show signup/demo buttons
               <>
-                <Button asChild size="lg" className="text-lg px-8 py-6 rounded-full">
+                <ServerButton asChild size="lg" className="text-lg px-8 py-6 rounded-full">
                   <Link href="/auth/signup">
                     Start Your Journey
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
-                </Button>
+                </ServerButton>
                 
-                <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-full">
-                  <Play className="mr-2 h-5 w-5" />
-                  Watch Demo
-                </Button>
+                <InteractiveDemoButton 
+                  variant="outline" 
+                  size="lg" 
+                  className="text-lg px-8 py-6 rounded-full" 
+                />
               </>
             )}
           </div>
