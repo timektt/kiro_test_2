@@ -1,3 +1,5 @@
+'use client';
+
 import Link from 'next/link'
 import { ArrowRight, Sparkles, Users, MessageSquare } from 'lucide-react'
 import { ServerButton } from '@/components/ui/server-button'

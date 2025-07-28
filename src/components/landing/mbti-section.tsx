@@ -1,6 +1,9 @@
+'use client'
+
 import { Brain, Users, Target, Lightbulb } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import InteractiveLinkButton from '@/components/common/InteractiveLinkButton'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
@@ -10,47 +13,50 @@ const mbtiTypes = [
     name: 'The Architect',
     description: 'Strategic and independent thinkers',
     color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
-    percentage: '15%'
+    percentage: '15%',
   },
   {
     type: 'ENFP',
     name: 'The Campaigner',
     description: 'Enthusiastic and creative spirits',
     color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    percentage: '12%'
+    percentage: '12%',
   },
   {
     type: 'ISTP',
     name: 'The Virtuoso',
     description: 'Practical and hands-on problem solvers',
     color: 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200',
-    percentage: '10%'
+    percentage: '10%',
   },
   {
     type: 'ENTJ',
     name: 'The Commander',
     description: 'Bold and strong-willed leaders',
     color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-    percentage: '8%'
-  }
+    percentage: '8%',
+  },
 ]
 
 const benefits = [
   {
     icon: Users,
     title: 'Find Your Tribe',
-    description: 'Connect with people who share your cognitive preferences and communication style'
+    description:
+      'Connect with people who share your cognitive preferences and communication style',
   },
   {
     icon: Target,
     title: 'Better Relationships',
-    description: 'Understand compatibility and build stronger, more meaningful connections'
+    description:
+      'Understand compatibility and build stronger, more meaningful connections',
   },
   {
     icon: Lightbulb,
     title: 'Personal Growth',
-    description: 'Gain insights into your strengths, blind spots, and development opportunities'
-  }
+    description:
+      'Gain insights into your strengths, blind spots, and development opportunities',
+  },
 ]
 
 export function MBTISection() {
@@ -110,13 +116,11 @@ export function MBTISection() {
                     </Card>
                   ))}
                 </div>
-                
+
                 <div className="mt-6 text-center">
-                  <Button variant="outline" asChild>
-                    <Link href="/mbti-types">
-                      View All 16 Types
-                    </Link>
-                  </Button>
+                  <InteractiveLinkButton href="/mbti-types" variant="outline">
+                    View All 16 Types
+                  </InteractiveLinkButton>
                 </div>
               </div>
             </div>
@@ -168,11 +172,9 @@ export function MBTISection() {
                       <span>✓ Compatibility insights</span>
                       <span>✓ Growth recommendations</span>
                     </div>
-                    <Button className="w-full mt-4" asChild>
-                      <Link href="/auth/signup">
-                        Start Assessment
-                      </Link>
-                    </Button>
+                    <InteractiveLinkButton href="/auth/signup" className="w-full mt-4">
+                      Start Assessment
+                    </InteractiveLinkButton>
                   </div>
                 </CardContent>
               </Card>
