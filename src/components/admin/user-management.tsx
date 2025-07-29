@@ -214,11 +214,11 @@ export function UserManagement({ adminUser }: UserManagementProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">User Management</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">User Management</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Manage users, roles, and account status
         </p>
       </div>
@@ -226,45 +226,47 @@ export function UserManagement({ adminUser }: UserManagementProps) {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* Search */}
-            <div className="relative flex-1">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search users by username, name, or email..."
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="pl-10"
               />
             </div>
 
-            {/* Role Filter */}
-            <Select value={roleFilter} onValueChange={(value) => handleFilterChange('role', value)}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Roles</SelectItem>
-                <SelectItem value="USER">User</SelectItem>
-                <SelectItem value="MODERATOR">Moderator</SelectItem>
-                <SelectItem value="ADMIN">Admin</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              {/* Role Filter */}
+              <Select value={roleFilter} onValueChange={(value) => handleFilterChange('role', value)}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Roles</SelectItem>
+                  <SelectItem value="USER">User</SelectItem>
+                  <SelectItem value="MODERATOR">Moderator</SelectItem>
+                  <SelectItem value="ADMIN">Admin</SelectItem>
+                </SelectContent>
+              </Select>
 
-            {/* Status Filter */}
-            <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Status</SelectItem>
-                <SelectItem value="ACTIVE">Active</SelectItem>
-                <SelectItem value="INACTIVE">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
+              {/* Status Filter */}
+              <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Status</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="INACTIVE">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -272,11 +274,11 @@ export function UserManagement({ adminUser }: UserManagementProps) {
       {/* Users List */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5" />
             Users
             {data?.pagination.total && (
-              <span className="text-sm font-normal text-muted-foreground">
+              <span className="text-xs sm:text-sm font-normal text-muted-foreground">
                 ({data.pagination.total} total)
               </span>
             )}
@@ -298,28 +300,28 @@ export function UserManagement({ adminUser }: UserManagementProps) {
               {data.users.map((user: User) => (
                 <div
                   key={user.id}
-                  className="flex items-center justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-3 sm:p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
                 >
-                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                  <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
                     {/* Avatar */}
-                    <Avatar className="h-12 w-12">
+                    <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                       <AvatarImage src={user.image || undefined} />
-                      <AvatarFallback>
+                      <AvatarFallback className="text-xs sm:text-sm">
                         {user.name?.[0] || user.username[0]}
                       </AvatarFallback>
                     </Avatar>
 
                     {/* User Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold truncate">
+                      <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">
                           {user.name || user.username}
                         </h3>
-                        <Badge variant={getRoleBadgeVariant(user.role)}>
+                        <Badge variant={getRoleBadgeVariant(user.role)} className="text-xs">
                           {user.role}
                         </Badge>
                         {!user.isActive && (
-                          <Badge variant="outline" className="text-red-600">
+                          <Badge variant="outline" className="text-red-600 text-xs">
                             Inactive
                           </Badge>
                         )}
@@ -329,20 +331,20 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                           </Badge>
                         )}
                       </div>
-                      <p className="text-sm text-muted-foreground mb-1">
+                      <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">
                         @{user.username} • {user.email}
                       </p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                         <span>{user._count.posts} posts</span>
                         <span>{user._count.followers} followers</span>
-                        <span>{user._count.following} following</span>
-                        <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                        <span className="hidden sm:inline">{user._count.following} following</span>
+                        <span className="hidden sm:inline">Joined {new Date(user.createdAt).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <div className="flex-shrink-0 ml-4">
+                  <div className="flex justify-end sm:flex-shrink-0">
                     {user.id !== adminUser.id && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -394,10 +396,11 @@ export function UserManagement({ adminUser }: UserManagementProps) {
 
               {/* Pagination */}
               {data.pagination.hasMore && (
-                <div className="p-6 text-center border-t">
+                <div className="p-4 sm:p-6 text-center border-t">
                   <Button 
                     variant="outline" 
                     onClick={() => setPage(page + 1)}
+                    className="w-full sm:w-auto"
                   >
                     Load More Users
                   </Button>

@@ -5,8 +5,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
+  const { notificationId } = await params
   try {
     const session = await getServerSession(authOptions)
     
@@ -18,7 +19,7 @@ export async function GET(
     }
 
     const notification = await prisma.notification.findUnique({
-      where: { id: params.notificationId },
+      where: { id: notificationId },
       include: {
         user: {
           select: {
@@ -61,8 +62,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
+  const { notificationId } = await params
   try {
     const session = await getServerSession(authOptions)
     
@@ -74,7 +76,7 @@ export async function PUT(
     }
 
     const notification = await prisma.notification.findUnique({
-      where: { id: params.notificationId },
+      where: { id: notificationId },
     })
 
     if (!notification) {
@@ -97,7 +99,7 @@ export async function PUT(
 
     // Update notification
     const updatedNotification = await prisma.notification.update({
-      where: { id: params.notificationId },
+      where: { id: notificationId },
       data: {
         read: Boolean(read),
       },
@@ -128,8 +130,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { notificationId: string } }
+  { params }: { params: Promise<{ notificationId: string }> }
 ) {
+  const { notificationId } = await params
   try {
     const session = await getServerSession(authOptions)
     
@@ -141,7 +144,7 @@ export async function DELETE(
     }
 
     const notification = await prisma.notification.findUnique({
-      where: { id: params.notificationId },
+      where: { id: notificationId },
     })
 
     if (!notification) {
@@ -161,7 +164,7 @@ export async function DELETE(
 
     // Delete notification
     await prisma.notification.delete({
-      where: { id: params.notificationId },
+      where: { id: notificationId },
     })
 
     return NextResponse.json({

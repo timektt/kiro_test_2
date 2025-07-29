@@ -178,34 +178,34 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Admin Dashboard</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Welcome back, {adminUser.name || adminUser.username}
           </p>
         </div>
-        <Badge variant={adminUser.role === 'ADMIN' ? 'default' : 'secondary'}>
+        <Badge variant={adminUser.role === 'ADMIN' ? 'default' : 'secondary'} className="w-fit">
           {adminUser.role}
         </Badge>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat) => {
           const Icon = stat.icon
           return (
             <Card key={stat.title}>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-xs sm:text-sm font-medium truncate">
                   {stat.title}
                 </CardTitle>
-                <Icon className={`h-4 w-4 ${stat.color}`} />
+                <Icon className={`h-4 w-4 ${stat.color} flex-shrink-0`} />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stat.value.toLocaleString()}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stat.value.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground">
                   {stat.change}
                 </p>
@@ -218,23 +218,23 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
       {/* Recent Activity */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="h-5 w-5" />
+          <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+            <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5" />
             Recent Activity
           </CardTitle>
         </CardHeader>
         <CardContent>
           {recentActivity.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
+            <p className="text-muted-foreground text-center py-6 sm:py-8 text-sm sm:text-base">
               No recent activity to display
             </p>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {recentActivity.map((activity) => {
                 const Icon = getActivityIcon(activity.type)
                 return (
-                  <div key={activity.id} className="flex items-start gap-3">
-                    <Icon className={`h-4 w-4 mt-1 ${getActivityColor(activity.severity)}`} />
+                  <div key={activity.id} className="flex items-start gap-2 sm:gap-3">
+                    <Icon className={`h-4 w-4 mt-0.5 sm:mt-1 ${getActivityColor(activity.severity)} flex-shrink-0`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">{activity.message}</p>
                       <p className="text-xs text-muted-foreground">
@@ -252,25 +252,25 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
       {/* Quick Actions */}
       <Card>
         <CardHeader>
-          <CardTitle>Quick Actions</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <Users className="h-6 w-6" />
-              <span className="text-sm">Manage Users</span>
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+            <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-center gap-1 sm:gap-2">
+              <Users className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="text-xs sm:text-sm">Manage Users</span>
             </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <FileText className="h-6 w-6" />
-              <span className="text-sm">Review Content</span>
+            <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-center gap-1 sm:gap-2">
+              <FileText className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="text-xs sm:text-sm">Review Content</span>
             </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <AlertTriangle className="h-6 w-6" />
-              <span className="text-sm">Handle Reports</span>
+            <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-center gap-1 sm:gap-2">
+              <AlertTriangle className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="text-xs sm:text-sm">Handle Reports</span>
             </Button>
-            <Button variant="outline" className="h-auto p-4 flex flex-col items-center gap-2">
-              <TrendingUp className="h-6 w-6" />
-              <span className="text-sm">View Analytics</span>
+            <Button variant="outline" className="h-auto p-3 sm:p-4 flex flex-col items-center gap-1 sm:gap-2">
+              <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6" />
+              <span className="text-xs sm:text-sm">View Analytics</span>
             </Button>
           </div>
         </CardContent>

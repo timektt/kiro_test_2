@@ -77,58 +77,60 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
   const socialLinks = user.socialLinks as Record<string, string> || {}
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn('space-y-4 sm:space-y-6', className)}>
       {/* Profile Card */}
-      <Card>
-        <CardHeader className="text-center pb-4">
-          <Avatar className="h-24 w-24 mx-auto mb-4">
+      <Card className="overflow-hidden">
+        <CardHeader className="text-center pb-3 sm:pb-4 px-4 sm:px-6">
+          <Avatar className="h-20 w-20 sm:h-24 sm:w-24 mx-auto mb-3 sm:mb-4 ring-2 ring-border">
             <AvatarImage src={user.image || undefined} alt={user.name || 'User'} />
-            <AvatarFallback className="text-2xl">
+            <AvatarFallback className="text-xl sm:text-2xl font-semibold">
               {user.name ? getInitials(user.name) : user.username[0].toUpperCase()}
             </AvatarFallback>
           </Avatar>
           
           <div className="space-y-2">
-            <CardTitle className="text-xl">{user.name || user.username}</CardTitle>
-            <p className="text-muted-foreground">@{user.username}</p>
+            <CardTitle className="text-lg sm:text-xl leading-tight">{user.name || user.username}</CardTitle>
+            <p className="text-sm text-muted-foreground">@{user.username}</p>
             
             {user.mbti && (
               <div className="flex justify-center">
-                <Badge className={cn('text-sm', mbtiColors[user.mbti.type])}>
-                  {user.mbti.type} - {mbtiDescriptions[user.mbti.type]}
+                <Badge className={cn('text-xs sm:text-sm px-2 py-1', mbtiColors[user.mbti.type])}>
+                  <span className="hidden sm:inline">{user.mbti.type} - </span>
+                  <span className="sm:hidden">{user.mbti.type}</span>
+                  <span className="hidden sm:inline">{mbtiDescriptions[user.mbti.type]}</span>
                 </Badge>
               </div>
             )}
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 sm:px-6 pb-4 sm:pb-6">
           {/* Bio */}
           {user.bio && (
             <div>
-              <p className="text-sm leading-relaxed">{user.bio}</p>
+              <p className="text-sm leading-relaxed break-words">{user.bio}</p>
             </div>
           )}
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 text-center">
-            <div>
-              <div className="font-semibold text-lg">{user._count?.posts || 0}</div>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center py-2 sm:py-3 bg-muted/30 rounded-lg">
+            <div className="space-y-1">
+              <div className="font-semibold text-base sm:text-lg">{user._count?.posts || 0}</div>
               <div className="text-xs text-muted-foreground">Posts</div>
             </div>
-            <div>
-              <div className="font-semibold text-lg">{user._count?.followers || 0}</div>
+            <div className="space-y-1 border-x border-border/50">
+              <div className="font-semibold text-base sm:text-lg">{user._count?.followers || 0}</div>
               <div className="text-xs text-muted-foreground">Followers</div>
             </div>
-            <div>
-              <div className="font-semibold text-lg">{user._count?.following || 0}</div>
+            <div className="space-y-1">
+              <div className="font-semibold text-base sm:text-lg">{user._count?.following || 0}</div>
               <div className="text-xs text-muted-foreground">Following</div>
             </div>
           </div>
 
           {/* Join Date */}
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Calendar className="h-4 w-4" />
+          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
             <span>Joined {formatDate(user.createdAt)}</span>
           </div>
 
@@ -143,10 +145,10 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                    className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors min-h-[44px] sm:min-h-[auto] py-2 sm:py-1 -mx-2 px-2 rounded-md hover:bg-muted/50"
                   >
-                    <LinkIcon className="h-3 w-3" />
-                    <span className="capitalize">{platform}</span>
+                    <LinkIcon className="h-3 w-3 flex-shrink-0" />
+                    <span className="capitalize truncate">{platform}</span>
                   </Link>
                 ))}
               </div>
@@ -154,16 +156,27 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
           )}
 
           {/* Action Buttons */}
-          <div className="space-y-2">
+          <div className="space-y-2 pt-2">
             {isOwnProfile ? (
-              <Button variant="outline" className="w-full" asChild>
+              <Button 
+                variant="outline" 
+                className="w-full min-h-[44px] sm:min-h-[auto] text-sm" 
+                asChild
+              >
                 <Link href="/settings/profile">Edit Profile</Link>
               </Button>
             ) : (
-              <>
-                <Button className="w-full">Follow</Button>
-                <Button variant="outline" className="w-full">Message</Button>
-              </>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Button className="w-full min-h-[44px] sm:min-h-[auto] text-sm">
+                  Follow
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full min-h-[44px] sm:min-h-[auto] text-sm"
+                >
+                  Message
+                </Button>
+              </div>
             )}
           </div>
         </CardContent>
@@ -171,22 +184,24 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
 
       {/* MBTI Details */}
       {user.mbti && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg flex items-center gap-2">
-              🧠 Personality Type
+        <Card className="overflow-hidden">
+          <CardHeader className="px-4 sm:px-6 pb-3">
+            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+              <span className="text-lg">🧠</span>
+              <span>Personality Type</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{user.mbti.type}</span>
-                <Badge className={mbtiColors[user.mbti.type]}>
-                  {mbtiDescriptions[user.mbti.type]}
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium text-sm sm:text-base">{user.mbti.type}</span>
+                <Badge className={cn('text-xs px-2 py-1', mbtiColors[user.mbti.type])}>
+                  <span className="hidden sm:inline">{mbtiDescriptions[user.mbti.type]}</span>
+                  <span className="sm:hidden">{mbtiDescriptions[user.mbti.type].split(' ')[1]}</span>
                 </Badge>
               </div>
               {user.mbti.description && (
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed break-words">
                   {user.mbti.description}
                 </p>
               )}
@@ -196,26 +211,26 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
       )}
 
       {/* Ranking */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <Trophy className="h-5 w-5" />
-            Community Ranking
+      <Card className="overflow-hidden">
+        <CardHeader className="px-4 sm:px-6 pb-3">
+          <CardTitle className="text-base sm:text-lg flex items-center gap-2">
+            <Trophy className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+            <span>Community Ranking</span>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
           <div className="space-y-3">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center min-h-[44px] sm:min-h-[auto] py-2 sm:py-1">
               <span className="text-sm">Posts Likes</span>
-              <Badge variant="secondary">#42</Badge>
+              <Badge variant="secondary" className="text-xs px-2 py-1">#42</Badge>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center min-h-[44px] sm:min-h-[auto] py-2 sm:py-1">
               <span className="text-sm">Engagement</span>
-              <Badge variant="secondary">#28</Badge>
+              <Badge variant="secondary" className="text-xs px-2 py-1">#28</Badge>
             </div>
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center min-h-[44px] sm:min-h-[auto] py-2 sm:py-1">
               <span className="text-sm">Followers</span>
-              <Badge variant="secondary">#15</Badge>
+              <Badge variant="secondary" className="text-xs px-2 py-1">#15</Badge>
             </div>
           </div>
         </CardContent>

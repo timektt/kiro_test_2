@@ -133,16 +133,18 @@ export const PostItem = memo<PostItemProps>(({
 
   return (
     <Card className={cn('w-full', className)}>
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <UserBadge user={post.author} size="md" showMBTI />
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
+      <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-6 pt-3 sm:pt-6">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex-1 min-w-0">
+            <UserBadge user={post.author} size="sm" showMBTI />
+          </div>
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+            <span className="text-xs sm:text-sm text-muted-foreground whitespace-nowrap">
               {formattedTime}
             </span>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0 min-h-[44px] sm:min-h-[32px]">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -178,10 +180,10 @@ export const PostItem = memo<PostItemProps>(({
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 px-3 sm:px-6 pb-3 sm:pb-6">
         {/* Post Content */}
         <div className="space-y-3">
-          <div className="text-sm leading-relaxed whitespace-pre-wrap">
+          <div className="text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
             {post.content}
           </div>
 
@@ -201,30 +203,30 @@ export const PostItem = memo<PostItemProps>(({
 
           {/* Engagement Actions */}
           <div className="flex items-center justify-between pt-2 border-t">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleLike}
                 className={cn(
-                  'flex items-center gap-2 text-muted-foreground hover:text-red-500',
+                  'flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-red-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3',
                   isLiked && 'text-red-500'
                 )}
               >
                 <Heart className={cn('h-4 w-4', isLiked && 'fill-current')} />
-                <span className="text-sm">{likeCount}</span>
+                <span className="text-xs sm:text-sm">{likeCount}</span>
               </Button>
 
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={handleComment}
-                className="flex items-center gap-2 text-muted-foreground hover:text-blue-500"
+                className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-blue-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3"
                 asChild
               >
                 <Link href={`/post/${post.id}`}>
                   <MessageCircle className="h-4 w-4" />
-                  <span className="text-sm">{commentCount}</span>
+                  <span className="text-xs sm:text-sm">{commentCount}</span>
                 </Link>
               </Button>
 
@@ -232,10 +234,10 @@ export const PostItem = memo<PostItemProps>(({
                 variant="ghost"
                 size="sm"
                 onClick={handleShare}
-                className="flex items-center gap-2 text-muted-foreground hover:text-green-500"
+                className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-green-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3"
               >
                 <Share className="h-4 w-4" />
-                <span className="text-sm">Share</span>
+                <span className="text-xs sm:text-sm hidden sm:inline">Share</span>
               </Button>
             </div>
 
@@ -245,7 +247,7 @@ export const PostItem = memo<PostItemProps>(({
               onClick={handleBookmark}
               aria-label="Bookmark post"
               className={cn(
-                'text-muted-foreground hover:text-yellow-500',
+                'text-muted-foreground hover:text-yellow-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3',
                 isBookmarked && 'text-yellow-500'
               )}
             >

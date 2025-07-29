@@ -5,8 +5,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { commentId: string } }
+  { params }: { params: Promise<{ commentId: string }> }
 ) {
+  const { commentId } = await params
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -17,7 +18,7 @@ export async function GET(
     }
 
     const comment = await prisma.comment.findUnique({
-      where: { id: params.commentId },
+      where: { id: commentId },
       include: {
         author: {
           select: {
@@ -67,8 +68,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { commentId: string } }
+  { params }: { params: Promise<{ commentId: string }> }
 ) {
+  const { commentId } = await params
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -82,7 +84,7 @@ export async function PUT(
 
     // Check if comment exists and user owns it or is admin
     const existingComment = await prisma.comment.findUnique({
-      where: { id: params.commentId },
+      where: { id: commentId },
     })
 
     if (!existingComment) {
@@ -103,7 +105,7 @@ export async function PUT(
     }
 
     const updatedComment = await prisma.comment.update({
-      where: { id: params.commentId },
+      where: { id: commentId },
       data: { 
         content,
         updatedAt: new Date()
@@ -132,8 +134,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { commentId: string } }
+  { params }: { params: Promise<{ commentId: string }> }
 ) {
+  const { commentId } = await params
   try {
     const session = await getServerSession(authOptions)
     if (!session?.user) {
@@ -145,7 +148,7 @@ export async function DELETE(
 
     // Check if comment exists and user owns it or is admin
     const existingComment = await prisma.comment.findUnique({
-      where: { id: params.commentId },
+      where: { id: commentId },
     })
 
     if (!existingComment) {
@@ -166,7 +169,7 @@ export async function DELETE(
     }
 
     await prisma.comment.delete({
-      where: { id: params.commentId },
+      where: { id: commentId },
     })
 
     return NextResponse.json({ 

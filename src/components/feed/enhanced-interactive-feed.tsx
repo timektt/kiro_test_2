@@ -10,6 +10,7 @@ import { FileText, RefreshCw } from 'lucide-react'
 import { usePosts, useCreatePost, useLikePost } from '@/hooks/use-posts'
 import { useFeedStore } from '@/stores/feed-store'
 import { useUIStore } from '@/stores/ui-store'
+import { cn } from '@/lib/utils'
 
 interface EnhancedInteractiveFeedProps {
   currentUserId: string
@@ -55,7 +56,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
     } else if (filter === 'trending') {
       setFeedType('trending')
     }
-  }, [])
+  }, [setFeedType])
   
   // Handle sort changes
   const handleSortChange = (sort: 'recent' | 'popular') => {
@@ -102,20 +103,21 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
   }
   
   return (
-    <div className="space-y-6">
-      {/* Feed Controls */}
-      <div className="flex items-center justify-between">
+    <div className={cn('space-y-4 sm:space-y-6', className)}>
+      {/* Mobile: Stacked controls */}
+      <div className="sm:hidden space-y-3">
         <FeedFilter
           currentFilter={feedType === 'following' ? 'home' : feedType}
           onFilterChange={handleFilterChange}
         />
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1">
           {/* Sort Controls */}
           <select
             value={sortBy}
             onChange={(e) => handleSortChange(e.target.value as 'recent' | 'popular')}
-            className="px-3 py-1 border rounded-md text-sm"
+            className="px-2 py-1 border rounded-md text-xs flex-shrink-0 h-7"
+            title="Sort posts"
           >
             <option value="recent">Recent</option>
             <option value="popular">Popular</option>
@@ -125,7 +127,8 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
           <select
             value={mbtiFilter || ''}
             onChange={(e) => handleMbtiFilter(e.target.value || null)}
-            className="px-3 py-1 border rounded-md text-sm"
+            className="px-2 py-1 border rounded-md text-xs flex-shrink-0 h-7 min-w-0"
+            title="Filter by MBTI type"
           >
             <option value="">All Types</option>
             <option value="INTJ">INTJ</option>
@@ -152,6 +155,66 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
             size="sm"
             onClick={handleRefresh}
             disabled={isLoading}
+            className="flex-shrink-0 h-7 w-7 p-0"
+            title="Refresh feed"
+          >
+            <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
+          </Button>
+        </div>
+      </div>
+
+      {/* Desktop: Side-by-side controls */}
+      <div className="hidden sm:flex items-center justify-between">
+        <FeedFilter
+          currentFilter={feedType === 'following' ? 'home' : feedType}
+          onFilterChange={handleFilterChange}
+        />
+        
+        <div className="flex items-center gap-2">
+          {/* Sort Controls */}
+          <select
+            value={sortBy}
+            onChange={(e) => handleSortChange(e.target.value as 'recent' | 'popular')}
+            className="px-3 py-1 border rounded-md text-sm"
+            title="Sort posts"
+          >
+            <option value="recent">Recent</option>
+            <option value="popular">Popular</option>
+          </select>
+          
+          {/* MBTI Filter */}
+          <select
+            value={mbtiFilter || ''}
+            onChange={(e) => handleMbtiFilter(e.target.value || null)}
+            className="px-3 py-1 border rounded-md text-sm"
+            title="Filter by MBTI type"
+          >
+            <option value="">All Types</option>
+            <option value="INTJ">INTJ</option>
+            <option value="INTP">INTP</option>
+            <option value="ENTJ">ENTJ</option>
+            <option value="ENTP">ENTP</option>
+            <option value="INFJ">INFJ</option>
+            <option value="INFP">INFP</option>
+            <option value="ENFJ">ENFJ</option>
+            <option value="ENFP">ENFP</option>
+            <option value="ISTJ">ISTJ</option>
+            <option value="ISFJ">ISFJ</option>
+            <option value="ESTJ">ESTJ</option>
+            <option value="ESFJ">ESFJ</option>
+            <option value="ISTP">ISTP</option>
+            <option value="ISFP">ISFP</option>
+            <option value="ESTP">ESTP</option>
+            <option value="ESFP">ESFP</option>
+          </select>
+          
+          {/* Refresh Button */}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isLoading}
+            title="Refresh feed"
           >
             <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
           </Button>
@@ -160,8 +223,8 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
       
       {/* Loading State */}
       {(isLoading || globalLoading) && (
-        <div className="text-center py-4">
-          <div className="inline-flex items-center gap-2 text-muted-foreground">
+        <div className="text-center py-3 sm:py-4">
+          <div className="inline-flex items-center gap-2 text-muted-foreground text-sm">
             <RefreshCw className="h-4 w-4 animate-spin" />
             Loading posts...
           </div>
@@ -170,24 +233,25 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
       
       {/* Posts Feed */}
       {allPosts.length === 0 && !isLoading ? (
-        <EmptyState
-          icon={FileText}
-          title="No posts found"
-          description={
-            feedType === 'following'
-              ? "Follow some users to see their posts in your feed"
-              : "No posts match your current filters"
-          }
-        />
+        <div className="px-4 sm:px-0">
+          <EmptyState
+            icon={FileText}
+            title="No posts found"
+            description={
+              feedType === 'following'
+                ? "Follow some users to see their posts in your feed"
+                : "No posts match your current filters"
+            }
+          />
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {allPosts.map((post) => (
             <PostItem
               key={post.id}
               post={post}
               currentUserId={currentUserId}
               onLike={() => handleLike(post.id)}
-              isLiking={isToggling}
               // Add optimistic styling for temporary posts
               className={post.id.startsWith('temp-') ? 'opacity-70' : ''}
             />
@@ -195,7 +259,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
           
           {/* Load More Button */}
           {pagination.hasMore && (
-            <div className="text-center py-4">
+            <div className="text-center py-4 sm:py-6">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -203,6 +267,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
                   console.log('Load more posts')
                 }}
                 disabled={isLoading}
+                className="w-full sm:w-auto px-6 sm:px-8 h-10 sm:h-11"
               >
                 {isLoading ? (
                   <>
@@ -218,12 +283,12 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
         </div>
       )}
       
-      {/* Creating Post Indicator */}
+      {/* Creating Post Indicator - Mobile optimized */}
       {isCreating && (
-        <div className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg">
+        <div className="fixed bottom-4 right-4 bg-primary text-primary-foreground px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-lg z-50">
           <div className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4 animate-spin" />
-            Creating post...
+            <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+            <span className="text-xs sm:text-sm">Creating post...</span>
           </div>
         </div>
       )}

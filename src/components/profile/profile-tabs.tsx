@@ -89,7 +89,7 @@ export function ProfileTabs({
     switch (activeTab) {
       case 'posts':
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {posts.length > 0 ? (
               posts.map((post) => (
                 <PostItem
@@ -200,11 +200,11 @@ export function ProfileTabs({
   })
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn('space-y-4 sm:space-y-6', className)}>
       {/* Tab Navigation */}
       <Card>
-        <CardContent className="p-2">
-          <div className="flex flex-wrap gap-1">
+        <CardContent className="p-1 sm:p-2">
+          <div className="flex overflow-x-auto gap-1 pb-1 scrollbar-hide">
             {visibleTabs.map((tab) => {
               const Icon = tab.icon
               const isActive = activeTab === tab.id
@@ -216,24 +216,24 @@ export function ProfileTabs({
                   size="sm"
                   onClick={() => setActiveTab(tab.id)}
                   className={cn(
-                    'flex items-center gap-2 text-sm',
+                    'flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap min-h-[44px] sm:min-h-[auto] px-3 sm:px-4',
                     isActive && 'shadow-sm'
                   )}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <Icon className="h-4 w-4 flex-shrink-0" />
+                  <span className="hidden xs:inline sm:inline">{tab.label}</span>
                   {tab.id === 'posts' && (
-                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">
+                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded flex-shrink-0">
                       {user._count?.posts || 0}
                     </span>
                   )}
                   {tab.id === 'followers' && (
-                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">
+                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded flex-shrink-0">
                       {user._count?.followers || 0}
                     </span>
                   )}
                   {tab.id === 'following' && (
-                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded">
+                    <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded flex-shrink-0">
                       {user._count?.following || 0}
                     </span>
                   )}
@@ -245,7 +245,7 @@ export function ProfileTabs({
       </Card>
 
       {/* Tab Content */}
-      <div className="min-h-[400px]">
+      <div className="min-h-[300px] sm:min-h-[400px]">
         {renderTabContent()}
       </div>
     </div>

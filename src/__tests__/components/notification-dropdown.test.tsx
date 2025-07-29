@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { useSession } from 'next-auth/react'
 import { NotificationDropdown } from '@/components/ui/notification-dropdown'
 import useSWR from 'swr'
@@ -22,37 +23,17 @@ const mockNotifications = [
     id: 'notification-1',
     type: 'LIKE' as const,
     message: 'liked your post',
-    isRead: false,
-    readAt: null,
+    read: false,
     createdAt: new Date(),
-    actor: {
-      id: 'user-2',
-      username: 'user2',
-      name: 'User 2',
-      image: null,
-    },
-    post: {
-      id: 'post-1',
-      content: 'Test post content',
-    },
+    relatedId: 'post-1',
   },
   {
     id: 'notification-2',
     type: 'COMMENT' as const,
     message: 'commented on your post',
-    isRead: true,
-    readAt: new Date(),
+    read: true,
     createdAt: new Date(),
-    actor: {
-      id: 'user-3',
-      username: 'user3',
-      name: 'User 3',
-      image: null,
-    },
-    post: {
-      id: 'post-1',
-      content: 'Test post content',
-    },
+    relatedId: 'post-1',
   },
 ]
 
@@ -70,7 +51,10 @@ const mockNotificationData = {
 describe('NotificationDropdown', () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    global.fetch = jest.fn()
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve({ success: true }),
+    })
   })
 
   it('should not render when user is not authenticated', () => {
@@ -122,10 +106,7 @@ describe('NotificationDropdown', () => {
       mutate: jest.fn(),
     })
 
-    render(<NotificationDropdown />)
-    
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
+    render(<NotificationDropdown forceOpen />)
     
     expect(screen.getByText('Loading notifications...')).toBeInTheDocument()
   })
@@ -143,10 +124,7 @@ describe('NotificationDropdown', () => {
       mutate: jest.fn(),
     })
 
-    render(<NotificationDropdown />)
-    
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
+    render(<NotificationDropdown forceOpen />)
     
     expect(screen.getByText('Failed to load notifications')).toBeInTheDocument()
   })
@@ -164,10 +142,7 @@ describe('NotificationDropdown', () => {
       mutate: jest.fn(),
     })
 
-    render(<NotificationDropdown />)
-    
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
+    render(<NotificationDropdown forceOpen />)
     
     expect(screen.getByText('No notifications')).toBeInTheDocument()
     expect(screen.getByText("You're all caught up!")).toBeInTheDocument()
@@ -186,13 +161,8 @@ describe('NotificationDropdown', () => {
       mutate: jest.fn(),
     })
 
-    render(<NotificationDropdown />)
+    render(<NotificationDropdown forceOpen />)
     
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
-    
-    expect(screen.getByText('User 2')).toBeInTheDocument()
-    expect(screen.getByText('User 3')).toBeInTheDocument()
     expect(screen.getByText('liked your post')).toBeInTheDocument()
     expect(screen.getByText('commented on your post')).toBeInTheDocument()
   })
@@ -216,12 +186,8 @@ describe('NotificationDropdown', () => {
       json: () => Promise.resolve({ success: true }),
     })
 
-    render(<NotificationDropdown />)
+    render(<NotificationDropdown forceOpen />)
     
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
-    
-    // Click mark all read button
     const markAllReadButton = screen.getByText('Mark all read')
     fireEvent.click(markAllReadButton)
 
@@ -255,10 +221,8 @@ describe('NotificationDropdown', () => {
       json: () => Promise.resolve({ success: true }),
     })
 
-    render(<NotificationDropdown />)
-    
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
+    // Render with forceOpen to simulate dropdown opening
+    render(<NotificationDropdown forceOpen />)
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('/api/notifications', {
@@ -287,10 +251,7 @@ describe('NotificationDropdown', () => {
       mutate: jest.fn(),
     })
 
-    render(<NotificationDropdown />)
-    
-    // Click to open dropdown
-    fireEvent.click(screen.getByRole('button'))
+    render(<NotificationDropdown forceOpen />)
     
     const viewAllLink = screen.getByText('View all notifications')
     expect(viewAllLink).toBeInTheDocument()

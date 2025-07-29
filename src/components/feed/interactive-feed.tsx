@@ -121,30 +121,50 @@ export function InteractiveFeed({ initialPosts, currentUserId }: InteractiveFeed
 
   if (posts.length === 0) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <FeedFilter currentFilter={currentFilter} onFilterChange={handleFilterChange} />
-        <EmptyState
-          icon={FileText}
-          title="No posts found"
-          description={
-            currentFilter === 'home'
-              ? "Follow some people to see their posts in your feed"
-              : `No posts found for ${currentFilter} filter`
-          }
-          action={{
-            label: currentFilter === 'home' ? 'Find People' : 'Refresh',
-            onClick: currentFilter === 'home' 
-              ? () => console.log('Navigate to find people')
-              : handleRefresh
-          }}
-        />
+        <div className="px-4 sm:px-0">
+          <EmptyState
+            icon={FileText}
+            title="No posts found"
+            description={
+              currentFilter === 'home'
+                ? "Follow some people to see their posts in your feed"
+                : `No posts found for ${currentFilter} filter`
+            }
+            action={{
+              label: currentFilter === 'home' ? 'Find People' : 'Refresh',
+              onClick: currentFilter === 'home' 
+                ? () => console.log('Navigate to find people')
+                : handleRefresh
+            }}
+          />
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Mobile: Stacked filter and refresh */}
+      <div className="sm:hidden space-y-3">
+        <FeedFilter currentFilter={currentFilter} onFilterChange={handleFilterChange} />
+        <div className="flex justify-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center gap-2 h-8"
+          >
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <span className="text-sm">Refresh</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Desktop: Side-by-side filter and refresh */}
+      <div className="hidden sm:flex items-center justify-between">
         <FeedFilter currentFilter={currentFilter} onFilterChange={handleFilterChange} />
         <Button
           variant="ghost"
@@ -154,11 +174,11 @@ export function InteractiveFeed({ initialPosts, currentUserId }: InteractiveFeed
           className="flex items-center gap-2"
         >
           <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">Refresh</span>
+          <span>Refresh</span>
         </Button>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {posts.map((post) => (
           <PostItem
             key={post.id}
@@ -173,14 +193,22 @@ export function InteractiveFeed({ initialPosts, currentUserId }: InteractiveFeed
       </div>
 
       {/* Load More */}
-      <div className="text-center py-8">
+      <div className="text-center py-6 sm:py-8">
         <Button 
           variant="outline" 
-          size="lg"
+          size="default"
           onClick={handleLoadMore}
           disabled={isLoadingMore}
+          className="w-full sm:w-auto px-6 sm:px-8 h-10 sm:h-11"
         >
-          {isLoadingMore ? 'Loading...' : 'Load More Posts'}
+          {isLoadingMore ? (
+            <>
+              <RefreshCw className="h-4 w-4 animate-spin mr-2" />
+              Loading...
+            </>
+          ) : (
+            'Load More Posts'
+          )}
         </Button>
         <p className="text-xs text-muted-foreground mt-2">
           Showing {posts.length} posts

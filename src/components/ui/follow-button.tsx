@@ -117,32 +117,34 @@ export function FollowButton({
       onClick={handleFollow}
       disabled={isLoading}
       className={cn(
-        'transition-all duration-200',
+        'transition-all duration-200 min-h-[44px] sm:min-h-[auto] group',
         isFollowing && 'hover:bg-destructive hover:text-destructive-foreground hover:border-destructive',
         className
       )}
     >
       {isLoading ? (
         <>
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          {isFollowing ? 'Unfollowing...' : 'Following...'}
+          <Loader2 className="h-4 w-4 mr-1 sm:mr-2 animate-spin flex-shrink-0" />
+          <span className="text-xs sm:text-sm">
+            {isFollowing ? 'Unfollowing...' : 'Following...'}
+          </span>
         </>
       ) : (
         <>
           {showIcon && (
             <>
               {isFollowing ? (
-                <UserMinus className="h-4 w-4 mr-2" />
+                <UserMinus className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
               ) : (
-                <UserPlus className="h-4 w-4 mr-2" />
+                <UserPlus className="h-4 w-4 mr-1 sm:mr-2 flex-shrink-0" />
               )}
             </>
           )}
-          <span className="group-hover:hidden">
+          <span className="group-hover:hidden text-xs sm:text-sm">
             {isFollowing ? 'Following' : 'Follow'}
           </span>
           {isFollowing && (
-            <span className="hidden group-hover:inline">
+            <span className="hidden group-hover:inline text-xs sm:text-sm">
               Unfollow{username ? ` ${username}` : ''}
             </span>
           )}

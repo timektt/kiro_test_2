@@ -211,11 +211,11 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Content Moderation</h1>
-        <p className="text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl font-bold">Content Moderation</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Review and moderate posts and comments
         </p>
       </div>
@@ -223,12 +223,12 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
+          <CardTitle className="text-base sm:text-lg">Filters</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-3 sm:gap-4">
             {/* Search */}
-            <div className="relative flex-1">
+            <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search content..."
@@ -238,35 +238,37 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
               />
             </div>
 
-            {/* Type Filter */}
-            <Select value={typeFilter} onValueChange={(value) => handleFilterChange('type', value)}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Content</SelectItem>
-                <SelectItem value="POSTS">Posts Only</SelectItem>
-                <SelectItem value="COMMENTS">Comments Only</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              {/* Type Filter */}
+              <Select value={typeFilter} onValueChange={(value) => handleFilterChange('type', value)}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Content</SelectItem>
+                  <SelectItem value="POSTS">Posts Only</SelectItem>
+                  <SelectItem value="COMMENTS">Comments Only</SelectItem>
+                </SelectContent>
+              </Select>
 
-            {/* Status Filter */}
-            <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
-              <SelectTrigger className="w-full sm:w-40">
-                <SelectValue placeholder="Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ALL">All Status</SelectItem>
-                <SelectItem value="ACTIVE">Active</SelectItem>
-                <SelectItem value="HIDDEN">Hidden</SelectItem>
-              </SelectContent>
-            </Select>
+              {/* Status Filter */}
+              <Select value={statusFilter} onValueChange={(value) => handleFilterChange('status', value)}>
+                <SelectTrigger className="w-full sm:w-40">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All Status</SelectItem>
+                  <SelectItem value="ACTIVE">Active</SelectItem>
+                  <SelectItem value="HIDDEN">Hidden</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Content List */}
-      <div className="space-y-4">
+      <div className="space-y-3 sm:space-y-4">
         {isLoading ? (
           <LoadingFeed />
         ) : (
@@ -275,8 +277,8 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
             {(typeFilter === 'ALL' || typeFilter === 'POSTS') && data?.posts?.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
                     Posts ({data.posts.length})
                   </CardTitle>
                 </CardHeader>
@@ -284,46 +286,46 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
                   {data.posts.map((post: Post) => (
                     <div
                       key={post.id}
-                      className="flex items-start justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 p-3 sm:p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
                     >
-                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                      <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
                         {/* Author Avatar */}
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                           <AvatarImage src={post.author.image || undefined} />
-                          <AvatarFallback>
+                          <AvatarFallback className="text-xs sm:text-sm">
                             {post.author.name?.[0] || post.author.username[0]}
                           </AvatarFallback>
                         </Avatar>
 
                         {/* Post Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-medium">
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                            <span className="font-medium text-sm sm:text-base truncate">
                               {post.author.name || post.author.username}
                             </span>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-xs sm:text-sm text-muted-foreground">
                               @{post.author.username}
                             </span>
-                            <Badge variant={post.isPublic ? 'default' : 'secondary'}>
+                            <Badge variant={post.isPublic ? 'default' : 'secondary'} className="text-xs">
                               {post.isPublic ? 'Public' : 'Hidden'}
                             </Badge>
                           </div>
-                          <p className="text-sm mb-2">{truncateText(post.content)}</p>
+                          <p className="text-xs sm:text-sm mb-2">{truncateText(post.content, 80)}</p>
                           {post.imageUrl && (
                             <div className="mb-2">
-                              <Badge variant="outline">Has Image</Badge>
+                              <Badge variant="outline" className="text-xs">Has Image</Badge>
                             </div>
                           )}
-                          <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                             <span>{post._count.likes} likes</span>
                             <span>{post._count.comments} comments</span>
-                            <span>{formatDate(post.createdAt)}</span>
+                            <span className="hidden sm:inline">{formatDate(post.createdAt)}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex-shrink-0 ml-4">
+                      <div className="flex justify-end sm:flex-shrink-0">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -385,8 +387,8 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
             {(typeFilter === 'ALL' || typeFilter === 'COMMENTS') && data?.comments?.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <MessageSquare className="h-5 w-5" />
+                  <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5" />
                     Comments ({data.comments.length})
                   </CardTitle>
                 </CardHeader>
@@ -394,39 +396,40 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
                   {data.comments.map((comment: Comment) => (
                     <div
                       key={comment.id}
-                      className="flex items-start justify-between p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
+                      className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 p-3 sm:p-4 border-b border-border/50 hover:bg-muted/30 transition-colors"
                     >
-                      <div className="flex items-start gap-4 flex-1 min-w-0">
+                      <div className="flex items-start gap-3 sm:gap-4 flex-1 min-w-0">
                         {/* Author Avatar */}
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
                           <AvatarImage src={comment.author.image || undefined} />
-                          <AvatarFallback>
+                          <AvatarFallback className="text-xs sm:text-sm">
                             {comment.author.name?.[0] || comment.author.username[0]}
                           </AvatarFallback>
                         </Avatar>
 
                         {/* Comment Content */}
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="font-medium">
+                          <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-2">
+                            <span className="font-medium text-sm sm:text-base truncate">
                               {comment.author.name || comment.author.username}
                             </span>
-                            <span className="text-sm text-muted-foreground">
+                            <span className="text-xs sm:text-sm text-muted-foreground">
                               @{comment.author.username}
                             </span>
                           </div>
-                          <p className="text-sm mb-2">{truncateText(comment.content)}</p>
+                          <p className="text-xs sm:text-sm mb-2">{truncateText(comment.content, 80)}</p>
                           <div className="text-xs text-muted-foreground mb-2">
-                            On post: "{truncateText(comment.post.content, 50)}"
+                            On post: "{truncateText(comment.post.content, 40)}&quot;
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {formatDate(comment.createdAt)}
+                            <span className="hidden sm:inline">{formatDate(comment.createdAt)}</span>
+                            <span className="sm:hidden">{new Date(comment.createdAt).toLocaleDateString()}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Actions */}
-                      <div className="flex-shrink-0 ml-4">
+                      <div className="flex justify-end sm:flex-shrink-0">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
@@ -522,3 +525,4 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
   )
 }
 
+export default ContentModeration

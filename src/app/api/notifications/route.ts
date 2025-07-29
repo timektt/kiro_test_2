@@ -18,21 +18,14 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '20')
     const unreadOnly = searchParams.get('unreadOnly') === 'true'
-    const type = searchParams.get('type')
-
+    
     const skip = (page - 1) * limit
 
     // Build where clause
-    let whereClause: any = {
+    // eslint-disable-next-line prefer-const
+    const whereClause: any = {
       userId: session.user.id,
-    }
-
-    if (unreadOnly) {
-      whereClause.read = false
-    }
-
-    if (type) {
-      whereClause.type = type
+      ...(unreadOnly && { read: false }),
     }
 
     const [notifications, totalCount, unreadCount] = await Promise.all([
@@ -77,7 +70,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
@@ -91,55 +84,48 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json()
     const { action, notificationIds } = body
 
-    if (action === 'markAsRead') {
-      let updateResult
-
-      if (notificationIds && Array.isArray(notificationIds)) {
-        // Mark specific notifications as read
-        updateResult = await prisma.notification.updateMany({
-          where: {
-            id: { in: notificationIds },
-            userId: session.user.id,
-            read: false,
-          },
-          data: {
-            read: true,
-          },
-        })
-      } else {
-        // Mark all notifications as read
-        updateResult = await prisma.notification.updateMany({
-          where: {
-            userId: session.user.id,
-            read: false,
-          },
-          data: {
-            read: true,
-          },
-        })
-      }
+    if (action === 'markAllAsRead') {
+      // Mark all notifications as read for the user
+      await prisma.notification.updateMany({
+        where: {
+          userId: session.user.id,
+          read: false,
+        },
+        data: {
+          read: true,
+        },
+      })
 
       return NextResponse.json({
         success: true,
-        data: {
-          updatedCount: updateResult.count,
-        },
+        message: 'All notifications marked as read',
       })
     }
 
-    if (action === 'markAsUnread') {
-      if (!notificationIds || !Array.isArray(notificationIds)) {
-        return NextResponse.json(
-          { error: 'Notification IDs are required for markAsUnread action' },
-          { status: 400 }
-        )
-      }
-
-      const updateResult = await prisma.notification.updateMany({
+    if (action === 'markAsRead' && notificationIds && Array.isArray(notificationIds)) {
+      // Mark specific notifications as read
+      await prisma.notification.updateMany({
         where: {
           id: { in: notificationIds },
           userId: session.user.id,
+        },
+        data: {
           read: true,
+        },
+      })
+
+      return NextResponse.json({
+        success: true,
+        message: `${notificationIds.length} notifications marked as read`,
+      })
+    }
+
+    if (action === 'markAsUnread' && notificationIds && Array.isArray(notificationIds)) {
+      // Mark specific notifications as unread
+      await prisma.notification.updateMany({
+        where: {
+          id: { in: notificationIds },
+          userId: session.user.id,
         },
         data: {
           read: false,
@@ -148,14 +134,12 @@ export async function PATCH(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        data: {
-          updatedCount: updateResult.count,
-        },
+        message: `${notificationIds.length} notifications marked as unread`,
       })
     }
 
     return NextResponse.json(
-      { error: 'Invalid action' },
+      { error: 'Invalid action or missing parameters' },
       { status: 400 }
     )
   } catch (error) {
@@ -180,33 +164,16 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const notificationIds = searchParams.get('ids')?.split(',')
-    const deleteAll = searchParams.get('all') === 'true'
-
-    if (deleteAll) {
-      // Delete all notifications for the user
-      const deleteResult = await prisma.notification.deleteMany({
-        where: {
-          userId: session.user.id,
-        },
-      })
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          deletedCount: deleteResult.count,
-        },
-      })
-    }
 
     if (!notificationIds || notificationIds.length === 0) {
       return NextResponse.json(
-        { error: 'Notification IDs are required' },
+        { error: 'No notification IDs provided' },
         { status: 400 }
       )
     }
 
-    // Delete specific notifications
-    const deleteResult = await prisma.notification.deleteMany({
+    // Delete notifications (only user's own notifications)
+    const result = await prisma.notification.deleteMany({
       where: {
         id: { in: notificationIds },
         userId: session.user.id,
@@ -215,9 +182,8 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      data: {
-        deletedCount: deleteResult.count,
-      },
+      message: `${result.count} notifications deleted`,
+      deletedCount: result.count,
     })
   } catch (error) {
     console.error('Error deleting notifications:', error)
@@ -227,4 +193,3 @@ export async function DELETE(request: NextRequest) {
     )
   }
 }
-

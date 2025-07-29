@@ -7,8 +7,9 @@ import { createNotification } from '@/lib/db-utils'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
+  const { postId } = await params
   try {
     const session = await getServerSession(authOptions)
     
@@ -26,7 +27,7 @@ export async function GET(
 
     // Check if post exists
     const post = await prisma.post.findUnique({
-      where: { id: params.postId },
+      where: { id: postId },
     })
 
     if (!post) {
@@ -38,7 +39,7 @@ export async function GET(
 
     const [comments, totalCount] = await Promise.all([
       prisma.comment.findMany({
-        where: { postId: params.postId },
+        where: { postId: postId },
         include: {
           author: {
             include: {
@@ -53,7 +54,7 @@ export async function GET(
         take: limit,
       }),
       prisma.comment.count({
-        where: { postId: params.postId },
+        where: { postId: postId },
       }),
     ])
 
@@ -82,8 +83,9 @@ export async function GET(
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { postId: string } }
+  { params }: { params: Promise<{ postId: string }> }
 ) {
+  const { postId } = await params
   try {
     const session = await getServerSession(authOptions)
     
@@ -99,7 +101,7 @@ export async function POST(
     // Validate input
     const result = commentSchema.safeParse({
       ...body,
-      postId: params.postId,
+      postId: postId,
     })
     
     if (!result.success) {
@@ -113,7 +115,7 @@ export async function POST(
 
     // Check if post exists
     const post = await prisma.post.findUnique({
-      where: { id: params.postId },
+      where: { id: postId },
       include: {
         author: {
           select: {
@@ -136,7 +138,7 @@ export async function POST(
     const comment = await prisma.comment.create({
       data: {
         content,
-        postId: params.postId,
+        postId: postId,
         authorId: session.user.id,
       },
       include: {
