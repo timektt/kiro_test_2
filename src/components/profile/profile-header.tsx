@@ -125,7 +125,7 @@ export function ProfileHeader({
       } else {
         await navigator.clipboard.writeText(window.location.href)
         // TODO: Show toast notification
-        console.log('Profile link copied to clipboard')
+        // Profile link copied to clipboard
       }
     } catch (error) {
       console.error('Error sharing profile:', error)

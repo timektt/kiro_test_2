@@ -1,17 +1,17 @@
 import { NextResponse } from 'next/server'
 import { withAuth } from 'next-auth/middleware'
 
-console.log('[MIDDLEWARE]', 'RUNNING')
+// Middleware running
 
 export default withAuth(
   function middleware(req) {
-    console.log('[MIDDLEWARE] URL:', req.nextUrl.pathname)
+    // Processing URL: req.nextUrl.pathname
   },
   {
     callbacks: {
       authorized: ({ token, req }) => {
         const pathname = req.nextUrl.pathname
-        console.log('[MIDDLEWARE] Checking auth:', pathname)
+        // Checking auth for: pathname
         
         if (pathname.startsWith("/admin")) {
           return token?.role === "ADMIN"

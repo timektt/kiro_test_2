@@ -1,4 +1,4 @@
-export const dynamic = 'force-dynamic'; // 🔥 บังคับไม่ใช้ static cache
+// Removed force-dynamic for better performance - using static generation with ISR
 
 
 

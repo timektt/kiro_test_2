@@ -1,5 +1,3 @@
-'use client'
-
 import { MBTI } from '@/types'
 import { getMBTIInfo, getMBTIColorClass } from '@/lib/mbti'
 import { Badge } from '@/components/ui/badge'

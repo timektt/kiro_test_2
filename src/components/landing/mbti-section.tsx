@@ -4,8 +4,7 @@ import { Brain, Users, Target, Lightbulb } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import InteractiveLinkButton from '@/components/common/InteractiveLinkButton'
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
+
 
 const mbtiTypes = [
   {

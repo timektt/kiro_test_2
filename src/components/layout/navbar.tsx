@@ -29,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
+import { ClientLinkButton } from '@/components/ui/client-link-button'
 
 export function Navbar() {
   const { data: session, status } = useSession()
@@ -239,12 +240,12 @@ export function Navbar() {
               </>
             ) : (
               <div className="flex items-center space-x-1 sm:space-x-2">
-                <Button variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3" asChild>
-                  <Link href="/auth/signin">Sign In</Link>
-                </Button>
-                <Button size="sm" className="text-xs sm:text-sm px-2 sm:px-3" asChild>
-                  <Link href="/auth/signup">Sign Up</Link>
-                </Button>
+                <ClientLinkButton variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3" href="/auth/signin">
+                  Sign In
+                </ClientLinkButton>
+                <ClientLinkButton size="sm" className="text-xs sm:text-sm px-2 sm:px-3" href="/auth/signup">
+                  Sign Up
+                </ClientLinkButton>
               </div>
             )}
           </div>

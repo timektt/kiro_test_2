@@ -16,7 +16,7 @@ export function InteractiveDemoButton({
 }: InteractiveDemoButtonProps) {
   const handleDemoClick = () => {
     // TODO: Implement demo functionality
-    console.log('Demo clicked - implement demo modal or video')
+    // Demo clicked - implement demo modal or video
     // For now, just show an alert
     alert('Demo feature coming soon!')
   }
