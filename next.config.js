@@ -1,3 +1,5 @@
+const { withSentryConfig } = require('@sentry/nextjs')
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
@@ -19,12 +21,27 @@ const nextConfig = {
   output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
 
   images: {
-    domains: [
-      'res.cloudinary.com',
-      'lh3.googleusercontent.com',
-      'avatars.githubusercontent.com',
-      'images.unsplash.com',
-      'via.placeholder.com',
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
@@ -42,51 +59,51 @@ const nextConfig = {
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
 
-  // async headers() {
-  //   const isProd = process.env.NODE_ENV === 'production'
+  async headers() {
+    const isProd = process.env.NODE_ENV === 'production'
 
-  //   const baseHeaders = isProd
-  //     ? [
-  //         // {
-  //         //   source: '/(.*)',
-  //         //   headers: [
-  //         //     { key: 'X-DNS-Prefetch-Control', value: 'on' },
-  //         //     { key: 'X-XSS-Protection', value: '1; mode=block' },
-  //         //     { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
-  //         //     { key: 'X-Content-Type-Options', value: 'nosniff' },
-  //         //     { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
-  //         //     {
-  //         //       key: 'Content-Security-Policy',
-  //         //       value:
-  //         //         "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src * blob: data:; object-src 'none'; frame-ancestors 'self'; base-uri 'self';",
-  //         //     },
-  //         //   ],
-  //         // },
-  //       ]
-  //     : []
+    const baseHeaders = isProd
+      ? [
+          {
+            source: '/(.*)',
+            headers: [
+              { key: 'X-DNS-Prefetch-Control', value: 'on' },
+              { key: 'X-XSS-Protection', value: '1; mode=block' },
+              { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+              { key: 'X-Content-Type-Options', value: 'nosniff' },
+              { key: 'Referrer-Policy', value: 'origin-when-cross-origin' },
+              {
+                key: 'Content-Security-Policy',
+                value:
+                  "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com; style-src 'self' 'unsafe-inline'; img-src * blob: data:; connect-src 'self' https://*.sentry.io https://vitals.vercel-analytics.com; object-src 'none'; frame-ancestors 'self'; base-uri 'self';",
+              },
+            ],
+          },
+        ]
+      : []
 
-  //   return [
-  //     ...baseHeaders,
-  //     {
-  //       source: '/api/(.*)',
-  //       headers: [
-  //         { key: 'Cache-Control', value: 'no-store, max-age=0' },
-  //       ],
-  //     },
-  //     {
-  //       source: '/_next/static/(.*)',
-  //       headers: [
-  //         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-  //       ],
-  //     },
-  //     {
-  //       source: '/images/(.*)',
-  //       headers: [
-  //         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-  //       ],
-  //     },
-  //   ]
-  // },
+    return [
+      ...baseHeaders,
+      {
+        source: '/api/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'no-store, max-age=0' },
+        ],
+      },
+      {
+        source: '/_next/static/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/images/(.*)',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+    ]
+  },
 
   // async redirects() {
   //   return [
@@ -108,4 +125,21 @@ const nextConfig = {
   // },
 }
 
-module.exports = nextConfig
+// Sentry configuration
+const sentryWebpackPluginOptions = {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  silent: true,
+  widenClientFileUpload: true,
+  reactComponentAnnotation: {
+    enabled: true,
+  },
+  tunnelRoute: '/monitoring',
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: true,
+}
+
+module.exports = process.env.SENTRY_DSN
+  ? withSentryConfig(nextConfig, sentryWebpackPluginOptions)
+  : nextConfig

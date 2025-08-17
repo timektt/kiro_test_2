@@ -9,7 +9,7 @@ const testimonials = [
     name: 'Sarah Chen',
     role: 'Software Engineer',
     mbti: 'INTJ',
-    avatar: '/avatars/sarah-chen.jpg',
+    avatar: '/avatars/sarah-chen.svg',
     content: 'Finally found a platform where I can connect with people who actually understand how I think. The MBTI matching is incredibly accurate!',
     rating: 5
   },
@@ -17,7 +17,7 @@ const testimonials = [
     name: 'Marcus Johnson',
     role: 'Creative Director',
     mbti: 'ENFP',
-    avatar: '/avatars/marcus-johnson.jpg',
+    avatar: '/avatars/marcus-johnson.svg',
     content: 'The community here is amazing. I\'ve made genuine friendships and found collaborators for my creative projects. The personality insights are spot-on.',
     rating: 5
   },
@@ -25,7 +25,7 @@ const testimonials = [
     name: 'Emily Rodriguez',
     role: 'Psychology Student',
     mbti: 'INFJ',
-    avatar: '/avatars/emily-rodriguez.jpg',
+    avatar: '/avatars/emily-rodriguez.svg',
     content: 'As someone studying psychology, I appreciate how thoughtfully the MBTI system is integrated. It\'s not just a gimmick - it really helps with meaningful connections.',
     rating: 5
   },
@@ -33,7 +33,7 @@ const testimonials = [
     name: 'David Kim',
     role: 'Entrepreneur',
     mbti: 'ENTJ',
-    avatar: '/avatars/david-kim.jpg',
+    avatar: '/avatars/david-kim.svg',
     content: 'Great for networking and finding like-minded individuals. The ranking system motivates me to contribute quality content and engage meaningfully.',
     rating: 5
   },
@@ -41,7 +41,7 @@ const testimonials = [
     name: 'Lisa Thompson',
     role: 'Teacher',
     mbti: 'ESFJ',
-    avatar: '/avatars/lisa-thompson.jpg',
+    avatar: '/avatars/lisa-thompson.svg',
     content: 'I love how supportive and understanding this community is. Everyone respects different personality types and communication styles.',
     rating: 5
   },
@@ -49,7 +49,7 @@ const testimonials = [
     name: 'Alex Rivera',
     role: 'Data Analyst',
     mbti: 'ISTP',
-    avatar: '/avatars/alex-rivera.jpg',
+    avatar: '/avatars/alex-rivera.svg',
     content: 'The platform is well-designed and intuitive. I appreciate the focus on quality conversations over mindless scrolling.',
     rating: 5
   }

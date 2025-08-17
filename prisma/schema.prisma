@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -17,12 +17,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -62,9 +62,9 @@ model User {
   emailVerified DateTime?
   password      String?   // For credentials provider
   image         String?
-  bio           String?   @db.Text
-  socialLinks   Json?     @default("{}")
-  role          Role      @default(USER)
+  bio           String?
+  socialLinks   String?   @default("{}")
+  role          String    @default("USER")
   isActive      Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -93,7 +93,7 @@ model User {
 
 model MBTI {
   id          String   @id @default(cuid())
-  type        MBTIType
+  type        String
   description String?
   userId      String   @unique
   assignedAt  DateTime @default(now())
@@ -107,7 +107,7 @@ model MBTI {
 
 model Post {
   id        String   @id @default(cuid())
-  content   String   @db.Text
+  content   String
   imageUrl  String?
   authorId  String
   isPublic  Boolean  @default(true)
@@ -127,7 +127,7 @@ model Post {
 
 model Comment {
   id        String   @id @default(cuid())
-  content   String   @db.Text
+  content   String
   postId    String
   authorId  String
   createdAt DateTime @default(now())
@@ -177,7 +177,7 @@ model Follow {
 
 model Notification {
   id        String           @id @default(cuid())
-  type      NotificationType
+  type      String
   message   String
   read      Boolean          @default(false)
   userId    String
@@ -197,7 +197,7 @@ model Notification {
 model Ranking {
   id          String      @id @default(cuid())
   userId      String
-  type        RankingType
+  type        String
   score       Int         @default(0)
   rank        Int?
   period      String      // e.g., "2024-01", "2024-Q1", "all-time"
@@ -214,46 +214,8 @@ model Ranking {
   @@map("rankings")
 }
 
-// Enums
-enum Role {
-  USER
-  ADMIN
-  MODERATOR
-}
-
-enum NotificationType {
-  LIKE
-  COMMENT
-  FOLLOW
-  MENTION
-  SYSTEM
-}
-
-enum MBTIType {
-  INTJ // Architect
-  INTP // Thinker
-  ENTJ // Commander
-  ENTP // Debater
-  INFJ // Advocate
-  INFP // Mediator
-  ENFJ // Protagonist
-  ENFP // Campaigner
-  ISTJ // Logistician
-  ISFJ // Protector
-  ESTJ // Executive
-  ESFJ // Consul
-  ISTP // Virtuoso
-  ISFP // Adventurer
-  ESTP // Entrepreneur
-  ESFP // Entertainer
-}
-
-enum RankingType {
-  POSTS_LIKES      // Total likes received on posts
-  POSTS_COUNT      // Total number of posts
-  COMMENTS_COUNT   // Total number of comments
-  FOLLOWERS_COUNT  // Total number of followers
-  ENGAGEMENT       // Combined engagement score
-  WEEKLY_ACTIVE    // Weekly activity score
-  MONTHLY_ACTIVE   // Monthly activity score
-}
+// Note: SQLite doesn't support enums, so we use String types instead
+// Valid values for role: "USER", "ADMIN", "MODERATOR"
+// Valid values for notification type: "LIKE", "COMMENT", "FOLLOW", "MENTION", "SYSTEM"
+// Valid values for MBTI type: "INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"
+// Valid values for ranking type: "POSTS_LIKES", "POSTS_COUNT", "COMMENTS_COUNT", "FOLLOWERS_COUNT", "ENGAGEMENT", "WEEKLY_ACTIVE", "MONTHLY_ACTIVE"

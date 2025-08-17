@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import logger from '@/lib/logger'
 
 export async function GET(request: NextRequest) {
   try {
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       version: process.env.npm_package_version || '1.0.0'
     })
   } catch (error) {
-    console.error('Health check failed:', error)
+    logger.error('Health check failed', error)
     
     return NextResponse.json({
       status: 'unhealthy',

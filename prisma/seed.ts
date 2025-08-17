@@ -17,9 +17,9 @@ async function main() {
       role: 'ADMIN',
       bio: 'Platform administrator with full access to manage users and content.',
       image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      socialLinks: {
+      socialLinks: JSON.stringify({
         linkedin: 'https://linkedin.com/in/admin',
-      },
+      }),
     },
   })
 
@@ -33,11 +33,11 @@ async function main() {
       name: 'John Doe',
       bio: 'Software developer passionate about web technologies and clean code. Love building scalable applications.',
       image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      socialLinks: {
+      socialLinks: JSON.stringify({
         github: 'https://github.com/johndoe',
         twitter: 'https://twitter.com/johndoe',
         linkedin: 'https://linkedin.com/in/johndoe',
-      },
+      }),
     },
   })
 
@@ -50,11 +50,11 @@ async function main() {
       name: 'Jane Smith',
       bio: 'UI/UX designer and frontend enthusiast. Creating beautiful and intuitive user experiences.',
       image: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
-      socialLinks: {
+      socialLinks: JSON.stringify({
         linkedin: 'https://linkedin.com/in/janesmith',
         twitter: 'https://twitter.com/janesmith',
         github: 'https://github.com/janesmith',
-      },
+      }),
     },
   })
 
@@ -67,10 +67,10 @@ async function main() {
       name: 'Alex Chen',
       bio: 'Full-stack developer and tech enthusiast. Always learning new technologies.',
       image: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face',
-      socialLinks: {
+      socialLinks: JSON.stringify({
         github: 'https://github.com/alexchen',
         twitter: 'https://twitter.com/alexchen',
-      },
+      }),
     },
   })
 
