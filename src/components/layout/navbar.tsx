@@ -13,7 +13,9 @@ import {
   Home,
   Users,
   Bell,
-  Search
+  Search,
+  MessageCircle,
+  Shield
 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -78,8 +80,9 @@ export function Navbar() {
 
   const navItems = [
     { href: '/feed', label: 'Feed', icon: Home },
-    { href: '/explore', label: 'Explore', icon: Search },
+    { href: '/search', label: 'Search', icon: Search },
     { href: '/community', label: 'Community', icon: Users },
+    { href: '/chat', label: 'Chat', icon: MessageCircle },
     { href: '/notifications', label: 'Notifications', icon: Bell },
   ]
 
@@ -208,6 +211,12 @@ export function Navbar() {
                       <Link href="/settings" className="cursor-pointer min-h-[44px] sm:min-h-[auto] flex items-center">
                         <Settings className="mr-2 h-4 w-4" />
                         <span>Settings</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings/privacy" className="cursor-pointer min-h-[44px] sm:min-h-[auto] flex items-center">
+                        <Shield className="mr-2 h-4 w-4" />
+                        <span>Privacy</span>
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />

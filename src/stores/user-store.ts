@@ -66,10 +66,10 @@ export const useUserStore = create<UserState>()(
       }),
       {
         name: 'user-store',
-        // ✅ ป้องกันการใช้ persist ตอน SSR
+        // Prevent persist usage during SSR
         storage: isClient
           ? createJSONStorage(() => localStorage)
-          : undefined!, // ใช้ `undefined!` เพื่อบอกว่ามั่นใจจะไม่ run บน SSR
+          : undefined, // Use undefined to ensure it won't run on SSR
 
         partialize: (state) => ({
           currentUser: state.currentUser,

@@ -28,7 +28,7 @@ export function ThemeProvider({
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme)
 
-  // ✅ โหลด theme จาก localStorage (เฉพาะ client)
+  // Load theme from localStorage (client-side only)
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedTheme = localStorage.getItem(storageKey) as Theme | null
@@ -38,7 +38,7 @@ export function ThemeProvider({
     }
   }, [storageKey])
 
-  // ✅ Apply theme to <html>
+  // Apply theme to <html>
   useEffect(() => {
     const root = window.document.documentElement
     root.classList.remove("light", "dark")

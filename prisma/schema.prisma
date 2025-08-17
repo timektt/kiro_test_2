@@ -55,19 +55,27 @@ model VerificationToken {
 
 // Core application models
 model User {
-  id            String    @id @default(cuid())
-  username      String    @unique
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?   // For credentials provider
-  image         String?
-  bio           String?
-  socialLinks   String?   @default("{}")
-  role          String    @default("USER")
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                 String    @id @default(cuid())
+  username           String    @unique
+  name               String?
+  email              String    @unique
+  emailVerified      DateTime?
+  password           String?   // For credentials provider
+  image              String?
+  bio                String?
+  socialLinks        String?   @default("{}")
+  role               String    @default("USER")
+  isActive           Boolean   @default(true)
+  emailNotifications Boolean @default(true)
+  profileVisibility String @default("public") // public, followers, private
+  showOnlineStatus Boolean @default(true)
+  allowDirectMessages Boolean @default(true)
+  showMBTI Boolean @default(true)
+  showFollowersCount Boolean @default(true)
+  showFollowingCount Boolean @default(true)
+  allowMentions Boolean @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
 
   // NextAuth relations
   accounts      Account[]
@@ -82,6 +90,16 @@ model User {
   notifications Notification[]
   mbti          MBTI?
   rankings      Ranking[]
+  
+  // Chat relations
+  chatParticipants ChatParticipant[]
+  sentMessages     ChatMessage[]
+  readMessages     ChatMessageRead[]
+  
+  // Privacy relations
+  privacySettings PrivacySetting?
+  blockedUsers    BlockedUser[] @relation("UserBlocks")
+  blockedBy       BlockedUser[] @relation("UserBlocked")
 
   @@index([email])
   @@index([username])
@@ -111,6 +129,7 @@ model Post {
   imageUrl  String?
   authorId  String
   isPublic  Boolean  @default(true)
+  visibility String  @default("PUBLIC") // "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE", "CUSTOM"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -214,8 +233,148 @@ model Ranking {
   @@map("rankings")
 }
 
+// Real-time Chat Models
+model Chat {
+  id          String   @id @default(cuid())
+  name        String?  // For group chats
+  type        String   @default("DIRECT") // "DIRECT" or "GROUP"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastMessageAt DateTime?
+
+  participants ChatParticipant[]
+  messages     ChatMessage[]
+
+  @@index([type])
+  @@index([isActive])
+  @@index([lastMessageAt])
+  @@map("chats")
+}
+
+model ChatParticipant {
+  id        String   @id @default(cuid())
+  chatId    String
+  userId    String
+  role      String   @default("MEMBER") // "ADMIN", "MEMBER"
+  joinedAt  DateTime @default(now())
+  leftAt    DateTime?
+  isActive  Boolean  @default(true)
+
+  chat Chat @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([chatId, userId])
+  @@index([chatId])
+  @@index([userId])
+  @@index([isActive])
+  @@map("chat_participants")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  content   String
+  type      String   @default("TEXT") // "TEXT", "IMAGE", "FILE", "SYSTEM"
+  chatId    String
+  senderId  String
+  replyToId String?  // For replying to messages
+  isEdited  Boolean  @default(false)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chat    Chat         @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  sender  User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  replyTo ChatMessage? @relation("MessageReplies", fields: [replyToId], references: [id])
+  replies ChatMessage[] @relation("MessageReplies")
+  readBy  ChatMessageRead[]
+
+  @@index([chatId])
+  @@index([senderId])
+  @@index([createdAt])
+  @@index([chatId, createdAt])
+  @@index([replyToId])
+  @@map("chat_messages")
+}
+
+model ChatMessageRead {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  readAt    DateTime @default(now())
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+  @@index([readAt])
+  @@map("chat_message_reads")
+}
+
+// Privacy Models
+model PrivacySetting {
+  id     String @id @default(cuid())
+  userId String @unique
+  
+  // Profile visibility
+  profileVisibility    String @default("PUBLIC") // "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE"
+  showEmail           Boolean @default(false)
+  showMBTI            Boolean @default(true)
+  showBio             Boolean @default(true)
+  showJoinDate        Boolean @default(true)
+  showFollowerCount   Boolean @default(true)
+  showFollowingCount  Boolean @default(true)
+  
+  // Post visibility
+  defaultPostVisibility String @default("PUBLIC") // "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE", "CUSTOM"
+  allowComments        Boolean @default(true)
+  allowLikes           Boolean @default(true)
+  allowShares          Boolean @default(true)
+  
+  // Interaction settings
+  allowDirectMessages Boolean @default(true)
+  allowMentions       Boolean @default(true)
+  allowTagging        Boolean @default(true)
+  showOnlineStatus    Boolean @default(true)
+  
+  // Notification settings
+  emailNotifications  Boolean @default(true)
+  pushNotifications   Boolean @default(true)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("privacy_settings")
+}
+
+model BlockedUser {
+  id        String   @id @default(cuid())
+  userId    String   // User who is blocking
+  blockedId String   // User who is being blocked
+  reason    String?  // Optional reason for blocking
+  createdAt DateTime @default(now())
+  
+  user    User @relation("UserBlocks", fields: [userId], references: [id], onDelete: Cascade)
+  blocked User @relation("UserBlocked", fields: [blockedId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, blockedId])
+  @@index([userId])
+  @@index([blockedId])
+  @@map("blocked_users")
+}
+
 // Note: SQLite doesn't support enums, so we use String types instead
 // Valid values for role: "USER", "ADMIN", "MODERATOR"
-// Valid values for notification type: "LIKE", "COMMENT", "FOLLOW", "MENTION", "SYSTEM"
+// Valid values for notification type: "LIKE", "COMMENT", "FOLLOW", "MENTION", "SYSTEM", "CHAT_MESSAGE"
 // Valid values for MBTI type: "INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"
 // Valid values for ranking type: "POSTS_LIKES", "POSTS_COUNT", "COMMENTS_COUNT", "FOLLOWERS_COUNT", "ENGAGEMENT", "WEEKLY_ACTIVE", "MONTHLY_ACTIVE"
+// Valid values for chat type: "DIRECT", "GROUP"
+// Valid values for chat participant role: "ADMIN", "MEMBER"
+// Valid values for chat message type: "TEXT", "IMAGE", "FILE", "SYSTEM"
+// Valid values for profile visibility: "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE"
+// Valid values for post visibility: "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE", "CUSTOM"

@@ -106,7 +106,7 @@ export function usePosts(params?: {
   })
   
   if (params?.mbti || mbtiFilter) {
-    queryParams.append('mbti', params?.mbti || mbtiFilter!)
+    queryParams.append('mbti', params?.mbti || mbtiFilter || '')
   }
   
   const { data, error, isLoading, mutate } = useSWR(

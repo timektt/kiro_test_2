@@ -232,11 +232,11 @@ export class RequestValidator {
       'http://localhost:3000', // Development
     ].filter(Boolean)
 
-    if (origin && !allowedOrigins.some(allowed => origin.startsWith(allowed!))) {
+    if (origin && !allowedOrigins.some(allowed => allowed && origin.startsWith(allowed))) {
       return false
     }
 
-    if (referer && !allowedOrigins.some(allowed => referer.startsWith(allowed!))) {
+    if (referer && !allowedOrigins.some(allowed => allowed && referer.startsWith(allowed))) {
       return false
     }
 

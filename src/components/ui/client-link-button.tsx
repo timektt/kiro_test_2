@@ -10,8 +10,11 @@ interface ClientLinkButtonProps extends Omit<ButtonProps, 'asChild'> {
 }
 
 export function ClientLinkButton({ href, children, ...props }: ClientLinkButtonProps) {
+  // Filter out event handlers that shouldn't be passed to Link
+  const { onKeyDown, onClick, onMouseDown, onMouseUp, onFocus, onBlur, ...buttonProps } = props
+  
   return (
-    <Button asChild {...props}>
+    <Button asChild {...buttonProps}>
       <Link href={href}>
         {children}
       </Link>

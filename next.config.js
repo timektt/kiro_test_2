@@ -3,18 +3,18 @@ const { withSentryConfig } = require('@sentry/nextjs')
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: [
-      'lucide-react',
-      '@radix-ui/react-icons',
-      '@radix-ui/react-avatar',
-      '@radix-ui/react-dialog',
-      '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-select',
-      '@radix-ui/react-tabs',
-      'zustand',
-      'swr',
-    ],
+    optimizeCss: false,
+    // optimizePackageImports: [
+    //   'lucide-react',
+    //   '@radix-ui/react-icons',
+    //   '@radix-ui/react-avatar',
+    //   '@radix-ui/react-dialog',
+    //   '@radix-ui/react-dropdown-menu',
+    //   '@radix-ui/react-select',
+    //   '@radix-ui/react-tabs',
+    //   'zustand',
+    //   'swr',
+    // ],
   },
 
   serverExternalPackages: ['prisma', '@prisma/client'],
@@ -75,7 +75,7 @@ const nextConfig = {
               {
                 key: 'Content-Security-Policy',
                 value:
-                  "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com; style-src 'self' 'unsafe-inline'; img-src * blob: data:; connect-src 'self' https://*.sentry.io https://vitals.vercel-analytics.com; object-src 'none'; frame-ancestors 'self'; base-uri 'self';",
+                  "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.sentry-cdn.com https://cdn.socket.io; style-src 'self' 'unsafe-inline'; img-src * blob: data:; connect-src 'self' https://*.sentry.io https://vitals.vercel-analytics.com ws: wss:; object-src 'none'; frame-ancestors 'self'; base-uri 'self';",
               },
             ],
           },

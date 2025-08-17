@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { FeedLayout } from '@/components/layouts/feed-layout';
 import { TrendingSidebar } from '@/components/ui/trending-sidebar';
 import { RealTimeFeed } from '@/components/feed/real-time-feed';
-import { FloatingActionButton } from '@/components/ui/floating-action-button';
+import { FloatingActionWrapper } from '@/components/feed/floating-action-wrapper';
 import { Card, CardContent } from '@/components/ui/card';
 import { Sparkles } from 'lucide-react';
 
@@ -77,20 +77,7 @@ export default async function FeedPage() {
       </div>
 
       {/* Floating Action Button for Mobile */}
-      <FloatingActionButton
-        onCreatePost={() => {
-          console.log('Create post from FAB');
-          // TODO: Scroll to post composer or open modal
-        }}
-        onAddImage={() => {
-          console.log('Add image from FAB');
-          // TODO: Open image picker
-        }}
-        onAddEmoji={() => {
-          console.log('Add emoji from FAB');
-          // TODO: Open emoji picker
-        }}
-      />
+      <FloatingActionWrapper />
     </FeedLayout>
   );
 }
