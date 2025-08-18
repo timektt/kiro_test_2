@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, memo, useCallback, useMemo } from 'react'
+import { useState, memo, useCallback, useMemo, useEffect } from 'react'
 import Image from 'next/image'
 import { ImageIcon, Smile, X, Globe, Users, Lock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { usePostComposer } from '@/contexts/post-composer-context'
 import { cn } from '@/lib/utils'
 
 interface PostComposerProps {
@@ -29,102 +30,124 @@ interface PostComposerProps {
   disabled?: boolean
 }
 
-export const PostComposer = memo<PostComposerProps>(({
+export const PostComposer = memo<PostComposerProps>({
   currentUser,
   onSubmit,
   placeholder = "What's on your mind?",
   className,
   disabled = false,
 }) => {
-  const [content, setContent] = useState('')
-  const [imageUrl, setImageUrl] = useState('')
+  const {
+    state,
+    setContent,
+    setSelectedImage,
+    addEmoji,
+    clearImage,
+    resetComposer,
+    setSubmitting
+  } = usePostComposer()
+  
   const [visibility, setVisibility] = useState<'public' | 'followers' | 'private'>('public')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [showImageInput, setShowImageInput] = useState(false)
+
+  // Sync local content with context state
+  useEffect(() => {
+    if (state.selectedImage && !showImageInput) {
+      setShowImageInput(true)
+    }
+  }, [state.selectedImage, showImageInput])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!content.trim() || isSubmitting || disabled) return
+    if (!state.content.trim() || state.isSubmitting || disabled) return
 
-    setIsSubmitting(true)
+    setSubmitting(true)
     
     try {
-      if (onSubmit) {
-        await onSubmit(content.trim(), imageUrl || undefined, visibility)
+      let imageUrl: string | undefined
+      
+      // Upload image if selected
+      if (state.selectedImage) {
+        const formData = new FormData()
+        formData.append('file', state.selectedImage)
+        
+        const uploadResponse = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        })
+        
+        if (uploadResponse.ok) {
+          const { url } = await uploadResponse.json()
+          imageUrl = url
+        }
       }
-      setContent('')
-      setImageUrl('')
+      
+      await onSubmit?.(state.content, imageUrl, visibility)
+      resetComposer()
+      setVisibility('public')
       setShowImageInput(false)
     } catch (error) {
-      console.error('Failed to create post:', error)
+      console.error('Error submitting post:', error)
     } finally {
-      setIsSubmitting(false)
+      setSubmitting(false)
     }
-  }, [content, isSubmitting, disabled, onSubmit, imageUrl, visibility])
+  }, [state.content, state.selectedImage, state.isSubmitting, disabled, visibility, onSubmit, setSubmitting, resetComposer])
 
-  const getInitials = useCallback((name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }, [])
+  const handleImageChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size must be less than 5MB')
+        return
+      }
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please select a valid image file')
+        return
+      }
+      
+      setSelectedImage(file)
+    }
+  }, [setSelectedImage])
 
-  const visibilityIcons = useMemo(() => ({
-    public: Globe,
-    followers: Users,
-    private: Lock,
-  }), [])
+  const canSubmit = useMemo(() => {
+    return state.content.trim().length > 0 && !state.isSubmitting && !disabled
+  }, [state.content, state.isSubmitting, disabled])
 
-  const VisibilityIcon = visibilityIcons[visibility]
-
-  const canSubmit = useMemo(() => 
-    content.trim().length > 0 && !isSubmitting && !disabled,
-    [content, isSubmitting, disabled]
-  )
-
-  const handleImageToggle = useCallback(() => {
-    setShowImageInput(prev => !prev)
-  }, [])
-
-  const handleImageUrlChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setImageUrl(e.target.value)
-  }, [])
-
-  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setContent(e.target.value)
-  }, [])
-
-  const handleVisibilityChange = useCallback((value: 'public' | 'followers' | 'private') => {
-    setVisibility(value)
-  }, [])
-
-  if (!currentUser) {
-    return null
-  }
+  const VisibilityIcon = useMemo(() => {
+    switch (visibility) {
+      case 'public': return Globe
+      case 'followers': return Users
+      case 'private': return Lock
+      default: return Globe
+    }
+  }, [visibility])
 
   return (
-    <Card className={cn('w-full', className)}>
-      <CardHeader className="pb-3 px-3 sm:px-6">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <Avatar className="h-8 w-8 sm:h-10 sm:w-10 flex-shrink-0">
-            <AvatarImage src={currentUser.image || undefined} alt={currentUser.name || 'User'} />
-            <AvatarFallback className="text-xs sm:text-sm">
-              {currentUser.name ? getInitials(currentUser.name) : currentUser.username[0].toUpperCase()}
+    <Card className={cn('w-full', className)} data-post-composer>
+      <CardHeader className="pb-3">
+        <div className="flex items-center gap-3">
+          <Avatar className="h-10 w-10">
+            <AvatarImage 
+              src={currentUser?.image || undefined} 
+              alt={currentUser?.name || currentUser?.username || 'User'} 
+            />
+            <AvatarFallback className="text-sm">
+              {(currentUser?.name || currentUser?.username || 'U').charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-sm truncate">{currentUser.name || currentUser.username}</p>
+          <div className="flex-1">
+            <p className="font-medium text-sm">
+              {currentUser?.name || currentUser?.username || 'Anonymous'}
+            </p>
             <Select value={visibility} onValueChange={(value: any) => setVisibility(value)}>
-              <SelectTrigger 
-                className="w-auto h-auto p-0 border-none shadow-none text-xs text-muted-foreground hover:text-foreground"
-                aria-label="Select post visibility"
-              >
+              <SelectTrigger className="w-auto h-6 text-xs border-none p-0 focus:ring-0">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent align="start">
+              <SelectContent>
                 <SelectItem value="public">
                   <div className="flex items-center gap-2">
                     <Globe className="h-3 w-3" />
@@ -149,51 +172,53 @@ export const PostComposer = memo<PostComposerProps>(({
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0 px-3 sm:px-6">
-        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+      <CardContent className="pt-0">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Text Content */}
           <Textarea
-            value={content}
+            value={state.content}
             onChange={(e) => setContent(e.target.value)}
             placeholder={placeholder}
-            disabled={disabled || isSubmitting}
-            className="min-h-[80px] sm:min-h-[100px] resize-none border-none p-0 text-base sm:text-lg placeholder:text-muted-foreground focus-visible:ring-0"
-            maxLength={2000}
+            disabled={disabled || state.isSubmitting}
+            className={cn(
+              'min-h-[100px] resize-none border-none p-0 text-base',
+              'placeholder:text-muted-foreground',
+              'focus-visible:ring-0 focus-visible:ring-offset-0'
+            )}
+            rows={3}
           />
 
           {/* Image Input */}
           {showImageInput && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <input
-                  type="url"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="Enter image URL..."
-                  className="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-primary min-w-0"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setShowImageInput(false)
-                    setImageUrl('')
-                  }}
-                  className="flex-shrink-0"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              {imageUrl && (
-                <div className="relative">
+            <div className="space-y-3">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                disabled={disabled || state.isSubmitting}
+                className="text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-primary file:text-primary-foreground hover:file:bg-primary/90"
+              />
+              
+              {/* Image Preview */}
+              {state.imagePreview && (
+                <div className="relative inline-block">
                   <Image
-                    src={imageUrl}
+                    src={state.imagePreview}
                     alt="Preview"
-                    width={500}
-                    height={256}
+                    width={200}
+                    height={200}
                     className="w-full max-h-48 sm:max-h-64 object-cover rounded-lg"
-                    onError={() => setImageUrl('')}
+                    onError={() => clearImage()}
                   />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    onClick={clearImage}
+                    className="absolute top-2 right-2 h-6 w-6 p-0"
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
                 </div>
               )}
             </div>
@@ -207,7 +232,7 @@ export const PostComposer = memo<PostComposerProps>(({
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowImageInput(!showImageInput)}
-                disabled={disabled || isSubmitting}
+                disabled={disabled || state.isSubmitting}
                 className="text-muted-foreground hover:text-foreground p-2 h-8 w-8 sm:h-9 sm:w-9"
                 title="Add image"
               >
@@ -218,9 +243,16 @@ export const PostComposer = memo<PostComposerProps>(({
                 type="button"
                 variant="ghost"
                 size="sm"
-                disabled={disabled || isSubmitting}
+                disabled={disabled || state.isSubmitting}
                 className="text-muted-foreground hover:text-foreground p-2 h-8 w-8 sm:h-9 sm:w-9"
                 title="Add emoji"
+                data-emoji-button
+                onClick={() => {
+                  // Simple emoji picker - add a random emoji
+                  const emojis = ['😊', '👍', '❤️', '🎉', '🔥', '💯', '✨', '🚀']
+                  const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
+                  addEmoji(randomEmoji)
+                }}
               >
                 <Smile className="h-4 w-4" />
               </Button>
@@ -231,26 +263,23 @@ export const PostComposer = memo<PostComposerProps>(({
               </div>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xs text-muted-foreground hidden sm:inline">
-                {content.length}/2000
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                'text-xs',
+                state.content.length > 280 ? 'text-destructive' : 'text-muted-foreground'
+              )}>
+                {state.content.length}/500
               </span>
               
               <Button
                 type="submit"
-                disabled={!content.trim() || disabled || isSubmitting}
-                className="px-4 sm:px-6 h-8 sm:h-9 text-sm"
+                disabled={!canSubmit}
+                size="sm"
+                className="px-6"
               >
-                {isSubmitting ? 'Posting...' : 'Post'}
+                {state.isSubmitting ? 'Posting...' : 'Post'}
               </Button>
             </div>
-          </div>
-
-          {/* Mobile character count */}
-          <div className="sm:hidden text-right">
-            <span className="text-xs text-muted-foreground">
-              {content.length}/2000
-            </span>
           </div>
         </form>
       </CardContent>

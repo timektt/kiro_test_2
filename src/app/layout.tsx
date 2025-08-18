@@ -8,7 +8,7 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Navbar } from '@/components/layout/navbar';
 import { MobileNav } from '@/components/layout/mobile-nav';
-import { Analytics } from '@vercel/analytics/react';
+import { AnalyticsProvider } from '@/components/providers/analytics-provider';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -129,7 +129,7 @@ export default async function RootLayout({
             </SessionProvider>
           </ThemeProvider>
         </ErrorBoundary>
-        <Analytics />
+        <AnalyticsProvider />
       </body>
     </html>
   );

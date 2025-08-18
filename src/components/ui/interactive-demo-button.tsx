@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { DemoModal } from '@/components/ui/demo-modal'
 
 interface InteractiveDemoButtonProps {
   className?: string
@@ -14,22 +16,31 @@ export function InteractiveDemoButton({
   size = "lg", 
   variant = "outline" 
 }: InteractiveDemoButtonProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const handleDemoClick = () => {
-    // TODO: Implement demo functionality
-    // Demo clicked - implement demo modal or video
-    // For now, just show an alert
-    alert('Demo feature coming soon!')
+    setIsModalOpen(true)
   }
 
   return (
-    <Button 
-      variant={variant} 
-      size={size} 
-      className={className}
-      onClick={handleDemoClick}
-    >
-      <Play className="mr-2 h-5 w-5" />
-      Watch Demo
-    </Button>
+    <>
+      <Button 
+        variant={variant} 
+        size={size} 
+        className={className}
+        onClick={handleDemoClick}
+        suppressHydrationWarning={true}
+      >
+        <Play className="mr-2 h-5 w-5" />
+        Watch Demo
+      </Button>
+      
+      <DemoModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
+    </>
   )
 }
+
+export default InteractiveDemoButton

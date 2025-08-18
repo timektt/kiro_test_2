@@ -1,13 +1,13 @@
 'use client'
 
-import { useEffect, memo, useCallback, useMemo } from 'react'
+import { useEffect, memo, useCallback, useMemo, useState } from 'react'
 import { PostItem } from '@/components/ui/post-item'
 import { FeedFilter } from '@/components/ui/feed-filter'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { EmptyState } from '@/components/ui/empty-state'
 import { Button } from '@/components/ui/button'
 import { FileText, RefreshCw } from 'lucide-react'
-import { usePosts, useCreatePost, useLikePost } from '@/hooks/use-posts'
+import { usePosts, useCreatePost, useLikePost, useLoadMorePosts } from '@/hooks/use-posts'
 import { useFeedStore } from '@/stores/feed-store'
 import { useUIStore } from '@/stores/ui-store'
 import { cn } from '@/lib/utils'
@@ -31,6 +31,11 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
   
   const { isLoading: globalLoading } = useUIStore()
   
+  // Local state for pagination
+  const [allLoadedPosts, setAllLoadedPosts] = useState<any[]>([])
+  const [currentPagination, setCurrentPagination] = useState<any>(null)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  
   // Fetch posts using the custom hook
   const { posts, pagination, isLoading, error, mutate } = usePosts({
     type: feedType,
@@ -38,14 +43,25 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
     mbti: mbtiFilter || undefined,
   })
   
+  // Load more posts hook
+  const { loadMorePosts } = useLoadMorePosts()
+  
   // Post creation hook
   const { createPost, isCreating } = useCreatePost()
   
   // Like functionality
   const { toggleLike, isToggling } = useLikePost()
   
+  // Update local state when posts change
+  useEffect(() => {
+    if (posts.length > 0) {
+      setAllLoadedPosts(posts)
+      setCurrentPagination(pagination)
+    }
+  }, [posts, pagination])
+  
   // Combine real posts with optimistic posts
-  const allPosts = useMemo(() => [...optimisticPosts, ...posts], [optimisticPosts, posts])
+  const allPosts = useMemo(() => [...optimisticPosts, ...allLoadedPosts], [optimisticPosts, allLoadedPosts])
   
   // Handle filter changes
   const handleFilterChange = useCallback((filter: string) => {
@@ -76,6 +92,22 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
       mutate()
     } catch (error) {
       console.error('Failed to toggle like:', error)
+    }
+  }
+
+  // Handle load more posts
+  const handleLoadMore = async () => {
+    if (!currentPagination?.hasMore || isLoadingMore) return
+    
+    setIsLoadingMore(true)
+    try {
+      const result = await loadMorePosts(currentPagination.page, allLoadedPosts)
+      setAllLoadedPosts(result.posts)
+      setCurrentPagination(result.pagination)
+    } catch (error) {
+      console.error('Failed to load more posts:', error)
+    } finally {
+      setIsLoadingMore(false)
     }
   }
   
@@ -258,21 +290,18 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({ cur
           ))}
           
           {/* Load More Button */}
-          {pagination.hasMore && (
+          {currentPagination?.hasMore && (
             <div className="text-center py-4 sm:py-6">
               <Button
                 variant="outline"
-                onClick={() => {
-                  // TODO: Implement load more functionality
-                  console.log('Load more posts')
-                }}
-                disabled={isLoading}
+                onClick={handleLoadMore}
+                disabled={isLoading || isLoadingMore}
                 className="w-full sm:w-auto px-6 sm:px-8 h-10 sm:h-11"
               >
-                {isLoading ? (
+                {isLoadingMore ? (
                   <>
                     <RefreshCw className="h-4 w-4 animate-spin mr-2" />
-                    Loading...
+                    Loading more...
                   </>
                 ) : (
                   'Load More'

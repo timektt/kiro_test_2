@@ -3,8 +3,7 @@
  */
 
 import dynamic from 'next/dynamic'
-import * as React from 'react'
-import { ComponentType } from 'react'
+import React, { ComponentType } from 'react'
 
 /**
  * Dynamic import wrapper with loading states
@@ -28,21 +27,143 @@ export function createDynamicComponent<T = {}>(
  * Pre-configured dynamic components for common use cases
  */
 export const DynamicComponents = {
-  // Placeholder for future dynamic components
+  // Admin components - loaded only when needed
+  AdminDashboard: createDynamicComponent(
+    () => import('@/components/admin/admin-dashboard').then(mod => ({ default: mod.AdminDashboard })),
+    { ssr: false }
+  ),
+  
+  UserManagement: createDynamicComponent(
+    () => import('@/components/admin/user-management').then(mod => ({ default: mod.UserManagement })),
+    { ssr: false }
+  ),
+  
+  ContentModeration: createDynamicComponent(
+    () => import('@/components/admin/content-moderation').then(mod => ({ default: mod.ContentModeration })),
+    { ssr: false }
+  ),
+  
+  // Profile components - loaded on demand
+  ProfileEdit: createDynamicComponent(
+    () => import('@/components/profile/profile-edit-form').then(mod => ({ default: mod.ProfileEditForm })),
+    { ssr: false }
+  ),
+  
+  // Post components - loaded when needed
+  PostComposer: createDynamicComponent(
+    () => import('@/components/ui/post-composer').then(mod => ({ default: mod.PostComposer })),
+    { ssr: false }
+  ),
+  
+  // Notification components
+  NotificationsList: createDynamicComponent(
+    () => import('@/components/notifications/notifications-list').then(mod => ({ default: mod.NotificationsList })),
+    { ssr: false }
+  ),
+  
+  // Search components
+  SearchAutocomplete: createDynamicComponent(
+    () => import('@/components/ui/search-autocomplete').then(mod => ({ default: mod.SearchAutocomplete })),
+    { ssr: false }
+  ),
+  
+  AdvancedSearchFilters: createDynamicComponent(
+    () => import('@/components/ui/advanced-search-filters').then(mod => ({ default: mod.AdvancedSearchFilters })),
+    { ssr: false }
+  ),
+  
+  // Identity components
+  MBTISelector: createDynamicComponent(
+    () => import('@/components/identity/mbti-selector').then(mod => ({ default: mod.MBTISelector })),
+    { ssr: false }
+  ),
+  
+  // Rankings components
+  RankingBoard: createDynamicComponent(
+    () => import('@/components/rankings/ranking-board').then(mod => ({ default: mod.RankingBoard })),
+    { ssr: false }
+  )
 }
 
 /**
  * Route-based code splitting configuration
  */
 export const routeComponents = {
-  // Placeholder for future route components
+  // Main app routes
+  home: () => import('@/app/page'),
+  feed: () => import('@/app/feed/page'),
+  profile: () => import('@/app/profile/[username]/page'),
+  search: () => import('@/app/search/page'),
+  notifications: () => import('@/app/notifications/page'),
+  settings: () => import('@/app/settings/page'),
+  
+  // Admin routes - heavy bundles
+  admin: () => import('@/app/admin/page'),
+  adminUsers: () => import('@/app/admin/users/page'),
+  adminContent: () => import('@/app/admin/content/page'),
+  adminReports: () => import('@/app/admin/reports/page'),
+  adminAnalytics: () => import('@/app/admin/analytics/page'),
+  
+  // Auth routes
+  signin: () => import('@/app/auth/signin/page'),
+  signup: () => import('@/app/auth/signup/page'),
+  
+  // Chat routes
+  chat: () => import('@/app/chat/page'),
+  chatRoom: () => import('@/app/chat/[roomId]/page')
 }
 
 /**
  * Library code splitting for heavy dependencies
  */
 export const DynamicLibraries = {
-  // Placeholder for future heavy libraries
+  // Rich text editor - heavy library
+  RichTextEditor: createDynamicComponent(
+    () => import('@tiptap/react').then(() => ({ default: () => React.createElement('div', {}, 'Rich Text Editor') })),
+    { ssr: false }
+  ),
+  
+  // Image cropper - heavy image processing
+  ImageCropper: createDynamicComponent(
+    () => import('react-image-crop').then(() => ({ default: () => React.createElement('div', {}, 'Image Cropper') })),
+    { ssr: false }
+  ),
+  
+  // Charts library - heavy visualization
+  Charts: createDynamicComponent(
+    () => import('recharts').then(() => ({ default: () => React.createElement('div', {}, 'Charts') })),
+    { ssr: false }
+  ),
+  
+  // Date picker - heavy date library
+  DatePicker: createDynamicComponent(
+    () => import('react-datepicker').then(() => ({ default: () => React.createElement('div', {}, 'Date Picker') })),
+    { ssr: false }
+  ),
+  
+  // PDF viewer - heavy document library
+  PDFViewer: createDynamicComponent(
+    () => import('react-pdf').then(() => ({ default: () => React.createElement('div', {}, 'PDF Viewer') })),
+    { ssr: false }
+  ),
+  
+  // Video player - heavy media library
+  VideoPlayer: createDynamicComponent(
+    () => import('react-player').then(() => ({ default: () => React.createElement('div', {}, 'Video Player') })),
+    { ssr: false }
+  ),
+  
+  // Code editor - heavy editor library
+  CodeEditor: createDynamicComponent(
+    () => import('@monaco-editor/react').then(() => ({ default: () => React.createElement('div', {}, 'Code Editor') })),
+    { ssr: false }
+  ),
+  
+  // Markdown editor - heavy markdown processing
+  MarkdownEditor: createDynamicComponent(
+    () => import('@uiw/react-md-editor').then(() => ({ default: () => React.createElement('div', {}, 'Markdown Editor') })),
+    { ssr: false }
+  )
 }
 
 /**

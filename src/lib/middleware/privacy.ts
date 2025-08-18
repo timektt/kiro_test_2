@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { PrivacyService } from '@/lib/services/privacy'
-import { logger } from '@/lib/logger'
+import logger from '@/lib/logger'
 
 /**
  * Middleware to check if a user can access another user's data

@@ -45,6 +45,7 @@ import {
 import { EmptyState } from '@/components/ui/empty-state'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { cn } from '@/lib/utils'
+import { useUIStore } from '@/stores/ui-store'
 
 
 interface User {
@@ -92,6 +93,7 @@ const fetcher = async (url: string) => {
 }
 
 export function UserManagement({ adminUser }: UserManagementProps) {
+  const { addToast } = useUIStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [roleFilter, setRoleFilter] = useState('ALL')
   const [statusFilter, setStatusFilter] = useState('ALL')
@@ -167,9 +169,20 @@ export function UserManagement({ adminUser }: UserManagementProps) {
       // Refresh data
       mutate()
       setActionDialog(null)
+      
+      // Show success toast
+      addToast({
+        type: 'success',
+        title: 'User action completed',
+        description: `User ${action.toLowerCase().replace('_', ' ')} successfully`,
+      })
     } catch (error) {
       console.error('Error performing user action:', error)
-      // TODO: Show error toast
+      addToast({
+        type: 'error',
+        title: 'User action failed',
+        description: error instanceof Error ? error.message : 'Failed to perform user action',
+      })
     }
   }
 
@@ -186,9 +199,20 @@ export function UserManagement({ adminUser }: UserManagementProps) {
       // Refresh data
       mutate()
       setActionDialog(null)
+      
+      // Show success toast
+      addToast({
+        type: 'success',
+        title: 'User deleted',
+        description: 'User has been successfully deleted',
+      })
     } catch (error) {
       console.error('Error deleting user:', error)
-      // TODO: Show error toast
+      addToast({
+        type: 'error',
+        title: 'Delete failed',
+        description: error instanceof Error ? error.message : 'Failed to delete user',
+      })
     }
   }
 

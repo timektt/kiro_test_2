@@ -4,6 +4,7 @@ import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider } from '@/components/theme-provider'
 import { StoreProvider } from '@/components/providers/store-provider'
 import { ToastProvider } from '@/components/ui/toast-provider'
+import { PostComposerProvider } from '@/contexts/post-composer-context'
 
 interface ProvidersProps {
   children: React.ReactNode
@@ -20,9 +21,11 @@ export function Providers({ children, session }: ProvidersProps) {
         disableTransitionOnChange
       >
         <StoreProvider>
-          <ToastProvider>
-            {children}
-          </ToastProvider>
+          <PostComposerProvider>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </PostComposerProvider>
         </StoreProvider>
       </ThemeProvider>
     </SessionProvider>

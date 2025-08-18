@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { useSession } from 'next-auth/react'
 import { ChatMessage, ChatRoom } from '@/lib/socket'
-import { logger } from '@/lib/logger'
+import logger from '@/lib/logger'
 
 interface UseSocketReturn {
   socket: Socket | null

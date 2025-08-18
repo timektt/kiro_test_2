@@ -41,6 +41,11 @@ export function FloatingActionButton({
     },
   ]
 
+  const handleActionClick = (action: typeof actions[0]) => {
+    action.onClick?.()
+    setIsExpanded(false)
+  }
+
   return (
     <div className={cn('fixed bottom-20 right-4 z-40 md:hidden', className)}>
       {/* Action buttons */}
@@ -58,10 +63,7 @@ export function FloatingActionButton({
                 'h-12 w-12 rounded-full shadow-lg text-white',
                 action.color
               )}
-              onClick={() => {
-                action.onClick?.()
-                setIsExpanded(false)
-              }}
+              onClick={() => handleActionClick(action)}
             >
               <Icon className="h-5 w-5" />
               <span className="sr-only">{action.label}</span>

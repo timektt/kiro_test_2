@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { formatRelativeTime, cn } from '@/lib/utils'
+import { useLikePost, useBookmarkPost, useSharePost } from '@/hooks/use-posts'
 import type { Post } from '@/types'
 
 interface PostItemProps {
@@ -44,7 +45,7 @@ interface PostItemProps {
   className?: string
 }
 
-export const PostItem = memo<PostItemProps>(({
+export const PostItem = memo<PostItemProps>(function PostItem({
   post,
   currentUserId,
   onLike,
@@ -57,37 +58,55 @@ export const PostItem = memo<PostItemProps>(({
   onHide,
   onBlock,
   className,
-}) => {
+}) {
+  // Initialize hooks
+  const { toggleLike, isToggling: isLikeToggling } = useLikePost()
+  const { toggleBookmark, isToggling: isBookmarkToggling } = useBookmarkPost()
+  const { sharePost, isSharing } = useSharePost()
+
+  // Local state for optimistic updates
   const [isLiked, setIsLiked] = useState(false)
   const [isBookmarked, setIsBookmarked] = useState(false)
   const [likeCount, setLikeCount] = useState(post._count?.likes || 0)
 
-  const handleLike = useCallback(() => {
-    if (onLike) {
-      onLike(post.id)
+  const handleLike = useCallback(async () => {
+    try {
+      // Use the hook instead of prop callback
+      await toggleLike(post.id)
+      // Optimistic update is handled by the hook
+    } catch (error) {
+      console.error('Failed to toggle like:', error)
     }
-    setIsLiked(!isLiked)
-    setLikeCount(prev => isLiked ? prev - 1 : prev + 1)
-  }, [onLike, post.id, isLiked])
+  }, [toggleLike, post.id])
 
   const handleComment = useCallback(() => {
-    if (onComment) {
-      onComment(post.id)
-    }
-  }, [onComment, post.id])
+    // Navigate to post detail page for comments
+    window.location.href = `/post/${post.id}`
+  }, [post.id])
 
-  const handleShare = useCallback(() => {
-    if (onShare) {
-      onShare(post.id)
+  const handleShare = useCallback(async (platform?: string) => {
+    try {
+      if (platform === 'copy') {
+        // Copy link to clipboard
+        const shareUrl = `${window.location.origin}/post/${post.id}`
+        await navigator.clipboard.writeText(shareUrl)
+      } else {
+        // Use the share hook
+        await sharePost({ postId: post.id, platform })
+      }
+    } catch (error) {
+      console.error('Failed to share post:', error)
     }
-  }, [onShare, post.id])
+  }, [sharePost, post.id])
 
-  const handleBookmark = useCallback(() => {
-    if (onBookmark) {
-      onBookmark(post.id)
+  const handleBookmark = useCallback(async () => {
+    try {
+      await toggleBookmark(post.id)
+      // Optimistic update is handled by the hook
+    } catch (error) {
+      console.error('Failed to toggle bookmark:', error)
     }
-    setIsBookmarked(!isBookmarked)
-  }, [onBookmark, post.id, isBookmarked])
+  }, [toggleBookmark, post.id])
 
   const handleEdit = useCallback(() => {
     if (onEdit) {
@@ -208,6 +227,7 @@ export const PostItem = memo<PostItemProps>(({
                 variant="ghost"
                 size="sm"
                 onClick={handleLike}
+                disabled={isLikeToggling}
                 className={cn(
                   'flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-red-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3',
                   isLiked && 'text-red-500'
@@ -220,7 +240,6 @@ export const PostItem = memo<PostItemProps>(({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleComment}
                 className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-blue-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3"
                 asChild
               >
@@ -230,21 +249,43 @@ export const PostItem = memo<PostItemProps>(({
                 </Link>
               </Button>
 
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleShare}
-                className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-green-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3"
-              >
-                <Share className="h-4 w-4" />
-                <span className="text-xs sm:text-sm hidden sm:inline">Share</span>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    disabled={isSharing}
+                    className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-green-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3"
+                  >
+                    <Share className="h-4 w-4" />
+                    <span className="text-xs sm:text-sm hidden sm:inline">Share</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => handleShare('copy')}>
+                    Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('facebook')}>
+                    Share on Facebook
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('twitter')}>
+                    Share on Twitter
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('linkedin')}>
+                    Share on LinkedIn
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
+                    Share on WhatsApp
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={handleBookmark}
+              disabled={isBookmarkToggling}
               aria-label="Bookmark post"
               className={cn(
                 'text-muted-foreground hover:text-yellow-500 min-h-[44px] sm:min-h-[auto] px-2 sm:px-3',

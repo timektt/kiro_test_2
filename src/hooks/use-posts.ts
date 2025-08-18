@@ -72,21 +72,52 @@ async function deletePost(url: string) {
 }
 
 async function toggleLike(url: string) {
-  const response = await fetch(url, { method: 'POST' })
-  
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
   if (!response.ok) {
     throw new Error('Failed to toggle like')
   }
-  
-  const result = await response.json()
-  if (!result.success) {
-    throw new Error(result.error || 'Failed to toggle like')
-  }
-  
-  return result.data
+
+  return response.json()
 }
 
-// Hook for fetching posts feed
+async function toggleBookmark(url: string) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to toggle bookmark')
+  }
+
+  return response.json()
+}
+
+async function sharePost(url: string, { arg }: { arg: { platform?: string; message?: string } }) {
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(arg),
+  })
+
+  if (!response.ok) {
+    throw new Error('Failed to share post')
+  }
+
+  return response.json()
+}
+
+// Hook for fetching posts feed with pagination support
 export function usePosts(params?: {
   type?: 'following' | 'discover' | 'trending'
   sort?: 'recent' | 'popular'
@@ -132,6 +163,49 @@ export function usePosts(params?: {
     error,
     mutate,
   }
+}
+
+// Hook for loading more posts with pagination
+export function useLoadMorePosts() {
+  const { feedType, sortBy, mbtiFilter } = useFeedStore()
+  const { addToast } = useUIStore()
+  
+  const loadMorePosts = async (currentPage: number, currentPosts: any[]) => {
+    try {
+      const nextPage = currentPage + 1
+      const queryParams = new URLSearchParams({
+        type: feedType,
+        sort: sortBy,
+        page: nextPage.toString(),
+        limit: '20',
+      })
+      
+      if (mbtiFilter) {
+        queryParams.append('mbti', mbtiFilter)
+      }
+      
+      const response = await fetch(`/api/posts?${queryParams.toString()}`)
+      if (!response.ok) {
+        throw new Error('Failed to load more posts')
+      }
+      
+      const data = await response.json()
+      
+      return {
+        posts: [...currentPosts, ...data.posts],
+        pagination: data.pagination,
+      }
+    } catch (error) {
+      addToast({
+        type: 'error',
+        title: 'Failed to load more posts',
+        description: error instanceof Error ? error.message : 'Unknown error',
+      })
+      throw error
+    }
+  }
+  
+  return { loadMorePosts }
 }
 
 // Hook for fetching a single post
@@ -331,6 +405,79 @@ export function useLikePost() {
   return {
     toggleLike: toggleLikeWithOptimistic,
     isToggling: isMutating,
+  }
+}
+
+// Hook for bookmarking posts
+export function useBookmarkPost() {
+  const { addToast } = useUIStore()
+  
+  const { trigger, isMutating } = useSWRMutation(
+    '/api/posts/bookmark',
+    (url: string, { arg }: { arg: string }) => toggleBookmark(`/api/posts/${arg}/bookmark`),
+    {
+      onSuccess: (data) => {
+        addToast({
+          type: 'success',
+          title: data.data.bookmarked ? 'Post bookmarked' : 'Bookmark removed',
+          description: data.data.message,
+        })
+      },
+      onError: (error) => {
+        addToast({
+          type: 'error',
+          title: 'Failed to update bookmark',
+          description: error.message,
+        })
+      },
+    }
+  )
+  
+  return {
+    toggleBookmark: trigger,
+    isToggling: isMutating,
+  }
+}
+
+// Hook for sharing posts
+export function useSharePost() {
+  const { addToast } = useUIStore()
+  
+  const { trigger, isMutating } = useSWRMutation(
+    '/api/posts/share',
+    (url: string, { arg }: { arg: { postId: string; platform?: string; message?: string } }) => 
+      sharePost(`/api/posts/${arg.postId}/share`, { arg: { platform: arg.platform, message: arg.message } }),
+    {
+      onSuccess: (data) => {
+        // Copy share URL to clipboard if platform is 'copy'
+        if (data.data.shareUrls?.copy) {
+          navigator.clipboard.writeText(data.data.shareUrls.copy)
+          addToast({
+            type: 'success',
+            title: 'Link copied!',
+            description: 'Share link has been copied to clipboard',
+          })
+        } else {
+          addToast({
+            type: 'success',
+            title: 'Post shared',
+            description: data.data.message,
+          })
+        }
+      },
+      onError: (error) => {
+        addToast({
+          type: 'error',
+          title: 'Failed to share post',
+          description: error.message,
+        })
+      },
+    }
+  )
+  
+  return {
+    sharePost: trigger,
+    isSharing: isMutating,
   }
 }
 

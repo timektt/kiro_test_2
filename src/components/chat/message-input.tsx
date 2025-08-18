@@ -25,7 +25,7 @@ export function MessageInput({
   onTypingStart,
   onTypingStop,
   disabled = false,
-  placeholder = {'พิมพ์ข้อความ...'}
+  placeholder = 'พิมพ์ข้อความ...'
 }: MessageInputProps) {
   const [message, setMessage] = useState('')
   const [isTyping, setIsTyping] = useState(false)
@@ -150,11 +150,11 @@ export function MessageInput({
           <DropdownMenuContent align="start" side="top">
             <DropdownMenuItem onClick={() => handleFileUpload('IMAGE')}>
               <Image className="h-4 w-4 mr-2" />
-              {'รูปภาพ'}
+              รูปภาพ
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => handleFileUpload('FILE')}>
               <File className="h-4 w-4 mr-2" />
-              {'ไฟล์'}
+              ไฟล์
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

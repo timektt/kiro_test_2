@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { EmptyState } from '@/components/ui/empty-state'
+import { useUIStore } from '@/stores/ui-store'
 
 interface AdminDashboardProps {
   adminUser: {
@@ -48,6 +49,7 @@ interface RecentActivity {
 }
 
 export function AdminDashboard({ adminUser }: AdminDashboardProps) {
+  const { addToast } = useUIStore()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -80,7 +82,13 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
 
     } catch (error) {
       console.error('Error fetching dashboard data:', error)
-      setError(error instanceof Error ? error.message : 'Failed to load dashboard')
+      const errorMessage = error instanceof Error ? error.message : 'Failed to load dashboard'
+      setError(errorMessage)
+      addToast({
+        type: 'error',
+        title: 'Dashboard Error',
+        description: errorMessage,
+      })
     } finally {
       setIsLoading(false)
     }

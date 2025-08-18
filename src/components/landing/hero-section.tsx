@@ -6,6 +6,7 @@ import { ServerButton } from '@/components/ui/server-button'
 import { InteractiveDemoButton } from '@/components/ui/interactive-demo-button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { PlatformPreview } from '@/components/landing/platform-preview'
 import { Session } from 'next-auth'
 
 interface HeroSectionProps {
@@ -115,27 +116,25 @@ export function HeroSection({ session }: HeroSectionProps) {
             </div>
           </div>
 
-          {/* Hero Image/Illustration Placeholder - responsive sizing */}
+          {/* Interactive Platform Preview - responsive sizing */}
           <div className="pt-8 md:pt-12 lg:pt-16 px-4 sm:px-0">
             <div className="relative max-w-4xl mx-auto">
-              <div className="aspect-video bg-gradient-to-br from-primary/20 to-secondary/20 rounded-xl md:rounded-2xl border shadow-lg md:shadow-2xl overflow-hidden">
-                <div className="absolute inset-0 bg-grid-pattern opacity-10" />
-                <div className="flex items-center justify-center h-full p-4">
-                  <div className="text-center space-y-3 md:space-y-4">
-                    <div className="w-12 h-12 md:w-16 md:h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
-                      <Users className="w-6 h-6 md:w-8 md:h-8 text-primary" />
-                    </div>
-                    <p className="text-sm md:text-base text-muted-foreground">
-                      Interactive platform preview coming soon
-                    </p>
+              <div className="relative">
+                {/* Background decoration */}
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-secondary/10 rounded-xl md:rounded-2xl blur-3xl" />
+                
+                {/* Main preview container */}
+                <div className="relative bg-background/80 backdrop-blur-sm rounded-xl md:rounded-2xl border shadow-lg md:shadow-2xl overflow-hidden">
+                  <div className="flex items-center justify-center p-4 md:p-8">
+                    <PlatformPreview />
                   </div>
                 </div>
+                
+                {/* Floating elements - responsive positioning */}
+                <div className="absolute -top-2 -left-2 md:-top-4 md:-left-4 w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full animate-pulse" />
+                <div className="absolute -bottom-2 -right-2 md:-bottom-4 md:-right-4 w-4 h-4 md:w-6 md:h-6 bg-secondary rounded-full animate-pulse delay-1000" />
+                <div className="absolute top-1/2 -right-4 md:-right-8 w-3 h-3 md:w-4 md:h-4 bg-accent rounded-full animate-pulse delay-500" />
               </div>
-              
-              {/* Floating elements - responsive positioning */}
-              <div className="absolute -top-2 -left-2 md:-top-4 md:-left-4 w-6 h-6 md:w-8 md:h-8 bg-primary rounded-full animate-pulse" />
-              <div className="absolute -bottom-2 -right-2 md:-bottom-4 md:-right-4 w-4 h-4 md:w-6 md:h-6 bg-secondary rounded-full animate-pulse delay-1000" />
-              <div className="absolute top-1/2 -right-4 md:-right-8 w-3 h-3 md:w-4 md:h-4 bg-accent rounded-full animate-pulse delay-500" />
             </div>
           </div>
         </div>

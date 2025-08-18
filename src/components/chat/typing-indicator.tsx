@@ -11,10 +11,10 @@ export function TypingIndicator({ userNames, className }: TypingIndicatorProps) 
   if (userNames.length === 0) return null
 
   const getTypingText = () => {
-    const typingText = {'กำลังพิมพ์...'}
-    const andText = {'และ'}
-    const peopleText = {'คน'}
-    const moreText = {'อีก'}
+    const typingText = 'กำลังพิมพ์...'
+const andText = 'และ'
+const peopleText = 'คน'
+const moreText = 'อีก'
     
     if (userNames.length === 1) {
       return `${userNames[0]} ${typingText}`

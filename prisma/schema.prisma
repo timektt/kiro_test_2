@@ -100,6 +100,11 @@ model User {
   privacySettings PrivacySetting?
   blockedUsers    BlockedUser[] @relation("UserBlocks")
   blockedBy       BlockedUser[] @relation("UserBlocked")
+  
+  // Report relations
+  reports         Report[] @relation("UserReports")
+  reportedAgainst Report[] @relation("UserReported")
+  reviewedReports Report[] @relation("AdminReviews")
 
   @@index([email])
   @@index([username])
@@ -136,6 +141,7 @@ model Post {
   author   User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
   comments Comment[]
   likes    Like[]
+  reports  Report[]
 
   @@index([authorId])
   @@index([createdAt])
@@ -152,8 +158,9 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  post    Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author  User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reports Report[]
 
   @@index([postId])
   @@index([authorId])
@@ -368,6 +375,46 @@ model BlockedUser {
   @@map("blocked_users")
 }
 
+// Report System Models
+model Report {
+  id          String   @id @default(cuid())
+  type        String   // "POST", "USER", "COMMENT", "CHAT_MESSAGE"
+  reason      String   // "SPAM", "HARASSMENT", "INAPPROPRIATE_CONTENT", "FAKE_ACCOUNT", "OTHER"
+  description String?  // Additional details from reporter
+  status      String   @default("PENDING") // "PENDING", "REVIEWED", "RESOLVED", "DISMISSED"
+  priority    String   @default("MEDIUM") // "LOW", "MEDIUM", "HIGH", "URGENT"
+  
+  // Reporter information
+  reporterId  String
+  reporter    User     @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+  
+  // Reported content/user
+  reportedUserId    String?
+  reportedUser      User?    @relation("UserReported", fields: [reportedUserId], references: [id], onDelete: Cascade)
+  reportedPostId    String?
+  reportedPost      Post?    @relation(fields: [reportedPostId], references: [id], onDelete: Cascade)
+  reportedCommentId String?
+  reportedComment   Comment? @relation(fields: [reportedCommentId], references: [id], onDelete: Cascade)
+  
+  // Admin handling
+  reviewedById String?
+  reviewedBy   User?    @relation("AdminReviews", fields: [reviewedById], references: [id])
+  reviewedAt   DateTime?
+  adminNotes   String?  // Internal notes for admins
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([status])
+  @@index([type])
+  @@index([priority])
+  @@index([reporterId])
+  @@index([reportedUserId])
+  @@index([createdAt])
+  @@index([status, priority])
+  @@map("reports")
+}
+
 // Note: SQLite doesn't support enums, so we use String types instead
 // Valid values for role: "USER", "ADMIN", "MODERATOR"
 // Valid values for notification type: "LIKE", "COMMENT", "FOLLOW", "MENTION", "SYSTEM", "CHAT_MESSAGE"
@@ -378,3 +425,7 @@ model BlockedUser {
 // Valid values for chat message type: "TEXT", "IMAGE", "FILE", "SYSTEM"
 // Valid values for profile visibility: "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE"
 // Valid values for post visibility: "PUBLIC", "FOLLOWERS_ONLY", "PRIVATE", "CUSTOM"
+// Valid values for report type: "POST", "USER", "COMMENT", "CHAT_MESSAGE"
+// Valid values for report reason: "SPAM", "HARASSMENT", "INAPPROPRIATE_CONTENT", "FAKE_ACCOUNT", "OTHER"
+// Valid values for report status: "PENDING", "REVIEWED", "RESOLVED", "DISMISSED"
+// Valid values for report priority: "LOW", "MEDIUM", "HIGH", "URGENT"

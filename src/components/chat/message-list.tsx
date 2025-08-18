@@ -81,8 +81,8 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
       const yesterday = new Date(today)
       yesterday.setDate(yesterday.getDate() - 1)
 
-      const todayText = {'วันนี้'}
-      const yesterdayText = {'เมื่อวาน'}
+      const todayText = 'วันนี้'
+const yesterdayText = 'เมื่อวาน'
       
       if (date.toDateString() === today.toDateString()) {
         return todayText
@@ -134,8 +134,8 @@ export const MessageList = forwardRef<HTMLDivElement, MessageListProps>(
     }
 
     if (messages.length === 0) {
-      const noMessagesText = {'ยังไม่มีข้อความ'}
-      const startConversationText = {'เริ่มสนทนาด้วยการส่งข้อความแรก'}
+      const noMessagesText = 'ยังไม่มีข้อความ'
+const startConversationText = 'เริ่มสนทนาด้วยการส่งข้อความแรก'
       
       return (
         <div ref={ref} className={cn('flex-1 flex items-center justify-center p-8', className)}>

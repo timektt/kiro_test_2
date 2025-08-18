@@ -54,7 +54,7 @@ export function ChatContainer({ className }: ChatContainerProps) {
         <div className="flex items-center justify-between p-4 border-b">
           {!sidebarCollapsed && (
             <>
-              <h2 className="text-lg font-semibold">{'แชท'}</h2>
+              <h2 className="text-lg font-semibold">แชท</h2>
               <div className="flex items-center gap-2">
                 <Button
                   size="sm"
@@ -86,11 +86,11 @@ export function ChatContainer({ className }: ChatContainerProps) {
                 isConnected ? 'bg-green-500' : 'bg-red-500'
               )} />
               <span className="text-muted-foreground">
-                {isConnected ? {'เชื่อมต่อแล้ว'} : {'ไม่ได้เชื่อมต่อ'}}
+                {isConnected ? 'เชื่อมต่อแล้ว' : 'ไม่ได้เชื่อมต่อ'}
               </span>
               {isConnected && onlineUsers.size > 0 && (
                 <span className="text-xs text-muted-foreground ml-auto">
-                  {onlineUsers.size} {'คนออนไลน์'}
+                  {onlineUsers.size} คนออนไลน์
                 </span>
               )}
             </div>
@@ -134,13 +134,13 @@ export function ChatContainer({ className }: ChatContainerProps) {
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <MessageSquarePlus className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium mb-2">{'เลือกแชทเพื่อเริ่มสนทนา'}</h3>
+              <h3 className="text-lg font-medium mb-2">เลือกแชทเพื่อเริ่มสนทนา</h3>
                 <p className="text-muted-foreground mb-4">
-                 {'เลือกแชทจากรายการด้านซ้าย หรือสร้างแชทใหม่'}
+                 เลือกแชทจากรายการด้านซ้าย หรือสร้างแชทใหม่
                 </p>
                 <Button onClick={() => setShowNewChatModal(true)}>
                   <MessageSquarePlus className="h-4 w-4 mr-2" />
-                 {'สร้างแชทใหม่'}
+                 สร้างแชทใหม่
                 </Button>
             </div>
           </div>

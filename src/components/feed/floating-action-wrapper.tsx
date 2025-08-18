@@ -1,39 +1,28 @@
 'use client'
 
 import { FloatingActionButton } from '@/components/ui/floating-action-button'
+import { useFabActions } from '@/hooks/use-fab-actions'
+import { usePostComposer } from '@/contexts/post-composer-context'
 
 export function FloatingActionWrapper() {
-  const handleCreatePost = () => {
-    console.log('Create post from FAB')
-    // TODO: Scroll to post composer or open modal
-    const postComposer = document.querySelector('[data-post-composer]')
-    if (postComposer) {
-      postComposer.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      // Focus on textarea if available
-      const textarea = postComposer.querySelector('textarea')
-      if (textarea) {
-        textarea.focus()
-      }
+  const { setSelectedImage, addEmoji, focusComposer, showComposer } = usePostComposer()
+  
+  const { handleCreatePost, handleAddImage, handleAddEmoji } = useFabActions({
+    onPostComposerFocus: () => {
+      showComposer()
+      focusComposer()
+    },
+    onImageSelect: (file: File) => {
+      setSelectedImage(file)
+      showComposer()
+      focusComposer()
+    },
+    onEmojiSelect: (emoji: string) => {
+      addEmoji(emoji)
+      showComposer()
+      focusComposer()
     }
-  }
-
-  const handleAddImage = () => {
-    console.log('Add image from FAB')
-    // TODO: Open image picker
-    const imageInput = document.querySelector('input[type="file"][accept*="image"]')
-    if (imageInput) {
-      (imageInput as HTMLInputElement).click()
-    }
-  }
-
-  const handleAddEmoji = () => {
-    console.log('Add emoji from FAB')
-    // TODO: Open emoji picker
-    const emojiButton = document.querySelector('[data-emoji-button]')
-    if (emojiButton) {
-      (emojiButton as HTMLButtonElement).click()
-    }
-  }
+  })
 
   return (
     <FloatingActionButton

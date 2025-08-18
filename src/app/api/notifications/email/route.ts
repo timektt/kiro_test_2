@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { emailService } from '@/lib/email'
-import { logger } from '@/lib/logger'
+import logger from '@/lib/logger'
 
 interface EmailNotificationRequest {
   userId: string

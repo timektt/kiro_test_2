@@ -40,9 +40,12 @@ export const GET = createAdminHandler('SYSTEM_SETTINGS')(
         // Total likes
         prisma.like.count(),
         
-        // Pending reports (assuming we have a reports table)
-        // For now, return 0 as placeholder
-        Promise.resolve(0),
+        // Pending reports
+        prisma.report.count({
+          where: {
+            status: 'PENDING',
+          },
+        }),
         
         // New users today
         prisma.user.count({

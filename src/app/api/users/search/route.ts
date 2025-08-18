@@ -1,72 +1,121 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { logger } from '@/lib/logger'
+import { z } from 'zod'
+
+const userSearchSchema = z.object({
+  q: z.string().min(1),
+  page: z.string().transform(Number).default('1'),
+  limit: z.string().transform(Number).default('20'),
+  
+  // User filters
+  mbti: z.string().optional(),
+  minFollowers: z.string().transform(Number).optional(),
+  verified: z.string().transform(val => val === 'true').optional(),
+  
+  // Sorting
+  sort: z.enum(['recent', 'popular', 'trending', 'relevant']).default('relevant')
+})
 
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      )
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { searchParams } = new URL(request.url)
-    const query = searchParams.get('q')
-    const limitParam = searchParams.get('limit')
-    const limit = limitParam ? parseInt(limitParam, 10) : 20
+    const rawParams = Object.fromEntries(searchParams.entries())
+    
+    const validatedParams = userSearchSchema.parse(rawParams)
+    const {
+      q: query,
+      page,
+      limit,
+      mbti,
+      minFollowers,
+      verified,
+      sort
+    } = validatedParams
 
-    if (!query || query.trim().length === 0) {
-      return NextResponse.json({
-        users: [],
-        total: 0
-      })
+    const skip = (page - 1) * limit
+
+    // Build where clause
+    const where: any = {
+      OR: [
+        {
+          username: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        },
+        {
+          name: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        },
+        {
+          bio: {
+            contains: query,
+            mode: 'insensitive'
+          }
+        }
+      ]
     }
 
-    const searchTerm = query.trim()
+    // Apply filters
+    if (mbti) {
+      where.mbti = {
+        type: mbti
+      }
+    }
 
-    // Search users by username, name, or email
-    const users = await prisma.user.findMany({
-      where: {
-        AND: [
-          {
-            id: {
-              not: session.user.id // Exclude current user
-            }
-          },
-          {
-            OR: [
-              {
-                username: {
-                  contains: searchTerm,
-                  mode: 'insensitive'
-                }
-              },
-              {
-                name: {
-                  contains: searchTerm,
-                  mode: 'insensitive'
-                }
-              },
-              {
-                email: {
-                  contains: searchTerm,
-                  mode: 'insensitive'
-                }
-              }
-            ]
-          }
+    if (verified !== undefined) {
+      where.verified = verified
+    }
+
+    // Build orderBy clause
+    let orderBy: any = []
+    switch (sort) {
+      case 'popular':
+        orderBy = [
+          { followers: { _count: 'desc' } },
+          { posts: { _count: 'desc' } },
+          { createdAt: 'desc' }
         ]
-      },
+        break
+      case 'recent':
+        orderBy = [{ createdAt: 'desc' }]
+        break
+      case 'trending':
+        // Trending users: recent activity + followers
+        orderBy = [
+          { followers: { _count: 'desc' } },
+          { createdAt: 'desc' }
+        ]
+        break
+      case 'relevant':
+      default:
+        orderBy = [
+          { verified: 'desc' },
+          { followers: { _count: 'desc' } },
+          { createdAt: 'desc' }
+        ]
+        break
+    }
+
+    // Search users
+    const users = await prisma.user.findMany({
+      where,
       select: {
         id: true,
         username: true,
         name: true,
         image: true,
-        email: true,
+        bio: true,
+        verified: true,
         createdAt: true,
         mbti: {
           select: {
@@ -75,89 +124,68 @@ export async function GET(request: NextRequest) {
         },
         _count: {
           select: {
-            posts: true,
             followers: true,
-            following: true
+            following: true,
+            posts: true
           }
         }
       },
-      take: Math.min(limit, 50), // Cap at 50 results
-      orderBy: [
-        {
-          username: 'asc'
-        },
-        {
-          name: 'asc'
-        }
-      ]
+      orderBy,
+      skip,
+      take: limit
     })
+
+    // Apply follower count filter after fetching (since Prisma doesn't support filtering by count directly)
+    let filteredUsers = users
+    if (minFollowers) {
+      filteredUsers = users.filter(user => user._count.followers >= minFollowers)
+    }
 
     // Get total count for pagination
-    const total = await prisma.user.count({
-      where: {
-        AND: [
-          {
-            id: {
-              not: session.user.id
-            }
-          },
-          {
-            OR: [
-              {
-                username: {
-                  contains: searchTerm,
-                  mode: 'insensitive'
-                }
-              },
-              {
-                name: {
-                  contains: searchTerm,
-                  mode: 'insensitive'
-                }
-              },
-              {
-                email: {
-                  contains: searchTerm,
-                  mode: 'insensitive'
-                }
-              }
-            ]
-          }
-        ]
-      }
-    })
+    const total = await prisma.user.count({ where })
+    const hasMore = skip + limit < total
 
-    // Remove sensitive information
-    const sanitizedUsers = users.map(user => ({
+    // Format users
+    const formattedUsers = filteredUsers.map(user => ({
       id: user.id,
       username: user.username,
       name: user.name,
       image: user.image,
-      createdAt: user.createdAt,
-      mbti: user.mbti,
+      bio: user.bio,
+      verified: user.verified,
+      mbti: user.mbti?.type,
       stats: {
-        posts: user._count.posts,
         followers: user._count.followers,
-        following: user._count.following
-      }
+        following: user._count.following,
+        posts: user._count.posts
+      },
+      createdAt: user.createdAt
     }))
 
-    logger.info(`User search completed`, {
-      userId: session.user.id,
-      query: searchTerm,
-      resultsCount: users.length,
-      total
-    })
-
     return NextResponse.json({
-      users: sanitizedUsers,
-      total,
-      query: searchTerm,
-      limit
+      users: formattedUsers,
+      total: filteredUsers.length,
+      hasMore,
+      page,
+      limit,
+      query,
+      filters: {
+        mbti,
+        minFollowers,
+        verified,
+        sort
+      }
     })
 
   } catch (error) {
-    logger.error('Error searching users:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: error.errors },
+        { status: 400 }
+      )
+    }
+    
+    console.error('Error searching users:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

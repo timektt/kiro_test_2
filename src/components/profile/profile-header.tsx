@@ -42,6 +42,7 @@ interface ProfileHeaderProps {
   }
   currentUserId?: string
   isFollowing?: boolean
+  isToggling?: boolean
   onFollow?: () => void
   onUnfollow?: () => void
   onMessage?: () => void
@@ -81,6 +82,7 @@ export function ProfileHeader({
   user,
   currentUserId,
   isFollowing = false,
+  isToggling = false,
   onFollow,
   onUnfollow,
   onMessage,
@@ -124,8 +126,10 @@ export function ProfileHeader({
         })
       } else {
         await navigator.clipboard.writeText(window.location.href)
-        // TODO: Show toast notification
-        // Profile link copied to clipboard
+        toast({
+          title: "Profile link copied!",
+          description: "The profile link has been copied to your clipboard.",
+        })
       }
     } catch (error) {
       console.error('Error sharing profile:', error)
@@ -219,11 +223,24 @@ export function ProfileHeader({
               ) : (
                 <>
                   <div className="flex gap-2 w-full sm:w-auto">
-                    <FollowButton
-                      userId={user.id}
-                      username={user.username}
+                    <Button
+                      variant={isFollowing ? 'outline' : 'default'}
+                      onClick={isFollowing ? onUnfollow : onFollow}
+                      disabled={isToggling}
                       className="flex-1 sm:flex-none"
-                    />
+                    >
+                      {isToggling ? (
+                        <>
+                          <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          {isFollowing ? 'Unfollowing...' : 'Following...'}
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="mr-2 h-4 w-4" />
+                          {isFollowing ? 'Following' : 'Follow'}
+                        </>
+                      )}
+                    </Button>
                     
                     <Button variant="outline" onClick={onMessage} className="flex-1 sm:flex-none">
                       <MessageCircle className="mr-2 h-4 w-4" />

@@ -189,7 +189,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     type: 'ESFP',
     name: 'Entertainer',
     nickname: 'The Performer',
-    description: 'Spontaneous, energetic and enthusiastic people – life is never boring around them.',
+    description: 'Spontaneous, energetic and enthusiastic people - life is never boring around them.',
     traits: ['Bold', 'Original', 'Aesthetics', 'Showmanship'],
     color: 'lime',
     emoji: '🎉',

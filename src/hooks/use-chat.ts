@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import { useSocket } from './use-socket'
-import { logger } from '@/lib/logger'
+import logger from '@/lib/logger'
 
 interface ChatMessage {
   id: string

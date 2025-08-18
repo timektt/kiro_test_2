@@ -46,6 +46,7 @@ import {
 import { EmptyState } from '@/components/ui/empty-state'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { cn } from '@/lib/utils'
+import { useUIStore } from '@/stores/ui-store'
 
 interface Post {
   id: string
@@ -105,6 +106,7 @@ const fetcher = async (url: string) => {
 }
 
 export function ContentModeration({ adminUser }: ContentModerationProps) {
+  const { addToast } = useUIStore()
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('ALL')
   const [statusFilter, setStatusFilter] = useState('ALL')
@@ -186,9 +188,20 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
       // Refresh data
       mutate()
       setActionDialog(null)
+      
+      // Show success toast
+      addToast({
+        type: 'success',
+        title: 'Action completed',
+        description: `${action === 'DELETE' ? 'Deleted' : action === 'HIDE' ? 'Hidden' : 'Shown'} ${itemType} successfully`,
+      })
     } catch (error) {
       console.error('Error performing content action:', error)
-      // TODO: Show error toast
+      addToast({
+        type: 'error',
+        title: 'Action failed',
+        description: error instanceof Error ? error.message : 'Failed to perform action',
+      })
     }
   }
 

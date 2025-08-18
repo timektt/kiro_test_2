@@ -1,8 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
+import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { logger } from '@/lib/logger'
+import { z } from 'zod'
+
+const searchSchema = z.object({
+  q: z.string().min(1),
+  page: z.string().transform(Number).default('1'),
+  
+  // Content filters
+  category: z.string().optional(),
+  mbti: z.string().optional(),
+  authorMbti: z.string().optional(),
+  hasImage: z.string().transform(val => val === 'true').optional(),
+  hasVideo: z.string().transform(val => val === 'true').optional(),
+  
+  // Engagement filters
+  minLikes: z.string().transform(Number).optional(),
+  maxLikes: z.string().transform(Number).optional(),
+  minComments: z.string().transform(Number).optional(),
+  maxComments: z.string().transform(Number).optional(),
+  
+  // Time filters
+  dateFrom: z.string().transform(str => new Date(str)).optional(),
+  dateTo: z.string().transform(str => new Date(str)).optional(),
+  
+  // Author filters
+  minFollowers: z.string().transform(Number).optional(),
+  verifiedOnly: z.string().transform(val => val === 'true').optional(),
+  
+  // Sorting
+  sort: z.enum(['recent', 'popular', 'trending', 'relevant']).default('recent'),
+  order: z.enum(['asc', 'desc']).default('desc')
+})
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,28 +45,31 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url)
-    const query = searchParams.get('q')
-    const category = searchParams.get('category')
-    const mbtiType = searchParams.get('mbti')
-    const sortBy = searchParams.get('sort') || 'recent' // recent, popular, oldest
-    const pageParam = searchParams.get('page')
-    const limitParam = searchParams.get('limit')
+    const rawParams = Object.fromEntries(searchParams.entries())
     
-    const page = pageParam ? parseInt(pageParam, 10) : 1
-    const limit = limitParam ? parseInt(limitParam, 10) : 20
-    const skip = (page - 1) * Math.min(limit, 50)
+    const validatedParams = searchSchema.parse(rawParams)
+    const {
+      q: query,
+      page,
+      category,
+      mbti,
+      authorMbti,
+      hasImage,
+      hasVideo,
+      minLikes,
+      maxLikes,
+      minComments,
+      maxComments,
+      dateFrom,
+      dateTo,
+      minFollowers,
+      verifiedOnly,
+      sort,
+      order
+    } = validatedParams
 
-    if (!query || query.trim().length === 0) {
-      return NextResponse.json({
-        posts: [],
-        total: 0,
-        page,
-        limit,
-        totalPages: 0
-      })
-    }
-
-    const searchTerm = query.trim()
+    const limit = 20
+    const skip = (page - 1) * limit
 
     // Build where clause
     const whereClause: any = {
@@ -45,13 +78,13 @@ export async function GET(request: NextRequest) {
           OR: [
             {
               content: {
-                contains: searchTerm,
+                contains: query,
                 mode: 'insensitive'
               }
             },
             {
               category: {
-                contains: searchTerm,
+                contains: query,
                 mode: 'insensitive'
               }
             }
@@ -60,8 +93,8 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    // Add category filter
-    if (category && category !== 'all') {
+    // Content filters
+    if (category) {
       whereClause.AND.push({
         category: {
           equals: category,
@@ -70,33 +103,77 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    // Add MBTI filter
-    if (mbtiType && mbtiType !== 'all') {
+    if (mbti) {
       whereClause.AND.push({
-        author: {
-          mbti: {
-            type: mbtiType
-          }
+        mbti: {
+          type: mbti
         }
+      })
+    }
+
+    if (hasImage) {
+      whereClause.AND.push({
+        imageUrl: { not: null }
+      })
+    }
+
+    if (hasVideo) {
+      whereClause.AND.push({
+        videoUrl: { not: null }
+      })
+    }
+
+    // Time filters
+    if (dateFrom || dateTo) {
+      const dateFilter: any = {}
+      if (dateFrom) dateFilter.gte = dateFrom
+      if (dateTo) dateFilter.lte = dateTo
+      whereClause.AND.push({
+        createdAt: dateFilter
+      })
+    }
+
+    // Author filters
+    const authorWhere: any = {}
+    if (authorMbti) {
+      authorWhere.mbti = {
+        type: authorMbti
+      }
+    }
+    if (verifiedOnly) {
+      authorWhere.verified = true
+    }
+    
+    if (Object.keys(authorWhere).length > 0) {
+      whereClause.AND.push({
+        author: authorWhere
       })
     }
 
     // Build order by clause
     let orderBy: any = []
-    switch (sortBy) {
+    switch (sort) {
       case 'popular':
         orderBy = [
-          { likes: { _count: 'desc' } },
-          { comments: { _count: 'desc' } },
+          { likes: { _count: order } },
+          { comments: { _count: order } },
           { createdAt: 'desc' }
         ]
         break
-      case 'oldest':
-        orderBy = [{ createdAt: 'asc' }]
+      case 'trending':
+        // Trending: combination of recent and popular
+        orderBy = [
+          { likes: { _count: 'desc' } },
+          { createdAt: 'desc' }
+        ]
+        break
+      case 'relevant':
+        // For relevance, we'll use creation date as fallback
+        orderBy = [{ createdAt: 'desc' }]
         break
       case 'recent':
       default:
-        orderBy = [{ createdAt: 'desc' }]
+        orderBy = [{ createdAt: order }]
         break
     }
 
@@ -110,9 +187,15 @@ export async function GET(request: NextRequest) {
             username: true,
             name: true,
             image: true,
+            verified: true,
             mbti: {
               select: {
                 type: true
+              }
+            },
+            _count: {
+              select: {
+                followers: true
               }
             }
           }
@@ -133,23 +216,42 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy,
-      take: Math.min(limit, 50),
+      take: limit,
       skip
     })
+
+    // Apply engagement filters after fetching (since Prisma doesn't support filtering by count directly)
+    let filteredPosts = posts
+    if (minLikes || maxLikes || minComments || maxComments || minFollowers) {
+      filteredPosts = posts.filter(post => {
+        const likesCount = post._count.likes
+        const commentsCount = post._count.comments
+        const followersCount = post.author._count.followers
+        
+        if (minLikes && likesCount < minLikes) return false
+        if (maxLikes && likesCount > maxLikes) return false
+        if (minComments && commentsCount < minComments) return false
+        if (maxComments && commentsCount > maxComments) return false
+        if (minFollowers && followersCount < minFollowers) return false
+        
+        return true
+      })
+    }
 
     // Get total count for pagination
     const total = await prisma.post.count({
       where: whereClause
     })
 
-    const totalPages = Math.ceil(total / Math.min(limit, 50))
+    const totalPages = Math.ceil(total / limit)
 
     // Format posts
-    const formattedPosts = posts.map(post => ({
+    const formattedPosts = filteredPosts.map(post => ({
       id: post.id,
       content: post.content,
       category: post.category,
       imageUrl: post.imageUrl,
+      videoUrl: post.videoUrl,
       createdAt: post.createdAt,
       updatedAt: post.updatedAt,
       author: {
@@ -157,7 +259,9 @@ export async function GET(request: NextRequest) {
         username: post.author.username,
         name: post.author.name,
         image: post.author.image,
-        mbti: post.author.mbti
+        verified: post.author.verified,
+        mbti: post.author.mbti,
+        followersCount: post.author._count.followers
       },
       stats: {
         likes: post._count.likes,
@@ -166,33 +270,41 @@ export async function GET(request: NextRequest) {
       isLiked: post.likes.length > 0
     }))
 
-    logger.info(`Post search completed`, {
-      userId: session.user.id,
-      query: searchTerm,
-      category,
-      mbtiType,
-      sortBy,
-      resultsCount: posts.length,
-      total,
-      page
-    })
-
     return NextResponse.json({
       posts: formattedPosts,
-      total,
+      total: filteredPosts.length,
       page,
-      limit: Math.min(limit, 50),
-      totalPages,
-      query: searchTerm,
+      limit,
+      totalPages: Math.ceil(filteredPosts.length / limit),
+      query,
       filters: {
         category,
-        mbtiType,
-        sortBy
+        mbti,
+        authorMbti,
+        hasImage,
+        hasVideo,
+        minLikes,
+        maxLikes,
+        minComments,
+        maxComments,
+        dateFrom,
+        dateTo,
+        minFollowers,
+        verifiedOnly,
+        sort,
+        order
       }
     })
 
   } catch (error) {
-    logger.error('Error searching posts:', error)
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid parameters', details: error.errors },
+        { status: 400 }
+      )
+    }
+    
+    console.error('Error searching posts:', error)
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

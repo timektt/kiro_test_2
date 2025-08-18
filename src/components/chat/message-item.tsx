@@ -119,9 +119,9 @@ export function MessageItem({
     const otherParticipants = chat.participants.filter(p => p.user.id !== message.senderId)
     const readByOthers = message.readBy.filter(read => read.userId !== message.senderId)
     
-    const sentText = {'ส่งแล้ว'}
-    const readText = {'อ่านแล้ว'}
-    const peopleText = {'คน'}
+    const sentText = 'ส่งแล้ว'
+const readText = 'อ่านแล้ว'
+const peopleText = 'คน'
     
     if (readByOthers.length === 0) {
       return { icon: Check, color: 'text-muted-foreground', tooltip: sentText }
@@ -205,7 +205,7 @@ export function MessageItem({
                     📎
                   </div>
                   <div>
-                    <p className="font-medium">{'ไฟล์แนบ'}</p>
+                    <p className="font-medium">ไฟล์แนบ</p>
                     <p className="text-xs opacity-70">{message.content}</p>
                   </div>
                 </div>
@@ -240,12 +240,12 @@ export function MessageItem({
                   <DropdownMenuContent align={isOwn ? 'end' : 'start'}>
                     <DropdownMenuItem onClick={copyToClipboard}>
                       <Copy className="h-4 w-4 mr-2" />
-                      {'คัดลอก'}
+                      คัดลอก
                     </DropdownMenuItem>
                     {isOwn && (
                       <DropdownMenuItem className="text-destructive">
                         <Trash2 className="h-4 w-4 mr-2" />
-                        {'ลบข้อความ'}
+                        ลบข้อความ
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>

@@ -1,94 +1,98 @@
-import winston from 'winston'
-import DailyRotateFile from 'winston-daily-rotate-file'
+// Client-side logger (browser)
+const clientLogger = {
+  info: (message: string, meta?: any) => {
+    console.log(`[INFO] ${message}`, meta || '')
+  },
+  error: (message: string, error?: Error | any) => {
+    console.error(`[ERROR] ${message}`, error || '')
+  },
+  warn: (message: string, meta?: any) => {
+    console.warn(`[WARN] ${message}`, meta || '')
+  },
+  debug: (message: string, meta?: any) => {
+    console.debug(`[DEBUG] ${message}`, meta || '')
+  }
+}
 
-const logLevel = process.env.LOG_LEVEL || 'info'
-const logPath = process.env.LOG_FILE_PATH || './logs'
+// Server-side logger (Node.js)
+let serverLogger: any = null
 
-// Define log format
-const logFormat = winston.format.combine(
-  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-  winston.format.errors({ stack: true }),
-  winston.format.json()
-)
-
-// Create transports
-const transports: winston.transport[] = [
-  // Console transport
-  new winston.transports.Console({
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.simple()
+if (typeof window === 'undefined') {
+  try {
+    const winston = require('winston')
+    const DailyRotateFile = require('winston-daily-rotate-file')
+    
+    const logLevel = process.env.LOG_LEVEL || 'info'
+    const logPath = process.env.LOG_FILE_PATH || './logs'
+    
+    // Define log format
+    const logFormat = winston.format.combine(
+      winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+      winston.format.errors({ stack: true }),
+      winston.format.json()
     )
-  })
-]
-
-// Add file transports only in production or when LOG_FILE_PATH is set
-if (process.env.NODE_ENV === 'production' || process.env.LOG_FILE_PATH) {
-  // Error log file
-  transports.push(
-    new DailyRotateFile({
-      filename: `${logPath}/error-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
-      level: 'error',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: logFormat
+    
+    // Create transports
+    const transports: any[] = [
+      // Console transport
+      new winston.transports.Console({
+        format: winston.format.combine(
+          winston.format.colorize(),
+          winston.format.simple()
+        )
+      })
+    ]
+    
+    // Add file transports only in production or when LOG_FILE_PATH is set
+    if (process.env.NODE_ENV === 'production' || process.env.LOG_FILE_PATH) {
+      // Error log file
+      transports.push(
+        new DailyRotateFile({
+          filename: `${logPath}/error-%DATE%.log`,
+          datePattern: 'YYYY-MM-DD',
+          level: 'error',
+          maxSize: '20m',
+          maxFiles: '14d',
+          format: logFormat
+        })
+      )
+      
+      // Combined log file
+      transports.push(
+        new DailyRotateFile({
+          filename: `${logPath}/combined-%DATE%.log`,
+          datePattern: 'YYYY-MM-DD',
+          maxSize: '20m',
+          maxFiles: '14d',
+          format: logFormat
+        })
+      )
+    }
+    
+    serverLogger = winston.createLogger({
+      level: logLevel,
+      format: logFormat,
+      transports,
+      exitOnError: false
     })
-  )
-
-  // Combined log file
-  transports.push(
-    new DailyRotateFile({
-      filename: `${logPath}/combined-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: logFormat
-    })
-  )
+  } catch (error) {
+    console.error('Failed to initialize server logger:', error)
+    serverLogger = clientLogger
+  }
 }
 
-// Create logger instance
-const logger = winston.createLogger({
-  level: logLevel,
-  format: logFormat,
-  transports,
-  // Don't exit on handled exceptions
-  exitOnError: false
-})
-
-// Handle uncaught exceptions and unhandled rejections
-if (process.env.NODE_ENV === 'production') {
-  logger.exceptions.handle(
-    new DailyRotateFile({
-      filename: `${logPath}/exceptions-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: logFormat
-    })
-  )
-
-  logger.rejections.handle(
-    new DailyRotateFile({
-      filename: `${logPath}/rejections-%DATE%.log`,
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-      format: logFormat
-    })
-  )
-}
+// Use appropriate logger based on environment
+const logger = typeof window === 'undefined' ? (serverLogger || clientLogger) : clientLogger
 
 export default logger
 
-// Helper functions for different log levels
+// Helper functions for easier logging
 export const logInfo = (message: string, meta?: any) => {
   logger.info(message, meta)
 }
 
 export const logError = (message: string, error?: Error | any) => {
-  logger.error(message, { error: error?.stack || error })
+  logger.error(message, error)
 }
 
 export const logWarn = (message: string, meta?: any) => {

@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, Filter, Users, FileText, Loader2 } from 'lucide-react'
+import { Search, Filter, Users, FileText, Loader2, SlidersHorizontal } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,8 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { PostCard } from '@/components/ui/post-card'
+import { SearchAutocomplete } from '@/components/ui/search-autocomplete'
+import { AdvancedSearchFilters } from '@/components/ui/advanced-search-filters'
 import { useDebounce } from '@/hooks/use-debounce'
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 interface SearchUser {
   id: string
@@ -66,6 +69,32 @@ const POST_CATEGORIES = [
   'experience', 'relationship', 'career', 'hobby'
 ]
 
+interface SearchFilters {
+  // Content filters
+  category?: string
+  mbtiType?: string
+  hasImage?: boolean
+  hasVideo?: boolean
+  minLikes?: number
+  maxLikes?: number
+  minComments?: number
+  maxComments?: number
+  
+  // Time filters
+  dateFrom?: Date
+  dateTo?: Date
+  timeRange?: 'today' | 'week' | 'month' | 'year' | 'custom'
+  
+  // User filters
+  authorMbti?: string
+  minFollowers?: number
+  verifiedOnly?: boolean
+  
+  // Sorting
+  sortBy?: 'recent' | 'popular' | 'trending' | 'relevant'
+  sortOrder?: 'asc' | 'desc'
+}
+
 export default function SearchPage() {
   const { data: session } = useSession()
   const router = useRouter()
@@ -74,8 +103,15 @@ export default function SearchPage() {
   const [query, setQuery] = useState(searchParams.get('q') || '')
   const [activeTab, setActiveTab] = useState(searchParams.get('type') || 'posts')
   const [isLoading, setIsLoading] = useState(false)
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false)
   
-  // Post filters
+  // Advanced filters
+  const [advancedFilters, setAdvancedFilters] = useState<SearchFilters>({
+    sortBy: 'recent',
+    sortOrder: 'desc'
+  })
+  
+  // Post filters (legacy - keeping for backward compatibility)
   const [postCategory, setPostCategory] = useState(searchParams.get('category') || 'all')
   const [postMbti, setPostMbti] = useState(searchParams.get('mbti') || 'all')
   const [postSort, setPostSort] = useState(searchParams.get('sort') || 'recent')
@@ -98,7 +134,19 @@ export default function SearchPage() {
     }
     
     try {
-      const response = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}&limit=20`)
+      // Build query parameters with advanced filters
+      const params = new URLSearchParams({
+        q: searchQuery,
+        limit: '20'
+      })
+      
+      // Add user-specific filters
+      if (advancedFilters.authorMbti) params.append('mbti', advancedFilters.authorMbti)
+      if (advancedFilters.minFollowers) params.append('minFollowers', advancedFilters.minFollowers.toString())
+      if (advancedFilters.verifiedOnly) params.append('verified', 'true')
+      if (advancedFilters.sortBy) params.append('sort', advancedFilters.sortBy)
+      
+      const response = await fetch(`/api/users/search?${params}`)
       if (!response.ok) throw new Error('Failed to search users')
       
       const data = await response.json()
@@ -106,9 +154,9 @@ export default function SearchPage() {
       setUserTotal(data.total)
     } catch (error) {
       console.error('Error searching users:', error)
-      toast.error({'เกิดข้อผิดพลาดในการค้นหาผู้ใช้'})
+      toast.error('เกิดข้อผิดพลาดในการค้นหาผู้ใช้')
     }
-  }, [])
+  }, [advancedFilters])
   
   const searchPosts = useCallback(async (searchQuery: string, page = 1, reset = true) => {
     if (!searchQuery.trim()) {
@@ -125,6 +173,24 @@ export default function SearchPage() {
         limit: '20'
       })
       
+      // Add advanced filters
+      if (advancedFilters.category) params.append('category', advancedFilters.category)
+      if (advancedFilters.mbtiType) params.append('mbti', advancedFilters.mbtiType)
+      if (advancedFilters.authorMbti) params.append('authorMbti', advancedFilters.authorMbti)
+      if (advancedFilters.hasImage) params.append('hasImage', 'true')
+      if (advancedFilters.hasVideo) params.append('hasVideo', 'true')
+      if (advancedFilters.minLikes) params.append('minLikes', advancedFilters.minLikes.toString())
+      if (advancedFilters.maxLikes) params.append('maxLikes', advancedFilters.maxLikes.toString())
+      if (advancedFilters.minComments) params.append('minComments', advancedFilters.minComments.toString())
+      if (advancedFilters.maxComments) params.append('maxComments', advancedFilters.maxComments.toString())
+      if (advancedFilters.dateFrom) params.append('dateFrom', advancedFilters.dateFrom.toISOString())
+      if (advancedFilters.dateTo) params.append('dateTo', advancedFilters.dateTo.toISOString())
+      if (advancedFilters.minFollowers) params.append('minFollowers', advancedFilters.minFollowers.toString())
+      if (advancedFilters.verifiedOnly) params.append('verifiedOnly', 'true')
+      if (advancedFilters.sortBy) params.append('sort', advancedFilters.sortBy)
+      if (advancedFilters.sortOrder) params.append('order', advancedFilters.sortOrder)
+      
+      // Legacy filters for backward compatibility
       if (postCategory !== 'all') params.append('category', postCategory)
       if (postMbti !== 'all') params.append('mbti', postMbti)
       if (postSort) params.append('sort', postSort)
@@ -145,9 +211,9 @@ export default function SearchPage() {
       setPostPage(page)
     } catch (error) {
       console.error('Error searching posts:', error)
-      toast.error({'เกิดข้อผิดพลาดในการค้นหาโพสต์'})
+      toast.error('เกิดข้อผิดพลาดในการค้นหาโพสต์')
     }
-  }, [postCategory, postMbti, postSort])
+  }, [advancedFilters, postCategory, postMbti, postSort])
   
   const performSearch = useCallback(async () => {
     if (!debouncedQuery.trim()) {
@@ -177,6 +243,38 @@ export default function SearchPage() {
       await searchPosts(debouncedQuery, postPage + 1, false)
       setIsLoading(false)
     }
+  }
+
+  // Advanced filters handlers
+  const handleFiltersChange = (newFilters: SearchFilters) => {
+    setAdvancedFilters(newFilters)
+    // Reset search when filters change
+    if (debouncedQuery) {
+      if (activeTab === 'posts') {
+        searchPosts(debouncedQuery, 1, true)
+      } else {
+        searchUsers(debouncedQuery)
+      }
+    }
+  }
+
+  const handleFiltersReset = () => {
+    setAdvancedFilters({
+      sortBy: 'recent',
+      sortOrder: 'desc'
+    })
+    // Refresh search with reset filters
+    if (debouncedQuery) {
+      if (activeTab === 'posts') {
+        searchPosts(debouncedQuery, 1, true)
+      } else {
+        searchUsers(debouncedQuery)
+      }
+    }
+  }
+
+  const handleSearchSelect = (suggestion: any) => {
+    setQuery(suggestion.title || suggestion.username || suggestion.text)
   }
   
   // Update URL when search parameters change
@@ -229,15 +327,46 @@ export default function SearchPage() {
           <h1 className="text-2xl font-bold">{'ค้นหาขั้นสูง'}</h1>
         </div>
         
-        {/* Search Input */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder={'ค้นหาผู้ใช้หรือโพสต์...'}
+        {/* Enhanced Search Input */}
+        <div className="space-y-4">
+          <SearchAutocomplete
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="pl-10"
+            onChange={setQuery}
+            onSelect={handleSearchSelect}
+            placeholder="ค้นหาโพสต์, ผู้ใช้, หรือหัวข้อ..."
+            className="text-lg"
           />
+          
+          {/* Advanced Filters Toggle */}
+          <div className="flex items-center justify-between">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="gap-2"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              ตัวกรองขั้นสูง
+              {Object.keys(advancedFilters).filter(key => 
+                key !== 'sortBy' && key !== 'sortOrder' && advancedFilters[key as keyof SearchFilters]
+              ).length > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {Object.keys(advancedFilters).filter(key => 
+                    key !== 'sortBy' && key !== 'sortOrder' && advancedFilters[key as keyof SearchFilters]
+                  ).length}
+                </Badge>
+              )}
+            </Button>
+          </div>
+          
+          {/* Advanced Filters */}
+          {showAdvancedFilters && (
+            <AdvancedSearchFilters
+              filters={advancedFilters}
+              onFiltersChange={handleFiltersChange}
+              onReset={handleFiltersReset}
+            />
+          )}
         </div>
       </div>
       
