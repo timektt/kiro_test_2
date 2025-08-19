@@ -23,6 +23,16 @@ const customJestConfig = {
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
   ],
+  transformIgnorePatterns: [
+    'node_modules/(?!(jose|next-auth|openid-client|oauth|oidc-token-hash)/)',
+  ],
+  extensionsToTreatAsEsm: ['.ts', '.tsx'],
+  globals: {
+    'ts-jest': {
+      useESM: true,
+    },
+  },
+
 }
 
 // createJestConfig is exported this way to ensure that next/jest can load the Next.js config which is async

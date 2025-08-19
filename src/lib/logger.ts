@@ -85,6 +85,7 @@ if (typeof window === 'undefined') {
 const logger = typeof window === 'undefined' ? (serverLogger || clientLogger) : clientLogger
 
 export default logger
+export { logger }
 
 // Helper functions for easier logging
 export const logInfo = (message: string, meta?: any) => {

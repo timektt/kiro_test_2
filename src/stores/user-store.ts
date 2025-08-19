@@ -19,6 +19,7 @@ type User = {
   isActive: boolean
   createdAt: Date
   updatedAt: Date
+  mbti?: string | null
 }
 
 type UserState = {
@@ -30,6 +31,9 @@ type UserState = {
   setCurrentUser: (user: User) => void
   setAuthenticated: (authenticated: boolean) => void
   clearUserData: () => void
+  updateUser: (userData: Partial<User>) => void
+  followUser: (userId: string) => void
+  unfollowUser: (userId: string) => void
 }
 
 const defaultPreferences: Preferences = {
@@ -62,6 +66,25 @@ export const useUserStore = create<UserState>()(
             preferences: defaultPreferences,
             followingUsers: new Set(),
             blockedUsers: new Set(),
+          }),
+
+        updateUser: (userData: Partial<User>) =>
+          set((state) => ({
+            currentUser: state.currentUser
+              ? { ...state.currentUser, ...userData }
+              : null,
+          })),
+
+        followUser: (userId: string) =>
+          set((state) => ({
+            followingUsers: new Set([...state.followingUsers, userId]),
+          })),
+
+        unfollowUser: (userId: string) =>
+          set((state) => {
+            const newFollowing = new Set(state.followingUsers)
+            newFollowing.delete(userId)
+            return { followingUsers: newFollowing }
           }),
       }),
       {
