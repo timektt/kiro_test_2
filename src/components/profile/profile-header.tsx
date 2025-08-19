@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { 
   Settings, 
@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
 import { FollowButton } from '@/components/ui/follow-button'
 import {
   DropdownMenu,
@@ -29,6 +30,9 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { ProfileEditForm } from '@/components/profile/profile-edit-form'
 import { formatDate, cn } from '@/lib/utils'
+import { useFollowers, useFollowing } from '@/hooks/use-follow'
+import { useProfileVisibility, useBlockUser, useReportUser, getVisibleProfileInfo, canPerformAction } from '@/hooks/use-privacy'
+import { toast } from 'sonner'
 import type { User, MBTIType } from '@/types'
 
 interface ProfileHeaderProps {
@@ -89,9 +93,45 @@ export function ProfileHeader({
   className,
 }: ProfileHeaderProps) {
   const [isEditing, setIsEditing] = useState(false)
-  const [isFollowLoading, setIsFollowLoading] = useState(false)
-  
+  const [isLoading, setIsLoading] = useState(false)
   const isOwnProfile = currentUserId === user.id
+
+  // Real-time follower counts
+  const { totalCount: followersCount, isLoading: followersLoading, refresh: refreshFollowers } = useFollowers(user.id, 1, 1)
+  const { totalCount: followingCount, isLoading: followingLoading, refresh: refreshFollowing } = useFollowing(user.id, 1, 1)
+  
+  // Get privacy visibility settings with error handling
+  const { visibility, error: visibilityError } = useProfileVisibility(user.id, currentUserId)
+  const { blockUser, isLoading: isBlockLoading, error: blockError } = useBlockUser()
+  const { reportUser, isLoading: isReportLoading, error: reportError } = useReportUser()
+  
+  // Use real-time counts if available, fallback to user._count
+  const followerCount = followersLoading ? user._count?.followers || 0 : followersCount || user._count?.followers || 0
+  const finalFollowingCount = followingLoading ? user._count?.following || 0 : followingCount || user._count?.following || 0
+  
+  // Get visible profile information based on privacy settings
+  const visibleInfo = getVisibleProfileInfo(visibility, isOwnProfile)
+
+  // Show error toast if privacy hooks fail
+  useEffect(() => {
+    if (visibilityError) {
+      toast.error('Failed to load privacy settings')
+    }
+    if (blockError) {
+      toast.error('Failed to block user')
+    }
+    if (reportError) {
+      toast.error('Failed to report user')
+    }
+  }, [visibilityError, blockError, reportError])
+
+  // Refresh counts when follow status changes
+  useEffect(() => {
+    if (!isToggling) {
+      refreshFollowers()
+      refreshFollowing()
+    }
+  }, [isFollowing, isToggling, refreshFollowers, refreshFollowing])
   const socialLinks = user.socialLinks as Record<string, string> || {}
 
   const getInitials = (name: string) => {
@@ -103,37 +143,201 @@ export function ProfileHeader({
       .slice(0, 2)
   }
 
+  const [isFollowLoading, setIsFollowLoading] = useState(false)
+
   const handleFollowToggle = async () => {
+    if (!canPerformAction(visibility, 'viewProfile')) {
+      toast.error('You cannot follow this user due to privacy settings')
+      return
+    }
+
+    if (!currentUserId) {
+      toast.error('Please log in to follow users')
+      return
+    }
+    
     setIsFollowLoading(true)
     try {
       if (isFollowing) {
-        onUnfollow?.()
+        await onUnfollow?.()
+        toast.success('Unfollowed successfully')
       } else {
-        onFollow?.()
+        await onFollow?.()
+        toast.success('Following successfully')
       }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update follow status'
+      toast.error(errorMessage)
+      console.error('Error toggling follow:', error)
     } finally {
       setIsFollowLoading(false)
     }
   }
 
   const handleShare = async () => {
+    if (!canPerformAction(visibility, 'viewProfile')) {
+      toast.error('This profile cannot be shared due to privacy settings')
+      return
+    }
+    
     try {
+      const url = `${window.location.origin}/profile/${user.username}`
+      
+      // Check if Web Share API is available
       if (navigator.share) {
         await navigator.share({
-          title: `${user.name || user.username} on Community Platform`,
-          text: user.bio || `Check out ${user.name || user.username}'s profile`,
-          url: window.location.href,
+          title: `${user.name || user.username}'s Profile`,
+          text: `Check out ${user.name || user.username}'s profile on our platform`,
+          url: url,
         })
+        toast.success('Profile shared successfully')
       } else {
-        await navigator.clipboard.writeText(window.location.href)
-        toast({
-          title: "Profile link copied!",
-          description: "The profile link has been copied to your clipboard.",
-        })
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(url)
+        toast.success('Profile link copied to clipboard!')
       }
     } catch (error) {
+      // If sharing was cancelled, don't show error
+      if (error instanceof Error && error.name === 'AbortError') {
+        return
+      }
+      
+      const errorMessage = error instanceof Error ? error.message : 'Failed to share profile'
+      toast.error(errorMessage)
       console.error('Error sharing profile:', error)
     }
+  }
+
+  const handleMessage = async () => {
+    if (!canPerformAction(visibility, 'sendMessage')) {
+      toast.error('You cannot message this user due to privacy settings')
+      return
+    }
+
+    if (!currentUserId) {
+      toast.error('Please log in to send messages')
+      return
+    }
+
+    if (currentUserId === user.id) {
+      toast.error('You cannot message yourself')
+      return
+    }
+    
+    try {
+      // Navigate to chat or open message modal
+      onMessage?.()
+      toast.success('Opening chat...')
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to open chat'
+      toast.error(errorMessage)
+      console.error('Error opening message:', error)
+    }
+  }
+  
+  const handleBlock = async () => {
+    if (!currentUserId) {
+      toast.error('Please log in to block users')
+      return
+    }
+
+    if (currentUserId === user.id) {
+      toast.error('You cannot block yourself')
+      return
+    }
+
+    // Show confirmation dialog
+    const confirmed = window.confirm(
+      `Are you sure you want to block @${user.username}? This will prevent them from following you or sending you messages.`
+    )
+    
+    if (!confirmed) {
+      return
+    }
+
+    try {
+      await blockUser(user.id)
+      toast.success(`@${user.username} has been blocked`)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to block user'
+      toast.error(errorMessage)
+      console.error('Error blocking user:', error)
+    }
+  }
+  
+  const handleReport = async () => {
+    if (!currentUserId) {
+      toast.error('Please log in to report users')
+      return
+    }
+
+    if (currentUserId === user.id) {
+      toast.error('You cannot report yourself')
+      return
+    }
+
+    // Show confirmation dialog with reason selection
+    const reason = window.prompt(
+      `Why are you reporting @${user.username}?\n\nCommon reasons:\n- Harassment or bullying\n- Spam or fake account\n- Inappropriate content\n- Impersonation\n- Other\n\nPlease enter your reason:`
+    )
+    
+    if (!reason || reason.trim() === '') {
+      return
+    }
+
+    try {
+      await reportUser(user.id, 'inappropriate_behavior', reason.trim())
+      toast.success(`Report submitted for @${user.username}`)
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to report user'
+      toast.error(errorMessage)
+      console.error('Error reporting user:', error)
+    }
+  }
+
+  // Show loading state if privacy data is still loading
+  if (!visibility && !visibilityError) {
+    return (
+      <Card className={cn('w-full', className)}>
+        <CardContent className="p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:gap-6 animate-pulse">
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+              <div className="h-24 w-24 sm:h-32 sm:w-32 bg-muted rounded-full flex-shrink-0" />
+              <div className="text-center sm:text-left space-y-2 sm:space-y-3 flex-1 min-w-0">
+                <div className="space-y-1">
+                  <div className="h-6 sm:h-8 bg-muted rounded w-48 mx-auto sm:mx-0" />
+                  <div className="h-4 bg-muted rounded w-32 mx-auto sm:mx-0" />
+                </div>
+                <div className="flex justify-center sm:justify-start gap-2">
+                  <div className="h-6 bg-muted rounded w-16" />
+                  <div className="h-6 bg-muted rounded w-20" />
+                </div>
+                <div className="flex justify-center sm:justify-start gap-4">
+                  <div className="text-center">
+                    <div className="h-5 bg-muted rounded w-8 mx-auto mb-1" />
+                    <div className="h-3 bg-muted rounded w-12" />
+                  </div>
+                  <div className="text-center">
+                    <div className="h-5 bg-muted rounded w-8 mx-auto mb-1" />
+                    <div className="h-3 bg-muted rounded w-16" />
+                  </div>
+                  <div className="text-center">
+                    <div className="h-5 bg-muted rounded w-8 mx-auto mb-1" />
+                    <div className="h-3 bg-muted rounded w-16" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-center sm:justify-start">
+              <div className="flex gap-2">
+                <div className="h-10 bg-muted rounded w-24" />
+                <div className="h-10 bg-muted rounded w-24" />
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    )
   }
 
   if (isEditing) {
@@ -169,7 +373,7 @@ export function ProfileHeader({
 
               {/* Badges */}
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-1 sm:gap-2">
-                {user.mbti && (
+                {user.mbti && visibleInfo.showMBTI && (
                   <Badge className={cn('text-xs sm:text-sm', mbtiColors[user.mbti.type])}>
                     {user.mbti.type}
                   </Badge>
@@ -192,14 +396,26 @@ export function ProfileHeader({
                   <div className="font-bold text-base sm:text-lg">{user._count?.posts || 0}</div>
                   <div className="text-xs sm:text-sm text-muted-foreground">Posts</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-bold text-base sm:text-lg">{user._count?.followers || 0}</div>
-                  <div className="text-xs sm:text-sm text-muted-foreground">Followers</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-base sm:text-lg">{user._count?.following || 0}</div>
-                  <div className="text-xs sm:text-sm text-muted-foreground">Following</div>
-                </div>
+                {visibleInfo.showFollowerCount && (
+                  <div className="text-center">
+                    {followersLoading ? (
+                      <div className="h-5 w-8 bg-muted animate-pulse rounded mx-auto mb-1" />
+                    ) : (
+                      <div className="font-bold text-base sm:text-lg">{followerCount}</div>
+                    )}
+                    <div className="text-xs sm:text-sm text-muted-foreground">Followers</div>
+                  </div>
+                )}
+                {visibleInfo.showFollowingCount && (
+                  <div className="text-center">
+                    {followingLoading ? (
+                      <div className="h-5 w-8 bg-muted animate-pulse rounded mx-auto mb-1" />
+                    ) : (
+                      <div className="font-bold text-base sm:text-lg">{finalFollowingCount}</div>
+                    )}
+                    <div className="text-xs sm:text-sm text-muted-foreground">Following</div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -225,11 +441,12 @@ export function ProfileHeader({
                   <div className="flex gap-2 w-full sm:w-auto">
                     <Button
                       variant={isFollowing ? 'outline' : 'default'}
-                      onClick={isFollowing ? onUnfollow : onFollow}
-                      disabled={isToggling}
+                      onClick={handleFollowToggle}
+                      disabled={isFollowLoading || !canPerformAction(visibility, 'follow')}
                       className="flex-1 sm:flex-none"
+                      title={!canPerformAction(visibility, 'follow') ? 'Cannot follow due to privacy settings' : undefined}
                     >
-                      {isToggling ? (
+                      {isFollowLoading ? (
                         <>
                           <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                           {isFollowing ? 'Unfollowing...' : 'Following...'}
@@ -242,7 +459,18 @@ export function ProfileHeader({
                       )}
                     </Button>
                     
-                    <Button variant="outline" onClick={onMessage} className="flex-1 sm:flex-none">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleMessage} 
+                      className="flex-1 sm:flex-none"
+                      disabled={!canPerformAction(visibility, 'sendMessage') || !currentUserId || currentUserId === user.id}
+                      title={
+                        !currentUserId ? 'Please log in to send messages' :
+                        currentUserId === user.id ? 'You cannot message yourself' :
+                        !canPerformAction(visibility, 'sendMessage') ? 'Cannot message due to privacy settings' :
+                        undefined
+                      }
+                    >
                       <MessageCircle className="mr-2 h-4 w-4" />
                       <span className="hidden sm:inline">Message</span>
                     </Button>
@@ -254,18 +482,40 @@ export function ProfileHeader({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={handleShare}>
+                        <DropdownMenuItem 
+                          onClick={handleShare}
+                          disabled={!canPerformAction(visibility, 'viewProfile')}
+                        >
                           <Share className="mr-2 h-4 w-4" />
                           Share Profile
+                          {!canPerformAction(visibility, 'viewProfile') && (
+                            <span className="ml-auto text-xs text-muted-foreground">(Private)</span>
+                          )}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive">
-                          <Flag className="mr-2 h-4 w-4" />
-                          Report User
+                        <DropdownMenuItem 
+                          onClick={handleReport} 
+                          className="text-destructive"
+                          disabled={isReportLoading || !currentUserId || currentUserId === user.id}
+                        >
+                          {isReportLoading ? (
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          ) : (
+                            <Flag className="mr-2 h-4 w-4" />
+                          )}
+                          {isReportLoading ? 'Reporting...' : 'Report User'}
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Shield className="mr-2 h-4 w-4" />
-                          Block User
+                        <DropdownMenuItem 
+                          onClick={handleBlock} 
+                          className="text-destructive"
+                          disabled={isBlockLoading || !currentUserId || currentUserId === user.id}
+                        >
+                          {isBlockLoading ? (
+                            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                          ) : (
+                            <Shield className="mr-2 h-4 w-4" />
+                          )}
+                          {isBlockLoading ? 'Blocking...' : 'Block User'}
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -277,7 +527,7 @@ export function ProfileHeader({
         </div>
 
         {/* Bio */}
-        {user.bio && (
+        {user.bio && visibleInfo.showBio && (
           <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t">
             <p className="text-sm sm:text-base text-muted-foreground leading-relaxed whitespace-pre-wrap">
               {user.bio}
@@ -287,10 +537,12 @@ export function ProfileHeader({
 
         {/* Additional Info */}
         <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t space-y-2 sm:space-y-3">
-          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-            <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
-            <span>Joined {formatDate(user.createdAt)}</span>
-          </div>
+          {visibleInfo.showJoinDate && (
+            <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span>Joined {formatDate(user.createdAt)}</span>
+            </div>
+          )}
 
           {/* Social Links */}
           {Object.keys(socialLinks).length > 0 && (

@@ -30,13 +30,13 @@ interface PostComposerProps {
   disabled?: boolean
 }
 
-export const PostComposer = memo<PostComposerProps>({
+export const PostComposer = memo<PostComposerProps>(function PostComposer({
   currentUser,
   onSubmit,
   placeholder = "What's on your mind?",
   className,
   disabled = false,
-}) => {
+}) {
   const {
     state,
     setContent,

@@ -18,12 +18,16 @@ interface UseFollowResult {
   unfollowUser: () => Promise<void>
 }
 
-const fetcher = async (url: string): Promise<FollowStatus> => {
+const fetcher = async (url: string): Promise<any> => {
   const response = await fetch(url)
   if (!response.ok) {
-    throw new Error('Failed to fetch follow status')
+    throw new Error('Failed to fetch data')
   }
-  return response.json()
+  const result = await response.json()
+  if (!result.success && result.error) {
+    throw new Error(result.error)
+  }
+  return result.success ? result.data : result
 }
 
 export function useFollow(userId: string): UseFollowResult {
@@ -174,6 +178,7 @@ export function useFollowers(userId: string, page = 1, limit = 20) {
   return {
     followers: data?.followers || [],
     pagination: data?.pagination || { page: 1, limit, total: 0, hasMore: false },
+    totalCount: data?.pagination?.total || 0,
     isLoading,
     error,
     refresh: mutateFollowers
@@ -201,6 +206,7 @@ export function useFollowing(userId: string, page = 1, limit = 20) {
   return {
     following: data?.following || [],
     pagination: data?.pagination || { page: 1, limit, total: 0, hasMore: false },
+    totalCount: data?.pagination?.total || 0,
     isLoading,
     error,
     refresh: mutateFollowing
