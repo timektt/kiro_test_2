@@ -29,52 +29,52 @@ export function createDynamicComponent<T = {}>(
 export const DynamicComponents = {
   // Admin components - loaded only when needed
   AdminDashboard: createDynamicComponent(
-    () => import('@/components/admin/admin-dashboard').then(mod => ({ default: mod.AdminDashboard })),
+    () => import('@/components/admin/admin-dashboard'),
     { ssr: false }
   ),
   
   UserManagement: createDynamicComponent(
-    () => import('@/components/admin/user-management').then(mod => ({ default: mod.UserManagement })),
+    () => import('@/components/admin/user-management'),
     { ssr: false }
   ),
   
   ContentModeration: createDynamicComponent(
-    () => import('@/components/admin/content-moderation').then(mod => ({ default: mod.ContentModeration })),
+    () => import('@/components/admin/content-moderation'),
     { ssr: false }
   ),
   
   // Profile components - loaded on demand
   ProfileEdit: createDynamicComponent(
-    () => import('@/components/profile/profile-edit-form').then(mod => ({ default: mod.ProfileEditForm })),
+    () => import('@/components/profile/profile-edit-form'),
     { ssr: false }
   ),
   
   // Post components - loaded when needed
   PostComposer: createDynamicComponent(
-    () => import('@/components/ui/post-composer').then(mod => ({ default: mod.PostComposer })),
+    () => import('@/components/ui/post-composer'),
     { ssr: false }
   ),
   
   // Notification components
   NotificationsList: createDynamicComponent(
-    () => import('@/components/notifications/notifications-list').then(mod => ({ default: mod.NotificationsList })),
+    () => import('@/components/notifications/notifications-list'),
     { ssr: false }
   ),
   
   // Search components
   SearchAutocomplete: createDynamicComponent(
-    () => import('@/components/ui/search-autocomplete').then(mod => ({ default: mod.SearchAutocomplete })),
+    () => import('@/components/ui/search-autocomplete'),
     { ssr: false }
   ),
   
   AdvancedSearchFilters: createDynamicComponent(
-    () => import('@/components/ui/advanced-search-filters').then(mod => ({ default: mod.AdvancedSearchFilters })),
+    () => import('@/components/ui/advanced-search-filters'),
     { ssr: false }
   ),
   
   // Identity components
   MBTISelector: createDynamicComponent(
-    () => import('@/components/identity/mbti-selector').then(mod => ({ default: mod.MBTISelector })),
+    () => import('@/components/identity/mbti-selector'),
     { ssr: false }
   ),
   

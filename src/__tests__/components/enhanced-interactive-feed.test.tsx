@@ -167,4 +167,152 @@ describe('EnhancedInteractiveFeed', () => {
     render(<EnhancedInteractiveFeed currentUserId="user-123" />)
     expect(screen.getByText('Home')).toBeInTheDocument()
   })
+
+  it('should show Load More button when hasMore is true', () => {
+    mockUsePosts.mockReturnValue({
+      posts: mockPosts,
+      pagination: { page: 1, limit: 20, total: 50, hasMore: true },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.getByText('Load More')).toBeInTheDocument()
+  })
+
+  it('should hide Load More button when hasMore is false', () => {
+    mockUsePosts.mockReturnValue({
+      posts: mockPosts,
+      pagination: { page: 1, limit: 20, total: 1, hasMore: false },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.queryByText('Load More')).not.toBeInTheDocument()
+  })
+
+  it('should show loading state when posts are loading', () => {
+    mockUsePosts.mockReturnValue({
+      posts: [],
+      pagination: { page: 1, limit: 20, total: 0, hasMore: false },
+      isLoading: true,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.getByText('Loading...')).toBeInTheDocument()
+  })
+
+  it('should handle search functionality', async () => {
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    
+    const searchInput = screen.getByPlaceholderText('Search posts...')
+    
+    await act(async () => {
+      fireEvent.change(searchInput, { target: { value: 'test query' } })
+    })
+
+    expect(searchInput).toHaveValue('test query')
+  })
+
+  it('should use virtualization for large datasets', () => {
+    const largePosts = Array.from({ length: 150 }, (_, i) => ({
+      ...mockPosts[0],
+      id: `post-${i}`,
+      content: `Test post ${i}`,
+    }))
+
+    mockUsePosts.mockReturnValue({
+      posts: largePosts,
+      pagination: { page: 1, limit: 20, total: 150, hasMore: true },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    
+    // Should render with virtualization for large datasets
+    expect(screen.getByText('Test post 0')).toBeInTheDocument()
+  })
+
+  it('should handle infinite scroll mode', () => {
+    mockUsePosts.mockReturnValue({
+      posts: mockPosts,
+      pagination: { page: 1, limit: 20, total: 50, hasMore: true },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    // Mock the feed store to enable infinite scroll
+    mockUseFeedStore.mockReturnValue({
+      ...defaultFeedStore,
+      infiniteScroll: true,
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    
+    // Should not show Load More button in infinite scroll mode
+    expect(screen.queryByText('Load More')).not.toBeInTheDocument()
+  })
+
+  it('should show performance warning for large datasets in development', () => {
+    const originalEnv = process.env.NODE_ENV
+    process.env.NODE_ENV = 'development'
+    
+    const consoleSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    
+    const largePosts = Array.from({ length: 1500 }, (_, i) => ({
+      ...mockPosts[0],
+      id: `post-${i}`,
+    }))
+
+    mockUsePosts.mockReturnValue({
+      posts: largePosts,
+      pagination: { page: 1, limit: 20, total: 1500, hasMore: true },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Large dataset detected')
+    )
+    
+    consoleSpy.mockRestore()
+    process.env.NODE_ENV = originalEnv
+  })
+
+  it('should handle empty posts state', () => {
+    mockUsePosts.mockReturnValue({
+      posts: [],
+      pagination: { page: 1, limit: 20, total: 0, hasMore: false },
+      isLoading: false,
+      error: null,
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.getByText('No posts found')).toBeInTheDocument()
+  })
+
+  it('should handle error state', () => {
+    mockUsePosts.mockReturnValue({
+      posts: [],
+      pagination: { page: 1, limit: 20, total: 0, hasMore: false },
+      isLoading: false,
+      error: new Error('Failed to load posts'),
+      mutate: jest.fn(),
+    })
+
+    render(<EnhancedInteractiveFeed currentUserId="user-123" />)
+    expect(screen.getByText('Failed to load posts')).toBeInTheDocument()
+  })
 })

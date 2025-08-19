@@ -170,7 +170,14 @@ export function useLoadMorePosts() {
   const { feedType, sortBy, mbtiFilter } = useFeedStore()
   const { addToast } = useUIStore()
   
-  const loadMorePosts = async (currentPage: number, currentPosts: any[]) => {
+  const loadMorePosts = async (
+    currentPage: number, 
+    currentPosts: any[], 
+    retryCount = 0
+  ): Promise<{ posts: any[]; pagination: any }> => {
+    const maxRetries = 3
+    const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000) // Exponential backoff
+    
     try {
       const nextPage = currentPage + 1
       const queryParams = new URLSearchParams({
@@ -184,22 +191,89 @@ export function useLoadMorePosts() {
         queryParams.append('mbti', mbtiFilter)
       }
       
-      const response = await fetch(`/api/posts?${queryParams.toString()}`)
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 10000) // 10s timeout
+      
+      const response = await fetch(`/api/posts?${queryParams.toString()}`, {
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      clearTimeout(timeoutId)
+      
       if (!response.ok) {
-        throw new Error('Failed to load more posts')
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(
+          errorData.error || 
+          `HTTP ${response.status}: ${response.statusText}`
+        )
       }
       
-      const data = await response.json()
+      const result = await response.json()
+      
+      if (!result.success) {
+        throw new Error(result.error || 'API returned unsuccessful response')
+      }
+      
+      const { posts: newPosts, pagination } = result.data
+      
+      // Validate response data
+      if (!Array.isArray(newPosts)) {
+        throw new Error('Invalid response: posts is not an array')
+      }
+      
+      // Remove duplicates based on post ID
+      const existingIds = new Set(currentPosts.map(post => post.id))
+      const uniqueNewPosts = newPosts.filter(post => !existingIds.has(post.id))
       
       return {
-        posts: [...currentPosts, ...data.posts],
-        pagination: data.pagination,
+        posts: [...currentPosts, ...uniqueNewPosts],
+        pagination,
       }
     } catch (error) {
+      console.error(`Load more posts attempt ${retryCount + 1} failed:`, error)
+      
+      // Handle specific error types
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          const timeoutError = new Error('Request timed out. Please check your connection.')
+          if (retryCount < maxRetries) {
+            addToast({
+              type: 'warning',
+              title: 'Request timed out',
+              description: `Retrying... (${retryCount + 1}/${maxRetries})`,
+            })
+            await new Promise(resolve => setTimeout(resolve, retryDelay))
+            return loadMorePosts(currentPage, currentPosts, retryCount + 1)
+          }
+          addToast({
+            type: 'error',
+            title: 'Failed to load more posts',
+            description: timeoutError.message,
+          })
+          throw timeoutError
+        }
+        
+        // Network errors - retry if possible
+        if ((error.message.includes('fetch') || error.message.includes('network')) && retryCount < maxRetries) {
+          addToast({
+            type: 'warning',
+            title: 'Connection issue',
+            description: `Retrying... (${retryCount + 1}/${maxRetries})`,
+          })
+          await new Promise(resolve => setTimeout(resolve, retryDelay))
+          return loadMorePosts(currentPage, currentPosts, retryCount + 1)
+        }
+      }
+      
+      // Final error handling
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
       addToast({
         type: 'error',
         title: 'Failed to load more posts',
-        description: error instanceof Error ? error.message : 'Unknown error',
+        description: errorMessage,
       })
       throw error
     }

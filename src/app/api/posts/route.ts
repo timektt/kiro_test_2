@@ -11,6 +11,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10')
     const userId = searchParams.get('userId')
     const following = searchParams.get('following') === 'true'
+    const type = searchParams.get('type') || 'discover' // following, discover, trending
+    const sort = searchParams.get('sort') || 'recent' // recent, popular
+    const mbti = searchParams.get('mbti') // MBTI filter
 
     const session = await getServerSession(authOptions)
     
@@ -32,8 +35,8 @@ export async function GET(request: NextRequest) {
       whereClause.authorId = userId
     }
 
-    // Filter by following users only
-    if (following && session.user.id) {
+    // Handle feed type filtering
+    if (type === 'following' && session.user.id) {
       const followingUsers = await prisma.follow.findMany({
         where: { followerId: session.user.id },
         select: { followingId: true },
@@ -45,6 +48,50 @@ export async function GET(request: NextRequest) {
       whereClause.authorId = {
         in: followingIds,
       }
+    } else if (following && session.user.id) {
+      // Legacy support for following parameter
+      const followingUsers = await prisma.follow.findMany({
+        where: { followerId: session.user.id },
+        select: { followingId: true },
+      })
+
+      const followingIds = followingUsers.map(f => f.followingId)
+      followingIds.push(session.user.id) // Include own posts
+
+      whereClause.authorId = {
+        in: followingIds,
+      }
+    }
+
+    // Filter by MBTI type
+    if (mbti) {
+      whereClause.author = {
+        mbti: {
+          type: mbti,
+        },
+      }
+    }
+
+    // Determine sorting order
+    let orderBy: any = { createdAt: 'desc' } // Default to recent
+    
+    if (sort === 'popular') {
+      orderBy = [
+        { likes: { _count: 'desc' } },
+        { comments: { _count: 'desc' } },
+        { createdAt: 'desc' }, // Fallback to recent for ties
+      ]
+    } else if (type === 'trending') {
+      // For trending, prioritize posts with recent activity and high engagement
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000)
+      whereClause.createdAt = {
+        gte: oneDayAgo,
+      }
+      orderBy = [
+        { likes: { _count: 'desc' } },
+        { comments: { _count: 'desc' } },
+        { createdAt: 'desc' },
+      ]
     }
 
     const [posts, totalCount] = await Promise.all([
@@ -63,9 +110,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: {
-          createdAt: 'desc',
-        },
+        orderBy,
         skip,
         take: limit,
       }),
