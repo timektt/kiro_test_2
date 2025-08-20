@@ -78,7 +78,8 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 24 * 60 * 60, // 24 hours
+    updateAge: 60 * 60, // 1 hour
   },
   pages: {
     signIn: '/auth/signin',
@@ -146,7 +147,8 @@ export const authOptions: NextAuthOptions = {
       if (url.startsWith('/')) return `${baseUrl}${url}`
       // Allows callback URLs on the same origin
       else if (new URL(url).origin === baseUrl) return url
-      return baseUrl
+      // Default redirect to feed after successful login
+      return `${baseUrl}/feed`
     },
   },
   events: {
@@ -207,4 +209,5 @@ declare module 'next-auth/jwt' {
     username?: string
   }
 }
+
 

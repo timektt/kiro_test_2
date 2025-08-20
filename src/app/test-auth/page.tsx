@@ -18,14 +18,14 @@ export default async function TestAuthPage() {
             <h3 className="font-semibold mb-2">Current Session Status:</h3>
             {session ? (
               <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-green-800">✅ Authenticated</p>
+                <p className="text-green-800">[CHECK] Authenticated</p>
                 <p className="text-sm text-green-600 mt-1">
                   User: {session.user.name || session.user.email}
                 </p>
               </div>
             ) : (
               <div className="bg-red-50 p-4 rounded-lg">
-                <p className="text-red-800">❌ Not authenticated</p>
+                <p className="text-red-800">[X] Not authenticated</p>
               </div>
             )}
           </div>
@@ -51,10 +51,10 @@ export default async function TestAuthPage() {
           <div className="bg-blue-50 p-4 rounded-lg">
             <h4 className="font-semibold text-blue-800 mb-2">Expected Behavior:</h4>
             <ul className="text-sm text-blue-700 space-y-1">
-              <li>• <strong>Homepage (/):</strong> Shows landing page for all users, with personalized CTAs for authenticated users</li>
-              <li>• <strong>Feed (/feed):</strong> Shows feed for authenticated users, redirects to signin for unauthenticated users</li>
-              <li>• <strong>Sign In/Up:</strong> Shows auth forms for unauthenticated users, redirects to homepage for authenticated users</li>
-              <li>• <strong>No automatic redirects:</strong> Users can stay on homepage regardless of auth status</li>
+              <li>&bull; <strong>Homepage (/):</strong> Shows landing page for all users, with personalized CTAs for authenticated users</li>
+                <li>&bull; <strong>Feed (/feed):</strong> Shows feed for authenticated users, redirects to signin for unauthenticated users</li>
+                <li>&bull; <strong>Sign In/Up:</strong> Shows auth forms for unauthenticated users, redirects to homepage for authenticated users</li>
+                <li>&bull; <strong>No automatic redirects:</strong> Users can stay on homepage regardless of auth status</li>
             </ul>
           </div>
         </CardContent>

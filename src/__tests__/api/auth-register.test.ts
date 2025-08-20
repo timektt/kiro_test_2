@@ -1,4 +1,4 @@
-import { createMocks } from 'node-mocks-http'
+﻿import { createMocks } from 'node-mocks-http'
 import { POST } from '@/app/api/auth/register/route'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
@@ -236,3 +236,4 @@ describe('/api/auth/register', () => {
     expect(data.error.message).toContain('validation')
   })
 })
+

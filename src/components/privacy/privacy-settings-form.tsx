@@ -29,9 +29,9 @@ interface PrivacySettings {
 }
 
 const visibilityOptions = [
-  { value: 'PUBLIC', label: 'สาธารณะ', description: 'ทุกคนสามารถเห็นได้' },
-  { value: 'FOLLOWERS_ONLY', label: 'ผู้ติดตามเท่านั้น', description: 'เฉพาะผู้ที่ติดตามคุณ' },
-  { value: 'PRIVATE', label: 'ส่วนตัว', description: 'เฉพาะคุณเท่านั้น' }
+  { value: 'PUBLIC', label: 'Public', description: 'Everyone can see' },
+  { value: 'FOLLOWERS_ONLY', label: 'Followers Only', description: 'Only your followers' },
+  { value: 'PRIVATE', label: 'Private', description: 'Only you' }
 ]
 
 export default function PrivacySettingsForm() {
@@ -57,7 +57,7 @@ export default function PrivacySettingsForm() {
       setSettings(data.settings)
     } catch (error) {
       console.error('Error loading privacy settings:', error)
-      toast.error('เกิดข้อผิดพลาดในการโหลดการตั้งค่า')
+      toast.error('Failed to load settings')
     } finally {
       setIsLoading(false)
     }
@@ -95,10 +95,10 @@ export default function PrivacySettingsForm() {
       }
 
       setHasChanges(false)
-      toast.success('บันทึกการตั้งค่าเรียบร้อยแล้ว')
+      toast.success('Settings saved successfully')
     } catch (error) {
       console.error('Error saving privacy settings:', error)
-      toast.error('เกิดข้อผิดพลาดในการบันทึกการตั้งค่า')
+      toast.error('Failed to save settings')
     } finally {
       setIsSaving(false)
     }
@@ -115,13 +115,13 @@ export default function PrivacySettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            การตั้งค่าความเป็นส่วนตัว
+            Privacy Settings
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">กำลังโหลด...</span>
+            <span className="ml-2">Loading...</span>
           </div>
         </CardContent>
       </Card>
@@ -134,12 +134,12 @@ export default function PrivacySettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5" />
-            การตั้งค่าความเป็นส่วนตัว
+            Privacy Settings
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-center text-muted-foreground py-8">
-            ไม่สามารถโหลดการตั้งค่าได้
+            Unable to load settings
           </p>
         </CardContent>
       </Card>
@@ -153,15 +153,15 @@ export default function PrivacySettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Eye className="h-5 w-5" />
-            การมองเห็นโปรไฟล์
+            Profile Visibility
           </CardTitle>
           <CardDescription>
-            ควบคุมว่าใครสามารถเห็นโปรไฟล์และโพสต์ของคุณได้
+            Control who can see your profile and posts
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="profile-visibility">การมองเห็นโปรไฟล์</Label>
+            <Label htmlFor="profile-visibility">Profile Visibility</Label>
             <Select
               value={settings.profileVisibility}
               onValueChange={(value: 'PUBLIC' | 'FOLLOWERS_ONLY' | 'PRIVATE') => 
@@ -185,7 +185,7 @@ export default function PrivacySettingsForm() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="post-visibility">การมองเห็นโพสต์</Label>
+            <Label htmlFor="post-visibility">Post Visibility</Label>
             <Select
               value={settings.postVisibility}
               onValueChange={(value: 'PUBLIC' | 'FOLLOWERS_ONLY' | 'PRIVATE') => 
@@ -213,9 +213,9 @@ export default function PrivacySettingsForm() {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>แสดงสถานะออนไลน์</Label>
+                <Label>Show Online Status</Label>
                 <p className="text-sm text-muted-foreground">
-                  ให้ผู้อื่นเห็นว่าคุณออนไลน์อยู่หรือไม่
+                  Let others see when you're online
                 </p>
               </div>
               <Switch
@@ -226,9 +226,9 @@ export default function PrivacySettingsForm() {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>แสดง MBTI</Label>
+                <Label>Show MBTI</Label>
                 <p className="text-sm text-muted-foreground">
-                  แสดงประเภทบุคลิกภาพ MBTI ในโปรไฟล์
+                  Display MBTI personality type in profile
                 </p>
               </div>
               <Switch
@@ -239,9 +239,9 @@ export default function PrivacySettingsForm() {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>แสดงจำนวนผู้ติดตาม</Label>
+                <Label>Show Followers Count</Label>
                 <p className="text-sm text-muted-foreground">
-                  แสดงจำนวนผู้ติดตามในโปรไฟล์
+                  Display follower count in profile
                 </p>
               </div>
               <Switch
@@ -252,9 +252,9 @@ export default function PrivacySettingsForm() {
 
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <Label>แสดงจำนวนการติดตาม</Label>
+                <Label>Show Following Count</Label>
                 <p className="text-sm text-muted-foreground">
-                  แสดงจำนวนคนที่คุณติดตามในโปรไฟล์
+                  Display following count in profile
                 </p>
               </div>
               <Switch
@@ -271,18 +271,18 @@ export default function PrivacySettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <MessageSquare className="h-5 w-5" />
-            การโต้ตอบ
+            Interactions
           </CardTitle>
           <CardDescription>
-            ควบคุมว่าใครสามารถโต้ตอบกับคุณได้อย่างไร
+            Control how others can interact with you
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>อนุญาตข้อความส่วนตัว</Label>
+              <Label>Allow Direct Messages</Label>
               <p className="text-sm text-muted-foreground">
-                ให้ผู้อื่นส่งข้อความส่วนตัวถึงคุณได้
+                Let others send you private messages
               </p>
             </div>
             <Switch
@@ -293,9 +293,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>อนุญาตการแท็ก</Label>
+              <Label>Allow Tagging</Label>
               <p className="text-sm text-muted-foreground">
-                ให้ผู้อื่นแท็กคุณในโพสต์และความคิดเห็นได้
+                Let others tag you in posts and comments
               </p>
             </div>
             <Switch
@@ -306,9 +306,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>อนุญาตคำขอติดตาม</Label>
+              <Label>Allow Follow Requests</Label>
               <p className="text-sm text-muted-foreground">
-                ให้ผู้อื่นส่งคำขอติดตามคุณได้
+                Let others send you follow requests
               </p>
             </div>
             <Switch
@@ -324,18 +324,18 @@ export default function PrivacySettingsForm() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="h-5 w-5" />
-            การแจ้งเตือน
+            Notifications
           </CardTitle>
           <CardDescription>
-            เลือกประเภทการแจ้งเตือนที่คุณต้องการรับ
+            Choose which types of notifications you want to receive
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>การแจ้งเตือนทางอีเมล</Label>
+              <Label>Email Notifications</Label>
               <p className="text-sm text-muted-foreground">
-                รับการแจ้งเตือนผ่านอีเมล
+                Receive notifications via email
               </p>
             </div>
             <Switch
@@ -346,9 +346,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>การแจ้งเตือนแบบ Push</Label>
+              <Label>Push Notifications</Label>
               <p className="text-sm text-muted-foreground">
-                รับการแจ้งเตือนแบบ Push บนเบราว์เซอร์
+                Receive push notifications in browser
               </p>
             </div>
             <Switch
@@ -361,9 +361,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>แจ้งเตือนความคิดเห็น</Label>
+              <Label>Comment Notifications</Label>
               <p className="text-sm text-muted-foreground">
-                เมื่อมีคนแสดงความคิดเห็นในโพสต์ของคุณ
+                When someone comments on your posts
               </p>
             </div>
             <Switch
@@ -374,9 +374,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>แจ้งเตือนการถูกใจ</Label>
+              <Label>Like Notifications</Label>
               <p className="text-sm text-muted-foreground">
-                เมื่อมีคนกดถูกใจโพสต์ของคุณ
+                When someone likes your posts
               </p>
             </div>
             <Switch
@@ -387,9 +387,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>แจ้งเตือนการติดตาม</Label>
+              <Label>Follow Notifications</Label>
               <p className="text-sm text-muted-foreground">
-                เมื่อมีคนติดตามคุณ
+                When someone follows you
               </p>
             </div>
             <Switch
@@ -400,9 +400,9 @@ export default function PrivacySettingsForm() {
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label>แจ้งเตือนการแท็ก</Label>
+              <Label>Mention Notifications</Label>
               <p className="text-sm text-muted-foreground">
-                เมื่อมีคนแท็กคุณในโพสต์หรือความคิดเห็น
+                When someone mentions you in posts or comments
               </p>
             </div>
             <Switch
@@ -419,7 +419,7 @@ export default function PrivacySettingsForm() {
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <p className="text-sm text-muted-foreground">
-                คุณมีการเปลี่ยนแปลงที่ยังไม่ได้บันทึก
+                You have unsaved changes
               </p>
               <div className="flex gap-2">
                 <Button
@@ -427,7 +427,7 @@ export default function PrivacySettingsForm() {
                   onClick={handleReset}
                   disabled={isSaving}
                 >
-                  ยกเลิก
+                  Cancel
                 </Button>
                 <Button
                   onClick={handleSave}
@@ -436,10 +436,10 @@ export default function PrivacySettingsForm() {
                   {isSaving ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      กำลังบันทึก...
+                      Saving...
                     </>
                   ) : (
-                    'บันทึกการตั้งค่า'
+                    'Save Settings'
                   )}
                 </Button>
               </div>

@@ -12,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { formatDistanceToNow } from 'date-fns'
 import { th } from 'date-fns/locale'
-import { MoreHorizontal, Reply, Copy, Trash2, Check, CheckCheck } from 'lucide-react'
+import { MoreHorizontal, Reply, Copy, Trash2, Check, CheckCheck, Paperclip } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface ChatMessage {
@@ -119,9 +119,9 @@ export function MessageItem({
     const otherParticipants = chat.participants.filter(p => p.user.id !== message.senderId)
     const readByOthers = message.readBy.filter(read => read.userId !== message.senderId)
     
-    const sentText = 'ส่งแล้ว'
-const readText = 'อ่านแล้ว'
-const peopleText = 'คน'
+    const sentText = 'Sent'
+const readText = 'Read'
+const peopleText = 'people'
     
     if (readByOthers.length === 0) {
       return { icon: Check, color: 'text-muted-foreground', tooltip: sentText }
@@ -202,10 +202,10 @@ const peopleText = 'คน'
               {message.type === 'FILE' && (
                 <div className="flex items-center gap-2">
                   <div className="p-2 bg-background/20 rounded">
-                    📎
+                    <Paperclip className="w-4 h-4" />
                   </div>
                   <div>
-                    <p className="font-medium">ไฟล์แนบ</p>
+                    <p className="font-medium">Attachment</p>
                     <p className="text-xs opacity-70">{message.content}</p>
                   </div>
                 </div>
@@ -240,12 +240,12 @@ const peopleText = 'คน'
                   <DropdownMenuContent align={isOwn ? 'end' : 'start'}>
                     <DropdownMenuItem onClick={copyToClipboard}>
                       <Copy className="h-4 w-4 mr-2" />
-                      คัดลอก
+                      Copy
                     </DropdownMenuItem>
                     {isOwn && (
                       <DropdownMenuItem className="text-destructive">
                         <Trash2 className="h-4 w-4 mr-2" />
-                        ลบข้อความ
+                        Delete message
                       </DropdownMenuItem>
                     )}
                   </DropdownMenuContent>

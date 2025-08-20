@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   DynamicComponents, 
   DynamicLibraries, 
   ResourcePreloader, 
@@ -342,3 +342,4 @@ describe('Performance Integration', () => {
     consoleSpy.mockRestore()
   })
 })
+

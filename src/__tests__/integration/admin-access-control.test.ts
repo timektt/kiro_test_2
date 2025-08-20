@@ -1,4 +1,4 @@
-import { createMocks } from 'node-mocks-http'
+﻿import { createMocks } from 'node-mocks-http'
 import { GET } from '@/app/api/admin/users/route'
 import { getServerSession } from 'next-auth'
 
@@ -140,3 +140,4 @@ describe('Admin Access Control Integration', () => {
     expect(data.error.message).toBe('Internal server error')
   })
 })
+

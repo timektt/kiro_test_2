@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import useSWR from 'swr'
 import Link from 'next/link'
@@ -92,7 +92,7 @@ export function FollowingList({ userId, username, className }: FollowingListProp
   )
 
   // Update following when data changes
-  useState(() => {
+  useEffect(() => {
     if (data?.following) {
       if (page === 1) {
         setAllFollowing(data.following)
@@ -103,7 +103,7 @@ export function FollowingList({ userId, username, className }: FollowingListProp
   }, [data, page])
 
   // Reset when search changes
-  useState(() => {
+  useEffect(() => {
     setPage(1)
     setAllFollowing([])
   }, [searchQuery])

@@ -97,10 +97,10 @@ export function useFabActions({
           (emojiButton as HTMLButtonElement).click()
         } else {
           // Fallback: insert a random emoji
-          const emojis = ['😊', '👍', '❤️', '🎉', '🔥', '💯', '✨', '🚀']
-          const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
-          onEmojiSelect?.(randomEmoji)
-          toast.success(`Added ${randomEmoji}`)
+          const reactions = [':)', ':thumbsup:', ':heart:', ':party:', ':fire:', ':100:', ':sparkles:', ':rocket:']
+          const randomReaction = reactions[Math.floor(Math.random() * reactions.length)]
+          onEmojiSelect?.(randomReaction)
+          toast.success(`Added ${randomReaction}`)
         }
       }, 300)
     } else {

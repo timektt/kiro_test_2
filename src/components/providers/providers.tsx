@@ -1,7 +1,7 @@
 'use client'
 
 import { SessionProvider } from 'next-auth/react'
-import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeProvider } from 'next-themes'
 import { StoreProvider } from '@/components/providers/store-provider'
 import { ToastProvider } from '@/components/ui/toast-provider'
 import { PostComposerProvider } from '@/contexts/post-composer-context'

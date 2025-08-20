@@ -8,9 +8,11 @@ import { ToastProvider } from '@/components/ui/toast-provider';
 
 interface StoreProviderProps {
   children: React.ReactNode;
+  userId?: string;
+  username?: string;
 }
 
-export function StoreProvider({ children }: StoreProviderProps) {
+export function StoreProvider({ children, userId, username }: StoreProviderProps) {
   const { data: session, status } = useSession();
   const { setCurrentUser, setAuthenticated, clearUserData } = useUserStore();
   const { addToast } = useUIStore();
@@ -24,9 +26,9 @@ export function StoreProvider({ children }: StoreProviderProps) {
         setCurrentUser({
           id: session.user.id,
           username: session.user.username || '',
-          name: session.user.name,
+          name: session.user.name || null,
           email: session.user.email || '',
-          image: session.user.image,
+          image: session.user.image || null,
           bio: null,
           role: session.user.role || 'USER',
           isActive: true,
@@ -65,10 +67,9 @@ export function StoreProvider({ children }: StoreProviderProps) {
   }, [session, status, addToast]);
 
   return (
-    <>
+    <ToastProvider>
       {children}
-      <ToastProvider />
-    </>
+    </ToastProvider>
   );
 }
 export default StoreProvider

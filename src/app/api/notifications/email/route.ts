@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
         break
       
       case 'chat':
-        contentPreview = message || 'ส่งข้อความใหม่'
+        contentPreview = message || 'sent a new message'
         actionUrl += '/chat'
         break
     }
@@ -146,7 +146,7 @@ export async function POST(request: NextRequest) {
     const emailSent = await emailService.sendNotificationEmail(
       recipient.email,
       {
-        recipientName: recipient.name || 'ผู้ใช้',
+        recipientName: recipient.name || 'User',
         senderName: sender.name || sender.username,
         notificationType: type,
         contentPreview,

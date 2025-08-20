@@ -101,9 +101,9 @@ export function ProfileHeader({
   const { totalCount: followingCount, isLoading: followingLoading, refresh: refreshFollowing } = useFollowing(user.id, 1, 1)
   
   // Get privacy visibility settings with error handling
-  const { visibility, error: visibilityError } = useProfileVisibility(user.id, currentUserId)
-  const { blockUser, isLoading: isBlockLoading, error: blockError } = useBlockUser()
-  const { reportUser, isLoading: isReportLoading, error: reportError } = useReportUser()
+  const { visibility } = useProfileVisibility(user.id, currentUserId)
+  const { blockUser, isLoading: isBlockLoading } = useBlockUser()
+  const { reportUser, isLoading: isReportLoading } = useReportUser()
   
   // Use real-time counts if available, fallback to user._count
   const followerCount = followersLoading ? user._count?.followers || 0 : followersCount || user._count?.followers || 0
@@ -112,18 +112,7 @@ export function ProfileHeader({
   // Get visible profile information based on privacy settings
   const visibleInfo = getVisibleProfileInfo(visibility, isOwnProfile)
 
-  // Show error toast if privacy hooks fail
-  useEffect(() => {
-    if (visibilityError) {
-      toast.error('Failed to load privacy settings')
-    }
-    if (blockError) {
-      toast.error('Failed to block user')
-    }
-    if (reportError) {
-      toast.error('Failed to report user')
-    }
-  }, [visibilityError, blockError, reportError])
+  // Privacy hooks are handled internally with toast notifications
 
   // Refresh counts when follow status changes
   useEffect(() => {
@@ -296,7 +285,7 @@ export function ProfileHeader({
   }
 
   // Show loading state if privacy data is still loading
-  if (!visibility && !visibilityError) {
+  if (!visibility) {
     return (
       <Card className={cn('w-full', className)}>
         <CardContent className="p-4 sm:p-6">
@@ -442,9 +431,8 @@ export function ProfileHeader({
                     <Button
                       variant={isFollowing ? 'outline' : 'default'}
                       onClick={handleFollowToggle}
-                      disabled={isFollowLoading || !canPerformAction(visibility, 'follow')}
-                      className="flex-1 sm:flex-none"
-                      title={!canPerformAction(visibility, 'follow') ? 'Cannot follow due to privacy settings' : undefined}
+                      disabled={isFollowLoading}
+                      onClick={handleFollowClick}
                     >
                       {isFollowLoading ? (
                         <>

@@ -61,13 +61,13 @@ export default function BlockUserDialog({
         throw new Error(error.error || 'Failed to block user')
       }
 
-      toast.success(`บล็อก ${user.username} เรียบร้อยแล้ว`)
+      toast.success(`Successfully blocked ${user.username}`)
       setIsOpen(false)
       setReason('')
       onUserBlocked?.(user.id)
     } catch (error) {
       console.error('Error blocking user:', error)
-      toast.error('เกิดข้อผิดพลาดในการบล็อกผู้ใช้')
+      toast.error('Failed to block user')
     } finally {
       setIsBlocking(false)
     }
@@ -84,7 +84,7 @@ export default function BlockUserDialog({
         {trigger || (
           <Button variant="outline" size="sm">
             <UserX className="h-4 w-4 mr-2" />
-            บล็อก
+            Block
           </Button>
         )}
       </DialogTrigger>
@@ -92,10 +92,10 @@ export default function BlockUserDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5 text-destructive" />
-            บล็อกผู้ใช้
+            Block User
           </DialogTitle>
           <DialogDescription>
-            คุณแน่ใจหรือไม่ว่าต้องการบล็อกผู้ใช้คนนี้?
+            Are you sure you want to block this user?
           </DialogDescription>
         </DialogHeader>
         
@@ -131,13 +131,13 @@ export default function BlockUserDialog({
               <AlertTriangle className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
               <div className="space-y-2 text-sm">
                 <p className="font-medium text-destructive">
-                  การบล็อกผู้ใช้จะมีผลดังนี้:
+                  Blocking this user will:
                 </p>
                 <ul className="space-y-1 text-muted-foreground">
-                  <li>• ผู้ใช้คนนี้จะไม่สามารถเห็นโปรไฟล์และโพสต์ของคุณได้</li>
-                  <li>• คุณจะไม่เห็นโพสต์และความคิดเห็นของผู้ใช้คนนี้</li>
-                  <li>• ผู้ใช้คนนี้จะไม่สามารถส่งข้อความหรือแท็กคุณได้</li>
-                  <li>• การติดตามระหว่างกันจะถูกยกเลิกโดยอัตโนมัติ</li>
+                  <li>&bull; They won't be able to see your profile and posts</li>
+                <li>&bull; You won't see their posts and comments</li>
+                <li>&bull; They won't be able to message or tag you</li>
+                <li>&bull; Mutual follows will be automatically removed</li>
                 </ul>
               </div>
             </div>
@@ -145,17 +145,17 @@ export default function BlockUserDialog({
 
           {/* Reason */}
           <div className="space-y-2">
-            <Label htmlFor="reason">เหตุผลในการบล็อก (ไม่บังคับ)</Label>
+            <Label htmlFor="reason">Reason for blocking (optional)</Label>
             <Textarea
               id="reason"
-              placeholder="ระบุเหตุผลในการบล็อกผู้ใช้คนนี้..."
+              placeholder="Specify reason for blocking this user..."
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               maxLength={500}
               rows={3}
             />
             <p className="text-xs text-muted-foreground">
-              {reason.length}/500 ตัวอักษร
+              {reason.length}/500 characters
             </p>
           </div>
         </div>
@@ -166,7 +166,7 @@ export default function BlockUserDialog({
             onClick={handleCancel}
             disabled={isBlocking}
           >
-            ยกเลิก
+            Cancel
           </Button>
           <Button
             variant="destructive"
@@ -176,12 +176,12 @@ export default function BlockUserDialog({
             {isBlocking ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                กำลังบล็อก...
+                Blocking...
               </>
             ) : (
               <>
                 <UserX className="h-4 w-4 mr-2" />
-                บล็อกผู้ใช้
+                Block User
               </>
             )}
           </Button>

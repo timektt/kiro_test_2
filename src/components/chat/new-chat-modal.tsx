@@ -125,7 +125,7 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
     if (selectedUsers.length === 0) return
     
     const participantIds = selectedUsers.map(u => u.id)
-    const finalGroupName = groupName.trim() || `กลุ่ม ${selectedUsers.length + 1} คน`
+    const finalGroupName = groupName.trim() || `Group of ${selectedUsers.length + 1} people`
     
     handleCreateChat(participantIds, 'GROUP', finalGroupName)
   }
@@ -136,18 +136,18 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>สร้างแชทใหม่</DialogTitle>
+          <DialogTitle>Create New Chat</DialogTitle>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="direct" className="flex items-center gap-2">
               <User className="h-4 w-4" />
-              แชทส่วนตัว
+              Private Chat
             </TabsTrigger>
             <TabsTrigger value="group" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              กลุ่ม
+              Group
             </TabsTrigger>
           </TabsList>
 
@@ -156,7 +156,7 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="ค้นหาผู้ใช้..."
+                placeholder="Search users..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
@@ -166,7 +166,7 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
             <TabsContent value="direct" className="mt-4">
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">
-                  เลือกผู้ใช้เพื่อเริ่มแชทส่วนตัว
+                  Select a user to start a private chat
                 </p>
                 
                 <ScrollArea className="h-64">
@@ -217,12 +217,12 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
                   ) : searchQuery ? (
                     <div className="text-center py-8 text-muted-foreground">
                       <User className="h-8 w-8 mx-auto mb-2" />
-                      <p>ไม่พบผู้ใช้</p>
+                      <p>No users found</p>
                     </div>
                   ) : (
                     <div className="text-center py-8 text-muted-foreground">
                       <Search className="h-8 w-8 mx-auto mb-2" />
-                      <p>ค้นหาผู้ใช้เพื่อเริ่มแชท</p>
+                      <p>Search for users to start chatting</p>
                     </div>
                   )}
                 </ScrollArea>
@@ -233,10 +233,10 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
               <div className="space-y-4">
                 {/* Group Name Input */}
                 <div className="space-y-2">
-                  <Label htmlFor="groupName">ชื่อกลุ่ม (ไม่บังคับ)</Label>
+                  <Label htmlFor="groupName">Group Name (Optional)</Label>
                    <Input
                      id="groupName"
-                     placeholder="ใส่ชื่อกลุ่ม..."
+                     placeholder="Enter group name..."
                      value={groupName}
                      onChange={(e) => setGroupName(e.target.value)}
                    />
@@ -245,7 +245,7 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
                 {/* Selected Users */}
                 {selectedUsers.length > 0 && (
                   <div className="space-y-2">
-                    <Label>สมาชิกที่เลือก ({selectedUsers.length})</Label>
+                    <Label>Selected Members ({selectedUsers.length})</Label>
                     <div className="flex flex-wrap gap-2">
                       {selectedUsers.map((user) => (
                         <Badge key={user.id} variant="secondary" className="flex items-center gap-1">
@@ -266,7 +266,7 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
 
                 {/* User List */}
                 <div className="space-y-2">
-                  <Label>เลือกสมาชิก</Label>
+                  <Label>Select Members</Label>
                   <ScrollArea className="h-48">
                     {loading ? (
                       <div className="space-y-2">
@@ -316,12 +316,12 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
                     ) : searchQuery ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <Users className="h-8 w-8 mx-auto mb-2" />
-                        <p>ไม่พบผู้ใช้</p>
+                        <p>No users found</p>
                       </div>
                     ) : (
                       <div className="text-center py-8 text-muted-foreground">
                         <Search className="h-8 w-8 mx-auto mb-2" />
-                        <p>ค้นหาผู้ใช้เพื่อเพิ่มในกลุ่ม</p>
+                        <p>Search for users to add to group</p>
                       </div>
                     )}
                   </ScrollArea>
@@ -333,7 +333,7 @@ export function NewChatModal({ open, onOpenChange, onCreateChat }: NewChatModalP
                   disabled={!canCreateGroup}
                   className="w-full"
                 >
-                  {creating ? 'กำลังสร้าง...' : `สร้างกลุ่ม (${selectedUsers.length} คน)`}
+                  {creating ? 'Creating...' : `Create Group (${selectedUsers.length} members)`}
                 </Button>
               </div>
             </TabsContent>

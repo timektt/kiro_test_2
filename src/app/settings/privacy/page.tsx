@@ -17,7 +17,7 @@ export default function PrivacySettingsPage() {
     return (
       <div className="container max-w-4xl mx-auto py-8">
         <div className="text-center">
-          <p>กรุณาเข้าสู่ระบบเพื่อเข้าถึงการตั้งค่าความเป็นส่วนตัว</p>
+          <p>Please sign in to access privacy settings</p>
         </div>
       </div>
     )
@@ -28,10 +28,10 @@ export default function PrivacySettingsPage() {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">การตั้งค่าความเป็นส่วนตัว</h1>
-          <p className="text-muted-foreground mt-2">
-            จัดการการตั้งค่าความเป็นส่วนตัว ความปลอดภัย และการควบคุมข้อมูลของคุณ
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">Privacy Settings</h1>
+        <p className="text-muted-foreground mt-2">
+          Manage your privacy settings, security, and data control
+        </p>
         </div>
 
         {/* Tabs */}
@@ -39,19 +39,19 @@ export default function PrivacySettingsPage() {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="settings" className="flex items-center gap-2">
               <Shield className="h-4 w-4" />
-              การตั้งค่า
+              Settings
             </TabsTrigger>
             <TabsTrigger value="blocked" className="flex items-center gap-2">
               <Users className="h-4 w-4" />
-              ผู้ใช้ที่บล็อก
+              Blocked Users
             </TabsTrigger>
             <TabsTrigger value="data" className="flex items-center gap-2">
               <Database className="h-4 w-4" />
-              ข้อมูลของฉัน
+              My Data
             </TabsTrigger>
             <TabsTrigger value="account" className="flex items-center gap-2">
               <Trash2 className="h-4 w-4" />
-              บัญชี
+              Account
             </TabsTrigger>
           </TabsList>
 
@@ -71,37 +71,37 @@ export default function PrivacySettingsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Database className="h-5 w-5" />
-                  การจัดการข้อมูล
+                  Data Management
                 </CardTitle>
                 <CardDescription>
-                  ดาวน์โหลดหรือจัดการข้อมูลส่วนตัวของคุณ
+                  Download or manage your personal data
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Export Data */}
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-medium">ส่งออกข้อมูล</h3>
+                    <h3 className="text-lg font-medium">Export Data</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      ดาวน์โหลดสำเนาข้อมูลของคุณในรูปแบบ JSON
+                      Download a copy of your data in JSON format
                     </p>
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Button variant="outline" className="justify-start">
                       <Download className="h-4 w-4 mr-2" />
-                      ข้อมูลโปรไฟล์
+                      Profile Data
                     </Button>
                     <Button variant="outline" className="justify-start">
                       <FileText className="h-4 w-4 mr-2" />
-                      โพสต์และความคิดเห็น
+                      Posts and Comments
                     </Button>
                     <Button variant="outline" className="justify-start">
                       <Users className="h-4 w-4 mr-2" />
-                      รายชื่อผู้ติดตาม
+                      Followers List
                     </Button>
                     <Button variant="outline" className="justify-start">
                       <Database className="h-4 w-4 mr-2" />
-                      ข้อมูลทั้งหมด
+                      All Data
                     </Button>
                   </div>
                 </div>
@@ -111,34 +111,34 @@ export default function PrivacySettingsPage() {
                 {/* Data Retention */}
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-medium">การเก็บรักษาข้อมูล</h3>
+                    <h3 className="text-lg font-medium">Data Retention</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      ข้อมูลของคุณจะถูกเก็บไว้ตามนโยบายความเป็นส่วนตัวของเรา
+                      Your data will be stored according to our privacy policy
                     </p>
                   </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium">ข้อมูลโปรไฟล์</h4>
+                      <h4 className="font-medium">Profile Data</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        เก็บไว้จนกว่าคุณจะลบบัญชี
+                        Stored until you delete your account
                       </p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium">โพสต์และความคิดเห็น</h4>
+                      <h4 className="font-medium">Posts and Comments</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        เก็บไว้จนกว่าคุณจะลบ
+                        Stored until you delete them
                       </p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium">ข้อความแชท</h4>
+                      <h4 className="font-medium">Chat Messages</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        เก็บไว้ 2 ปี หลังจากส่ง
+                        Stored for 2 years after sending
                       </p>
                     </div>
                     <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium">ข้อมูลการใช้งาน</h4>
+                      <h4 className="font-medium">Usage Data</h4>
                       <p className="text-sm text-muted-foreground mt-1">
-                        เก็บไว้ 1 ปี สำหรับการวิเคราะห์
+                        Stored for 1 year for analytics
                       </p>
                     </div>
                   </div>
@@ -153,23 +153,23 @@ export default function PrivacySettingsPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Trash2 className="h-5 w-5" />
-                  การจัดการบัญชี
+                  Account Management
                 </CardTitle>
                 <CardDescription>
-                  ตัวเลือกสำหรับการลบบัญชีและข้อมูลของคุณ
+                  Options for deleting your account and data
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {/* Deactivate Account */}
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-medium">ปิดใช้งานบัญชีชั่วคราว</h3>
+                    <h3 className="text-lg font-medium">Temporarily Deactivate Account</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      ซ่อนโปรไฟล์และโพสต์ของคุณจากผู้อื่น แต่ยังสามารถกลับมาใช้งานได้
+                      Hide your profile and posts from others, but you can still reactivate
                     </p>
                   </div>
                   <Button variant="outline" className="w-full sm:w-auto">
-                    ปิดใช้งานบัญชีชั่วคราว
+                    Temporarily Deactivate Account
                   </Button>
                 </div>
 
@@ -178,9 +178,9 @@ export default function PrivacySettingsPage() {
                 {/* Delete Account */}
                 <div className="space-y-4">
                   <div>
-                    <h3 className="text-lg font-medium text-destructive">ลบบัญชีถาวร</h3>
+                    <h3 className="text-lg font-medium text-destructive">Permanently Delete Account</h3>
                     <p className="text-sm text-muted-foreground mt-1">
-                      ลบบัญชีและข้อมูลทั้งหมดของคุณอย่างถาวร การดำเนินการนี้ไม่สามารถย้อนกลับได้
+                      Permanently delete your account and all data. This action cannot be undone
                     </p>
                   </div>
                   
@@ -189,13 +189,13 @@ export default function PrivacySettingsPage() {
                       <Trash2 className="h-5 w-5 text-destructive mt-0.5 flex-shrink-0" />
                       <div className="space-y-2 text-sm">
                         <p className="font-medium text-destructive">
-                          การลบบัญชีจะมีผลดังนี้:
+                          Deleting your account will:
                         </p>
                         <ul className="space-y-1 text-muted-foreground">
-                          <li>• โปรไฟล์และโพสต์ทั้งหมดจะถูกลบอย่างถาวร</li>
-                          <li>• ข้อความแชทและประวัติการสนทนาจะถูกลบ</li>
-                          <li>• การติดตามและผู้ติดตามจะถูกยกเลิกทั้งหมด</li>
-                          <li>• ไม่สามารถกู้คืนข้อมูลได้หลังจากลบแล้ว</li>
+                          <li>&bull; Permanently delete all your profile and posts</li>
+                <li>&bull; Delete all chat messages and conversation history</li>
+                <li>&bull; Cancel all follows and followers</li>
+                <li>&bull; Cannot recover data after deletion</li>
                         </ul>
                       </div>
                     </div>
@@ -203,7 +203,7 @@ export default function PrivacySettingsPage() {
 
                   <Button variant="destructive" className="w-full sm:w-auto">
                     <Trash2 className="h-4 w-4 mr-2" />
-                    ลบบัญชีถาวร
+                    Permanently Delete Account
                   </Button>
                 </div>
               </CardContent>

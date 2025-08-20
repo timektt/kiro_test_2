@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { TrendingUp, Users, Trophy, Activity } from 'lucide-react'
+import { TrendingUp, Users, Trophy, Activity, Heart, FileText, MessageCircle, UserCheck, Star, Crown, BarChart } from 'lucide-react'
 
 // Dynamic import for ranking board
 const RankingBoard = dynamic(
@@ -93,7 +93,7 @@ export default function RankingsPage() {
     <div className="container max-w-6xl mx-auto py-8">
       <div className="space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold">🏆 Community Rankings</h1>
+          <h1 className="text-4xl font-bold">[TROPHY] Community Rankings</h1>
           <p className="text-xl text-muted-foreground">
             Discover the most active and engaged community members
           </p>
@@ -250,17 +250,18 @@ export default function RankingsPage() {
   )
 }
 
-function getCategoryIcon(type: string): string {
-  const icons: Record<string, string> = {
-    POSTS_LIKES: '❤️',
-    POSTS_COUNT: '📝',
-    COMMENTS_COUNT: '💬',
-    FOLLOWERS_COUNT: '👥',
-    ENGAGEMENT: '🌟',
-    WEEKLY_ACTIVE: '🏆',
-    MONTHLY_ACTIVE: '👑'
+function getCategoryIcon(type: string): React.ReactNode {
+  const iconProps = { className: "w-4 h-4" }
+  const icons: Record<string, React.ReactNode> = {
+    POSTS_LIKES: <Heart {...iconProps} />,
+    POSTS_COUNT: <FileText {...iconProps} />,
+    COMMENTS_COUNT: <MessageCircle {...iconProps} />,
+    FOLLOWERS_COUNT: <UserCheck {...iconProps} />,
+    ENGAGEMENT: <Star {...iconProps} />,
+    WEEKLY_ACTIVE: <Trophy {...iconProps} />,
+    MONTHLY_ACTIVE: <Crown {...iconProps} />
   }
-  return icons[type] || '📊'
+  return icons[type] || <BarChart {...iconProps} />
 }
 
 function getCategoryName(type: string): string {
@@ -305,4 +306,5 @@ function formatPeriod(period: string): string {
   }
   return period
 }
+
 

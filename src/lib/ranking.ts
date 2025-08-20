@@ -164,43 +164,43 @@ export const RANKING_INFO = {
   POSTS_LIKES: {
     name: 'Most Liked',
     description: 'Users with the most likes on their posts',
-    icon: '❤️',
+    icon: '[HEART]',
     color: 'red'
   },
   POSTS_COUNT: {
     name: 'Most Active Poster',
     description: 'Users who create the most posts',
-    icon: '📝',
+    icon: '[POST]',
     color: 'blue'
   },
   COMMENTS_COUNT: {
     name: 'Most Engaged',
     description: 'Users who comment the most',
-    icon: '💬',
+    icon: '[CHAT]',
     color: 'green'
   },
   FOLLOWERS_COUNT: {
     name: 'Most Followed',
     description: 'Users with the most followers',
-    icon: '👥',
+    icon: '[USERS]',
     color: 'purple'
   },
   ENGAGEMENT: {
     name: 'Overall Engagement',
     description: 'Combined engagement across all activities',
-    icon: '🌟',
+    icon: '[STAR]',
     color: 'yellow'
   },
   WEEKLY_ACTIVE: {
     name: 'Weekly Champion',
     description: 'Most active user this week',
-    icon: '🏆',
+    icon: '[TROPHY]',
     color: 'orange'
   },
   MONTHLY_ACTIVE: {
     name: 'Monthly Champion',
     description: 'Most active user this month',
-    icon: '👑',
+    icon: '[CROWN]',
     color: 'gold'
   }
 }
@@ -232,10 +232,11 @@ export function getRankBadgeColor(rank: number): string {
 }
 
 export function getRankEmoji(rank: number): string {
-  if (rank === 1) return '🥇'
-  if (rank === 2) return '🥈'
-  if (rank === 3) return '🥉'
-  if (rank <= 10) return '🏅'
-  return '📊'
+  if (rank === 1) return '[GOLD]'
+  if (rank === 2) return '[SILVER]'
+  if (rank === 3) return '[BRONZE]'
+  if (rank <= 10) return '[MEDAL]'
+  return '[CHART]'
 }
+
 

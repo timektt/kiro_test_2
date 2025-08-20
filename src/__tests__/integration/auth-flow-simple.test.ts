@@ -1,4 +1,4 @@
-import { createMocks } from 'node-mocks-http'
+﻿import { createMocks } from 'node-mocks-http'
 import { POST } from '@/app/api/auth/register/route'
 
 // Mock Prisma
@@ -101,3 +101,4 @@ describe('Authentication Flow Integration', () => {
     expect(data.error.message).toContain('validation')
   })
 })
+

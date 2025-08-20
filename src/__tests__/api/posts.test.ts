@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+﻿import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { GET, POST } from '@/app/api/posts/route'
 import { GET as getPost, PUT, DELETE } from '@/app/api/posts/[postId]/route'
@@ -327,3 +327,4 @@ describe('/api/posts/[postId]', () => {
     })
   })
 })
+

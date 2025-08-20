@@ -302,3 +302,4 @@ export function useRealtimeNotifications() {
     refresh: mutate,
   }
 }
+

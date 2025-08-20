@@ -356,7 +356,7 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                         )}
                       </div>
                       <p className="text-xs sm:text-sm text-muted-foreground mb-1 truncate">
-                        @{user.username} • {user.email}
+                        @{user.username} &bull; {user.email}
                       </p>
                       <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                         <span>{user._count.posts} posts</span>

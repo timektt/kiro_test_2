@@ -188,7 +188,7 @@ export function FooterSection() {
           {/* Bottom Bar */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-8 border-t">
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <span>© 2024 Community Platform. All rights reserved.</span>
+              <span>(c) 2024 Community Platform. All rights reserved.</span>
               <div className="hidden md:flex items-center gap-1">
                 <span>Made with</span>
                 <Heart className="h-4 w-4 text-red-500 fill-current" />

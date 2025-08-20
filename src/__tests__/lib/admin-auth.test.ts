@@ -1,4 +1,4 @@
-import { checkAdminAuth, hasAdminPermission, withAdminAuth } from '@/lib/admin-auth'
+﻿import { checkAdminAuth, hasAdminPermission, withAdminAuth } from '@/lib/admin-auth'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
@@ -228,3 +228,4 @@ describe('withAdminAuth', () => {
     expect(data.error).toBe('Admin access required')
   })
 })
+

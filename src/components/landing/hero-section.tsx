@@ -58,7 +58,7 @@ export function HeroSection({ session }: HeroSectionProps) {
                     </AvatarFallback>
                   </Avatar>
                   <div className="text-center sm:text-left">
-                    <p className="text-base sm:text-lg font-semibold">Welcome back, {session.user.name || 'there'}! 👋</p>
+                    <p className="text-base sm:text-lg font-semibold">Welcome back, {session.user.name || 'there'}!</p>
                     <p className="text-sm sm:text-base text-muted-foreground">Ready to connect with your community?</p>
                   </div>
                 </div>

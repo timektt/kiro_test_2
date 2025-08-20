@@ -72,7 +72,7 @@ export function ChatSidebar({
   const getChatDisplayInfo = (chat: Chat) => {
     if (chat.type === 'GROUP') {
       return {
-        name: chat.name || `กลุ่ม ${chat._count.participants} คน`,
+        name: chat.name || `Group of ${chat._count.participants} members`,
         avatar: null,
         isOnline: false
       }
@@ -85,7 +85,7 @@ export function ChatSidebar({
 
     if (!otherParticipant) {
       return {
-        name: 'ไม่ทราบชื่อ',
+        name: 'Unknown',
         avatar: null,
         isOnline: false
       }
@@ -212,7 +212,7 @@ export function ChatSidebar({
                     </div>
                   ) : (
                     <p className="text-xs text-muted-foreground">
-                      {chat.type === 'GROUP' ? 'กลุ่มใหม่' : 'แชทใหม่'}
+                      {chat.type === 'GROUP' ? 'New Group' : 'New Chat'}
                     </p>
                   )}
                 </div>
@@ -253,7 +253,7 @@ export function ChatSidebar({
             className="w-full mt-2"
             size="sm"
           >
-            โหลดแชทเพิ่มเติม
+            Load More Chats
           </Button>
         )}
 
@@ -261,7 +261,7 @@ export function ChatSidebar({
         {chats.length === 0 && !loading && (
           <div className="text-center py-8">
             <Users className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm text-muted-foreground">ยังไม่มีแชท</p>
+            <p className="text-sm text-muted-foreground">No chats yet</p>
           </div>
         )}
       </div>

@@ -44,7 +44,7 @@ const mockPosts: MockPost[] = [
       mbti: 'INTJ',
       avatar: '/avatars/sarah-chen.svg'
     },
-    content: 'Just finished reading about cognitive functions and how they shape our decision-making process. The depth of MBTI theory never ceases to amaze me! 🧠',
+    content: 'Just finished reading about cognitive functions and how they shape our decision-making process. The depth of MBTI theory never ceases to amaze me!',
     timestamp: '2m ago',
     likes: 24,
     comments: 8,
@@ -58,7 +58,7 @@ const mockPosts: MockPost[] = [
       mbti: 'ENFP',
       avatar: '/avatars/marcus-johnson.svg'
     },
-    content: 'Anyone else get super excited about new projects but struggle with the follow-through? Looking for accountability partners! 🚀',
+    content: 'Anyone else get super excited about new projects but struggle with the follow-through? Looking for accountability partners!',
     timestamp: '15m ago',
     likes: 42,
     comments: 15,
@@ -72,7 +72,7 @@ const mockPosts: MockPost[] = [
       mbti: 'INFJ',
     avatar: '/avatars/emily-rodriguez.svg'
     },
-    content: 'The connection between personality types and communication styles is fascinating. We should have more discussions about this! 💭',
+    content: 'The connection between personality types and communication styles is fascinating. We should have more discussions about this!',
     timestamp: '1h ago',
     likes: 18,
     comments: 6,

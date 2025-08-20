@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Users, Trophy, Calendar, MapPin, Link as LinkIcon } from 'lucide-react'
+import { Users, Trophy, Calendar, MapPin, Link as LinkIcon, Brain } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -187,7 +187,7 @@ export function ProfileSidebar({ user, currentUserId, className }: ProfileSideba
         <Card className="overflow-hidden">
           <CardHeader className="px-4 sm:px-6 pb-3">
             <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-              <span className="text-lg">🧠</span>
+              <Brain className="w-5 h-5" />
               <span>Personality Type</span>
             </CardTitle>
           </CardHeader>

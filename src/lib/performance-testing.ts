@@ -20,7 +20,7 @@ export class PerformanceTimer {
   end(): number {
     this.endTime = performance.now()
     const duration = this.endTime - this.startTime
-    console.log(`⏱️  ${this.label}: ${duration.toFixed(2)}ms`)
+    console.log(`[TIMER] ${this.label}: ${duration.toFixed(2)}ms`)
     return duration
   }
 
@@ -72,7 +72,7 @@ export class DatabasePerformanceTester {
     const results: T[] = []
     const times: number[] = []
 
-    console.log(`🧪 Testing query: ${queryName} (${iterations} iterations)`)
+    console.log(`[TEST] Testing query: ${queryName} (${iterations} iterations)`)
 
     for (let i = 0; i < iterations; i++) {
       const startTime = performance.now()
@@ -93,7 +93,7 @@ export class DatabasePerformanceTester {
 
     const stats = { avg, min, max, p95, p99 }
 
-    console.log(`📊 Query stats for ${queryName}:`, {
+    console.log(`[STATS] Query stats for ${queryName}:`, {
       avg: `${avg.toFixed(2)}ms`,
       min: `${min.toFixed(2)}ms`,
       max: `${max.toFixed(2)}ms`,
@@ -121,7 +121,7 @@ export class DatabasePerformanceTester {
 
     const improvement = ((avg1 - avg2) / avg1) * 100
 
-    console.log(`📈 Query comparison:`)
+    console.log(`[COMPARISON] Query comparison:`)
     console.log(`  ${queryName1}: ${avg1.toFixed(2)}ms`)
     console.log(`  ${queryName2}: ${avg2.toFixed(2)}ms`)
     console.log(`  Improvement: ${improvement.toFixed(2)}%`)
@@ -141,7 +141,7 @@ export class ComponentPerformanceTester {
       const endTime = performance.now()
       const renderTime = endTime - startTime
       
-      console.log(`🎨 ${componentName} render time: ${renderTime.toFixed(2)}ms`)
+      console.log(`[RENDER] ${componentName} render time: ${renderTime.toFixed(2)}ms`)
       
       // Send to analytics if available
       if (window.gtag) {
@@ -164,10 +164,10 @@ export class ComponentPerformanceTester {
       count: renderCount,
       log: () => {
         renderCount++
-        console.log(`🔄 ${componentName} re-render #${renderCount}`)
+        console.log(`[RE-RENDER] ${componentName} re-render #${renderCount}`)
         
         if (renderCount > 10) {
-          console.warn(`⚠️  ${componentName} has re-rendered ${renderCount} times - consider optimization`)
+          console.warn(`[WARNING] ${componentName} has re-rendered ${renderCount} times - consider optimization`)
         }
       }
     }
@@ -190,7 +190,7 @@ export class BundleSizeAnalyzer {
     const totalJSSize = jsResources.reduce((sum, r) => sum + (r.transferSize || 0), 0)
     const totalCSSSize = cssResources.reduce((sum, r) => sum + (r.transferSize || 0), 0)
     
-    console.log('📦 Bundle Analysis:')
+    console.log('[BUNDLE] Bundle Analysis:')
     console.log(`  JavaScript: ${(totalJSSize / 1024).toFixed(2)} KB`)
     console.log(`  CSS: ${(totalCSSSize / 1024).toFixed(2)} KB`)
     console.log(`  Total: ${((totalJSSize + totalCSSSize) / 1024).toFixed(2)} KB`)
@@ -201,7 +201,7 @@ export class BundleSizeAnalyzer {
       .sort((a, b) => (b.transferSize || 0) - (a.transferSize || 0))
     
     if (largeResources.length > 0) {
-      console.log('🚨 Large resources detected:')
+      console.log('[ALERT] Large resources detected:')
       largeResources.forEach(r => {
         console.log(`  ${r.name}: ${((r.transferSize || 0) / 1024).toFixed(2)} KB`)
       })
@@ -219,7 +219,7 @@ export class BundleSizeAnalyzer {
           const sizeKB = resourceEntry.transferSize / 1024
           
           if (sizeKB > 200) { // > 200KB
-            console.warn(`📈 Large JS bundle loaded: ${resourceEntry.name} (${sizeKB.toFixed(2)} KB)`)
+            console.warn(`[LARGE] Large JS bundle loaded: ${resourceEntry.name} (${sizeKB.toFixed(2)} KB)`)
           }
         }
       })
@@ -242,7 +242,7 @@ export class MemoryMonitor {
     const totalJSHeapSize = memory.totalJSHeapSize / 1024 / 1024 // MB
     const jsHeapSizeLimit = memory.jsHeapSizeLimit / 1024 / 1024 // MB
     
-    console.log('🧠 Memory Usage:')
+    console.log('[MEMORY] Memory Usage:')
     console.log(`  Used: ${usedJSHeapSize.toFixed(2)} MB`)
     console.log(`  Total: ${totalJSHeapSize.toFixed(2)} MB`)
     console.log(`  Limit: ${jsHeapSizeLimit.toFixed(2)} MB`)
@@ -250,7 +250,7 @@ export class MemoryMonitor {
     
     // Warn if memory usage is high
     if (usedJSHeapSize > jsHeapSizeLimit * 0.8) {
-      console.warn('⚠️  High memory usage detected - consider optimization')
+      console.warn('[WARNING] High memory usage detected - consider optimization')
     }
     
     return {
@@ -284,7 +284,7 @@ export class NetworkPerformanceTester {
     const times: number[] = []
     const results: any[] = []
 
-    console.log(`🌐 Testing API endpoint: ${endpoint} (${iterations} iterations)`)
+    console.log(`[API] Testing API endpoint: ${endpoint} (${iterations} iterations)`)
 
     for (let i = 0; i < iterations; i++) {
       const startTime = performance.now()
@@ -315,7 +315,7 @@ export class NetworkPerformanceTester {
 
     const stats = { avg, min, max, p95, successRate: (times.length / iterations) * 100 }
 
-    console.log(`📊 API endpoint stats for ${endpoint}:`, {
+    console.log(`[STATS] API endpoint stats for ${endpoint}:`, {
       avg: `${avg.toFixed(2)}ms`,
       min: `${min.toFixed(2)}ms`,
       max: `${max.toFixed(2)}ms`,
@@ -337,7 +337,7 @@ export class NetworkPerformanceTester {
           const duration = resourceEntry.responseEnd - resourceEntry.requestStart
           
           if (duration > 1000) { // > 1 second
-            console.warn(`🐌 Slow API request: ${resourceEntry.name} (${duration.toFixed(2)}ms)`)
+            console.warn(`[SLOW] Slow API request: ${resourceEntry.name} (${duration.toFixed(2)}ms)`)
           }
         }
       })
@@ -352,7 +352,7 @@ export class NetworkPerformanceTester {
  */
 export class PerformanceTestSuite {
   static async runFullSuite() {
-    console.log('🚀 Starting performance test suite...')
+    console.log('[START] Starting performance test suite...')
 
     // Bundle analysis
     BundleSizeAnalyzer.analyzeBundleSize()
@@ -364,7 +364,7 @@ export class PerformanceTestSuite {
     BundleSizeAnalyzer.monitorBundleGrowth()
     NetworkPerformanceTester.monitorNetworkRequests()
     
-    console.log('✅ Performance monitoring started')
+    console.log('[SUCCESS] Performance monitoring started')
   }
 
   static generatePerformanceReport() {
@@ -381,7 +381,7 @@ export class PerformanceTestSuite {
       ],
     }
 
-    console.log('📋 Performance Report:', report)
+    console.log('[REPORT] Performance Report:', report)
     return report
   }
 }
@@ -395,3 +395,4 @@ export default {
   NetworkPerformanceTester,
   PerformanceTestSuite,
 }
+

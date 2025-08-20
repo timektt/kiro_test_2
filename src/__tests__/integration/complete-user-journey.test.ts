@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Complete User Journey Integration Test
  * Tests the entire application flow from landing page to full user interaction
  */

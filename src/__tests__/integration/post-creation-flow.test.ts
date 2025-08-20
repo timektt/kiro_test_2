@@ -1,4 +1,4 @@
-import { createMocks } from 'node-mocks-http'
+﻿import { createMocks } from 'node-mocks-http'
 import { POST } from '@/app/api/posts/route'
 import { getServerSession } from 'next-auth'
 
@@ -114,3 +114,4 @@ describe('Post Creation Flow Integration', () => {
     expect(data.error.message).toBe('Internal server error')
   })
 })
+

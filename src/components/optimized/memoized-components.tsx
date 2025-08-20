@@ -7,6 +7,7 @@ import React, { memo, useMemo, useCallback } from 'react'
 import Image from 'next/image'
 import { User, Post, Comment, Notification } from '@prisma/client'
 import { formatDistanceToNow } from 'date-fns'
+import { Heart, MessageCircle, User as UserIcon, Bell, Megaphone } from 'lucide-react'
 
 // Memoized user avatar component
 export const MemoizedUserAvatar = memo<{
@@ -78,7 +79,7 @@ export const MemoizedPostItem = memo<{
             isLiked ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'
           }`}
         >
-          <span>❤️</span>
+          <Heart className="w-4 h-4" />
           <span>{post._count.likes}</span>
         </button>
         
@@ -86,7 +87,7 @@ export const MemoizedPostItem = memo<{
           onClick={handleComment}
           className="flex items-center space-x-1 text-sm text-muted-foreground hover:text-blue-500"
         >
-          <span>💬</span>
+          <MessageCircle className="w-4 h-4" />
           <span>{post._count.comments}</span>
         </button>
       </div>
@@ -137,20 +138,20 @@ export const MemoizedNotificationItem = memo<{
     }
   }, [notification.id, notification.read, onMarkAsRead])
 
-  const notificationIcon = useMemo(() => {
+  const NotificationIcon = useMemo(() => {
     switch (notification.type) {
       case 'LIKE':
-        return '❤️'
+        return Heart
       case 'COMMENT':
-        return '💬'
+        return MessageCircle
       case 'FOLLOW':
-        return '👤'
+        return UserIcon
       case 'MENTION':
-        return '@'
+        return () => <span>@</span>
       case 'SYSTEM':
-        return '🔔'
+        return Bell
       default:
-        return '📢'
+        return Megaphone
     }
   }, [notification.type])
 
@@ -162,7 +163,7 @@ export const MemoizedNotificationItem = memo<{
       onClick={handleMarkAsRead}
     >
       <div className="flex items-start space-x-3">
-        <span className="text-lg">{notificationIcon}</span>
+        <NotificationIcon className="w-5 h-5 mt-0.5" />
         <div className="flex-1 space-y-1">
           <p className="text-sm">{notification.message}</p>
           <time className="text-xs text-muted-foreground">{timeAgo}</time>
@@ -292,4 +293,5 @@ export function useMemoizedValue<T>(
 ): T {
   return useMemo(factory, deps)
 }
+
 

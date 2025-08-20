@@ -71,7 +71,7 @@ export async function GET(request: NextRequest) {
         id: `user-${user.id}`,
         type: 'user',
         title: user.username,
-        subtitle: user.name || `${user._count.followers} ผู้ติดตาม`,
+        subtitle: user.name || `${user._count.followers} followers`,
         image: user.image || undefined,
         mbti: user.mbti?.type,
       })
@@ -123,7 +123,7 @@ export async function GET(request: NextRequest) {
         id: `post-${post.id}`,
         type: 'post',
         title: contentPreview,
-        subtitle: `โดย @${post.author.username} • ${post._count.likes} ไลค์`,
+        subtitle: `by @${post.author.username} &bull; ${post._count.likes} likes`,
         category: post.category || undefined,
         mbti: post.author.mbti?.type,
       })
@@ -153,7 +153,7 @@ export async function GET(request: NextRequest) {
           id: `tag-${hashtag}`,
           type: 'tag',
           title: `#${hashtag}`,
-          subtitle: `${hashtagPosts.length} โพสต์`,
+          subtitle: `${hashtagPosts.length} posts`,
         })
       }
     }
@@ -198,7 +198,7 @@ export async function GET(request: NextRequest) {
           id: `trending-${post.id}`,
           type: 'trending',
           title: contentPreview,
-          subtitle: `กำลังฮิต • ${post._count.likes + post._count.comments} การโต้ตอบ`,
+          subtitle: `Trending &bull; ${post._count.likes + post._count.comments} interactions`,
           category: post.category || undefined,
         })
       })

@@ -225,3 +225,4 @@ export function createRequestTracker(request: NextRequest) {
 // Export singleton instance
 export const monitor = PerformanceMonitor.getInstance()
 
+

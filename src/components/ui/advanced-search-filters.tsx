@@ -61,18 +61,18 @@ const POST_CATEGORIES = [
 ]
 
 const TIME_RANGES = [
-  { value: 'today', label: 'วันนี้' },
-  { value: 'week', label: 'สัปดาห์นี้' },
-  { value: 'month', label: 'เดือนนี้' },
-  { value: 'year', label: 'ปีนี้' },
-  { value: 'custom', label: 'กำหนดเอง' },
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'This Week' },
+  { value: 'month', label: 'This Month' },
+  { value: 'year', label: 'This Year' },
+  { value: 'custom', label: 'Custom' },
 ]
 
 const SORT_OPTIONS = [
-  { value: 'recent', label: 'ล่าสุด' },
-  { value: 'popular', label: 'ยอดนิยม' },
-  { value: 'trending', label: 'กำลังฮิต' },
-  { value: 'relevant', label: 'เกี่ยวข้องมากที่สุด' },
+  { value: 'recent', label: 'Recent' },
+  { value: 'popular', label: 'Popular' },
+  { value: 'trending', label: 'Trending' },
+  { value: 'relevant', label: 'Most Relevant' },
 ]
 
 export function AdvancedSearchFilters({
@@ -136,7 +136,7 @@ export function AdvancedSearchFilters({
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
-            <span>ตัวกรองขั้นสูง</span>
+            <span>Advanced Filters</span>
             {getActiveFiltersCount() > 0 && (
               <Badge variant="secondary" className="ml-2">
                 {getActiveFiltersCount()}
@@ -150,14 +150,14 @@ export function AdvancedSearchFilters({
               onClick={onReset}
               disabled={getActiveFiltersCount() === 0}
             >
-              รีเซ็ต
+              Reset
             </Button>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setIsExpanded(!isExpanded)}
             >
-              {isExpanded ? 'ย่อ' : 'ขยาย'}
+              {isExpanded ? 'Collapse' : 'Expand'}
             </Button>
           </div>
         </div>
@@ -173,26 +173,26 @@ export function AdvancedSearchFilters({
               let label = ''
               switch (key) {
                 case 'category':
-                  label = `หมวดหมู่: ${value}`
+                  label = `Category: ${value}`
                   break
                 case 'mbtiType':
                   label = `MBTI: ${value}`
                   break
                 case 'authorMbti':
-                  label = `ผู้เขียน MBTI: ${value}`
+                  label = `Author MBTI: ${value}`
                   break
                 case 'hasImage':
-                  label = 'มีรูปภาพ'
+                  label = 'Has Image'
                   break
                 case 'hasVideo':
-                  label = 'มีวิดีโอ'
+                  label = 'Has Video'
                   break
                 case 'verifiedOnly':
-                  label = 'ยืนยันแล้วเท่านั้น'
+                  label = 'Verified Only'
                   break
                 case 'timeRange':
                   const timeLabel = TIME_RANGES.find(t => t.value === value)?.label
-                  label = `ช่วงเวลา: ${timeLabel}`
+                  label = `Time Range: ${timeLabel}`
                   break
                 default:
                   label = `${key}: ${value}`
@@ -218,13 +218,13 @@ export function AdvancedSearchFilters({
         {/* Basic Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="space-y-2">
-            <Label>หมวดหมู่</Label>
+            <Label>Category</Label>
             <Select value={filters.category || ''} onValueChange={(value) => updateFilter('category', value || undefined)}>
               <SelectTrigger>
-                <SelectValue placeholder="เลือกหมวดหมู่" />
+                <SelectValue placeholder="Select Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">ทั้งหมด</SelectItem>
+                <SelectItem value="">All</SelectItem>
                 {POST_CATEGORIES.map(category => (
                   <SelectItem key={category} value={category}>
                     {category}
@@ -235,13 +235,13 @@ export function AdvancedSearchFilters({
           </div>
 
           <div className="space-y-2">
-            <Label>MBTI ของโพสต์</Label>
+            <Label>Post MBTI</Label>
             <Select value={filters.mbtiType || ''} onValueChange={(value) => updateFilter('mbtiType', value || undefined)}>
               <SelectTrigger>
-                <SelectValue placeholder="เลือก MBTI" />
+                <SelectValue placeholder="Select MBTI" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">ทั้งหมด</SelectItem>
+                <SelectItem value="">All</SelectItem>
                 {MBTI_TYPES.map(type => (
                   <SelectItem key={type} value={type}>
                     {type}
@@ -252,7 +252,7 @@ export function AdvancedSearchFilters({
           </div>
 
           <div className="space-y-2">
-            <Label>เรียงตาม</Label>
+            <Label>Sort By</Label>
             <Select value={filters.sortBy || 'recent'} onValueChange={(value) => updateFilter('sortBy', value)}>
               <SelectTrigger>
                 <SelectValue />
@@ -275,7 +275,7 @@ export function AdvancedSearchFilters({
             <div className="space-y-4">
               <Label className="flex items-center gap-2">
                 <Calendar className="h-4 w-4" />
-                ช่วงเวลา
+                Time Range
               </Label>
               <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
                 {TIME_RANGES.map(range => (
@@ -293,19 +293,19 @@ export function AdvancedSearchFilters({
               {filters.timeRange === 'custom' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>จากวันที่</Label>
+                    <Label>From Date</Label>
                     <Popover open={dateFromOpen} onOpenChange={setDateFromOpen}>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-start text-left font-normal">
                           <Calendar className="mr-2 h-4 w-4" />
-                          {filters.dateFrom ? format(filters.dateFrom, 'PPP', { locale: th }) : 'เลือกวันที่'}
+                          {filters.dateFrom ? format(filters.dateFrom, 'PPP') : 'Select Date'}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <CalendarComponent
                           mode="single"
                           selected={filters.dateFrom}
-                          onSelect={(date) => {
+                          onSelect={(date: Date | undefined) => {
                             updateFilter('dateFrom', date)
                             setDateFromOpen(false)
                           }}
@@ -316,19 +316,19 @@ export function AdvancedSearchFilters({
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>ถึงวันที่</Label>
+                    <Label>To Date</Label>
                     <Popover open={dateToOpen} onOpenChange={setDateToOpen}>
                       <PopoverTrigger asChild>
                         <Button variant="outline" className="justify-start text-left font-normal">
                           <Calendar className="mr-2 h-4 w-4" />
-                          {filters.dateTo ? format(filters.dateTo, 'PPP', { locale: th }) : 'เลือกวันที่'}
+                          {filters.dateTo ? format(filters.dateTo, 'PPP') : 'Select Date'}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
                         <CalendarComponent
                           mode="single"
                           selected={filters.dateTo}
-                          onSelect={(date) => {
+                          onSelect={(date: Date | undefined) => {
                             updateFilter('dateTo', date)
                             setDateToOpen(false)
                           }}
@@ -343,7 +343,7 @@ export function AdvancedSearchFilters({
 
             {/* Content Filters */}
             <div className="space-y-4">
-              <Label>ประเภทเนื้อหา</Label>
+              <Label>Content Type</Label>
               <div className="flex flex-wrap gap-4">
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -351,7 +351,7 @@ export function AdvancedSearchFilters({
                     checked={filters.hasImage || false}
                     onCheckedChange={(checked) => updateFilter('hasImage', checked || undefined)}
                   />
-                  <Label htmlFor="has-image">มีรูปภาพ</Label>
+                  <Label htmlFor="has-image">Has Image</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Switch
@@ -359,7 +359,7 @@ export function AdvancedSearchFilters({
                     checked={filters.hasVideo || false}
                     onCheckedChange={(checked) => updateFilter('hasVideo', checked || undefined)}
                   />
-                  <Label htmlFor="has-video">มีวิดีโอ</Label>
+                  <Label htmlFor="has-video">Has Video</Label>
                 </div>
               </div>
             </div>
@@ -368,24 +368,24 @@ export function AdvancedSearchFilters({
             <div className="space-y-4">
               <Label className="flex items-center gap-2">
                 <TrendingUp className="h-4 w-4" />
-                ระดับการมีส่วนร่วม
+                Engagement Level
               </Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <Label className="text-sm">จำนวนไลค์ขั้นต่ำ: {filters.minLikes || 0}</Label>
+                  <Label className="text-sm">Minimum Likes: {filters.minLikes || 0}</Label>
                   <Slider
                     value={[filters.minLikes || 0]}
-                    onValueChange={([value]) => updateFilter('minLikes', value || undefined)}
+                    onValueChange={([value]: number[]) => updateFilter('minLikes', value || undefined)}
                     max={1000}
                     step={10}
                     className="w-full"
                   />
                 </div>
                 <div className="space-y-3">
-                  <Label className="text-sm">จำนวนคอมเมนต์ขั้นต่ำ: {filters.minComments || 0}</Label>
+                  <Label className="text-sm">Minimum Comments: {filters.minComments || 0}</Label>
                   <Slider
                     value={[filters.minComments || 0]}
-                    onValueChange={([value]) => updateFilter('minComments', value || undefined)}
+                    onValueChange={([value]: number[]) => updateFilter('minComments', value || undefined)}
                     max={100}
                     step={5}
                     className="w-full"
@@ -398,17 +398,17 @@ export function AdvancedSearchFilters({
             <div className="space-y-4">
               <Label className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                ตัวกรองผู้เขียน
+                Author Filters
               </Label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>MBTI ของผู้เขียน</Label>
+                  <Label>Author MBTI</Label>
                   <Select value={filters.authorMbti || ''} onValueChange={(value) => updateFilter('authorMbti', value || undefined)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="เลือก MBTI" />
+                      <SelectValue placeholder="Select MBTI" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">ทั้งหมด</SelectItem>
+                      <SelectItem value="">All</SelectItem>
                       {MBTI_TYPES.map(type => (
                         <SelectItem key={type} value={type}>
                           {type}
@@ -418,10 +418,10 @@ export function AdvancedSearchFilters({
                   </Select>
                 </div>
                 <div className="space-y-3">
-                  <Label className="text-sm">ผู้ติดตามขั้นต่ำ: {filters.minFollowers || 0}</Label>
+                  <Label className="text-sm">Minimum Followers: {filters.minFollowers || 0}</Label>
                   <Slider
                     value={[filters.minFollowers || 0]}
-                    onValueChange={([value]) => updateFilter('minFollowers', value || undefined)}
+                    onValueChange={([value]: number[]) => updateFilter('minFollowers', value || undefined)}
                     max={10000}
                     step={100}
                     className="w-full"
@@ -434,7 +434,7 @@ export function AdvancedSearchFilters({
                   checked={filters.verifiedOnly || false}
                   onCheckedChange={(checked) => updateFilter('verifiedOnly', checked || undefined)}
                 />
-                <Label htmlFor="verified-only">ผู้ใช้ที่ยืนยันแล้วเท่านั้น</Label>
+                <Label htmlFor="verified-only">Verified Users Only</Label>
               </div>
             </div>
           </div>

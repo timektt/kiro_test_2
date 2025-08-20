@@ -160,7 +160,7 @@ export function ChatWindow({
     .filter(userId => userId !== session?.user?.id)
     .map(userId => {
       const participant = chat.participants.find(p => p.user.id === userId)
-      const unknownName = 'ไม่ทราบชื่อ'
+      const unknownName = 'Unknown'
       return participant?.user.name || participant?.user.username || unknownName
     })
 
@@ -191,10 +191,10 @@ export function ChatWindow({
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  กำลังโหลด...
+                  Loading...
                 </>
               ) : (
-                โหลดข้อความเก่า
+                "Load older messages"
               )}
             </Button>
           </div>
@@ -237,7 +237,7 @@ export function ChatWindow({
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">
               <p className="text-xs text-muted-foreground mb-1">
-                ตอบกลับ {replyToMessage.sender.name}
+                Reply to {replyToMessage.sender.name}
               </p>
               <p className="text-sm truncate">
                 {replyToMessage.content}
@@ -249,7 +249,7 @@ export function ChatWindow({
               onClick={() => setReplyToMessage(null)}
               className="h-8 w-8 p-0 ml-2"
             >
-              ×
+              X
             </Button>
           </div>
         </div>
@@ -263,10 +263,10 @@ export function ChatWindow({
           onTypingStop={handleTypingStop}
           disabled={loading}
           placeholder={(() => {
-            const groupPlaceholder = 'ส่งข้อความถึงกลุ่ม...'
-const chatPrefix = 'ส่งข้อความถึง '
+            const groupPlaceholder = 'Send message to group...'
+const chatPrefix = 'Send message to '
 const chatSuffix = '...'
-const defaultChat = 'แชท'
+const defaultChat = 'Chat'
             
             if (chat.type === 'GROUP') {
               return groupPlaceholder

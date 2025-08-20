@@ -8,7 +8,7 @@ import { MBTISelector } from '@/components/identity/mbti-selector'
 import { useMBTI } from '@/hooks/use-mbti'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, PartyPopper } from 'lucide-react'
 import Link from 'next/link'
 
 export default function IdentitySetupPage() {
@@ -68,7 +68,10 @@ export default function IdentitySetupPage() {
       <div className="space-y-6">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Welcome to the Community! 🎉</CardTitle>
+            <CardTitle className="text-2xl flex items-center justify-center gap-2">
+              Welcome to the Community!
+              <PartyPopper className="w-6 h-6" />
+            </CardTitle>
             <CardDescription className="text-base">
               Choose your personality type to help others understand you better and connect with like-minded community members.
             </CardDescription>
@@ -76,21 +79,21 @@ export default function IdentitySetupPage() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
               <div className="space-y-2">
-                <div className="text-2xl">🎭</div>
+                <div className="text-2xl">[MASK]</div>
                 <h3 className="font-semibold">Express Yourself</h3>
                 <p className="text-sm text-muted-foreground">
                   Show your unique personality to the community
                 </p>
               </div>
               <div className="space-y-2">
-                <div className="text-2xl">🤝</div>
+                <div className="text-2xl">[HANDSHAKE]</div>
                 <h3 className="font-semibold">Find Your Tribe</h3>
                 <p className="text-sm text-muted-foreground">
                   Connect with others who share similar traits
                 </p>
               </div>
               <div className="space-y-2">
-                <div className="text-2xl">🌟</div>
+                <div className="text-2xl">[STAR]</div>
                 <h3 className="font-semibold">Stand Out</h3>
                 <p className="text-sm text-muted-foreground">
                   Your identity badge will appear on all your posts
@@ -118,7 +121,7 @@ export default function IdentitySetupPage() {
         <Card className="bg-muted/50">
           <CardContent className="p-4">
             <div className="flex items-start gap-3">
-              <div className="text-xl">💡</div>
+              <div className="text-xl">[BULB]</div>
               <div className="space-y-1">
                 <h4 className="font-semibold text-sm">Not sure about your type?</h4>
                 <p className="text-xs text-muted-foreground">
@@ -132,4 +135,5 @@ export default function IdentitySetupPage() {
     </div>
   )
 }
+
 

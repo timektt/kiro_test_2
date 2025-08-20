@@ -67,7 +67,7 @@ describe('Post Interactions Integration Tests', () => {
         imageUrl: 'https://example.com/image.jpg',
       }
 
-      const mockPost = {
+      const createdPost = {
         id: 'post-123',
         ...postData,
         authorId: mockUser.id,
@@ -605,3 +605,4 @@ describe('Post Interactions Integration Tests', () => {
     })
   })
 })
+

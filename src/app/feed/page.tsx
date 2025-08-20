@@ -61,7 +61,7 @@ export default async function FeedPage() {
               </div>
               <div>
                 <h1 className="text-xl font-bold">
-                  Welcome back, {session.user.name}! 👋
+                  Welcome back, {session.user.name}! [WAVE]
                 </h1>
                 <p className="text-sm text-muted-foreground">
                   Catch up with your community and share what&apos;s on your
@@ -81,3 +81,4 @@ export default async function FeedPage() {
     </FeedLayout>
   );
 }
+

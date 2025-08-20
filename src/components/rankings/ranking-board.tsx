@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { UserBadge } from '@/components/ui/user-badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Trophy, Medal, Award, TrendingUp } from 'lucide-react'
+import { Trophy, Medal, Award, TrendingUp, BarChart } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface RankingBoardProps {
@@ -97,7 +97,7 @@ export function RankingBoard({ rankings, isLoading }: RankingBoardProps) {
         <CardContent>
           {currentRankings.length === 0 ? (
             <div className="text-center py-8">
-              <div className="text-4xl mb-2">📊</div>
+              <BarChart className="w-16 h-16 mx-auto mb-2 text-muted-foreground" />
               <h3 className="font-semibold mb-1">No Rankings Yet</h3>
               <p className="text-sm text-muted-foreground">
                 Rankings will appear here once users start engaging with the community

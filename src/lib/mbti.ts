@@ -21,7 +21,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Imaginative and strategic thinkers, with a plan for everything.',
     traits: ['Strategic', 'Independent', 'Decisive', 'Determined'],
     color: 'purple',
-    emoji: '🏗️',
+    emoji: '[BUILD]',
     strengths: ['Strategic thinking', 'Independence', 'Determination', 'Vision'],
     challenges: ['Perfectionism', 'Impatience', 'Overthinking', 'Social situations']
   },
@@ -32,7 +32,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Innovative inventors with an unquenchable thirst for knowledge.',
     traits: ['Analytical', 'Creative', 'Objective', 'Curious'],
     color: 'indigo',
-    emoji: '🧠',
+    emoji: '[BRAIN]',
     strengths: ['Logical analysis', 'Creativity', 'Objectivity', 'Intellectual curiosity'],
     challenges: ['Procrastination', 'Insensitivity', 'Absent-mindedness', 'Condescension']
   },
@@ -43,7 +43,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Bold, imaginative and strong-willed leaders, always finding a way.',
     traits: ['Confident', 'Strategic', 'Charismatic', 'Efficient'],
     color: 'red',
-    emoji: '👑',
+    emoji: '[CROWN]',
     strengths: ['Leadership', 'Strategic thinking', 'Efficiency', 'Confidence'],
     challenges: ['Impatience', 'Arrogance', 'Intolerance', 'Ruthlessness']
   },
@@ -54,7 +54,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Smart and curious thinkers who cannot resist an intellectual challenge.',
     traits: ['Innovative', 'Enthusiastic', 'Charismatic', 'Knowledgeable'],
     color: 'orange',
-    emoji: '💡',
+    emoji: '[BULB]',
     strengths: ['Innovation', 'Enthusiasm', 'Charisma', 'Quick thinking'],
     challenges: ['Argumentative', 'Insensitive', 'Intolerant', 'Difficulty focusing']
   },
@@ -67,7 +67,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Quiet and mystical, yet very inspiring and tireless idealists.',
     traits: ['Insightful', 'Principled', 'Passionate', 'Altruistic'],
     color: 'teal',
-    emoji: '🌟',
+    emoji: '[STAR]',
     strengths: ['Insight', 'Inspiration', 'Passion', 'Altruism'],
     challenges: ['Perfectionism', 'Sensitivity', 'Burnout', 'Reluctance to open up']
   },
@@ -78,7 +78,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Poetic, kind and altruistic people, always eager to help a good cause.',
     traits: ['Idealistic', 'Loyal', 'Adaptable', 'Curious'],
     color: 'green',
-    emoji: '🌱',
+    emoji: '[PLANT]',
     strengths: ['Idealism', 'Loyalty', 'Adaptability', 'Passion'],
     challenges: ['Impracticality', 'Self-isolation', 'Unfocused', 'Emotionally vulnerable']
   },
@@ -89,7 +89,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Charismatic and inspiring leaders, able to mesmerize their listeners.',
     traits: ['Charismatic', 'Altruistic', 'Natural leader', 'Reliable'],
     color: 'blue',
-    emoji: '🎭',
+    emoji: '[MASK]',
     strengths: ['Charisma', 'Altruism', 'Leadership', 'Reliability'],
     challenges: ['Overly idealistic', 'Too selfless', 'Too sensitive', 'Fluctuating self-esteem']
   },
@@ -100,7 +100,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Enthusiastic, creative and sociable free spirits, who can always find a reason to smile.',
     traits: ['Enthusiastic', 'Creative', 'Sociable', 'Energetic'],
     color: 'pink',
-    emoji: '🎨',
+    emoji: '[ART]',
     strengths: ['Enthusiasm', 'Creativity', 'Sociability', 'Optimism'],
     challenges: ['Poor practical skills', 'Difficulty focusing', 'Overthinking', 'Gets stressed easily']
   },
@@ -113,7 +113,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Practical and fact-minded, reliable and responsible.',
     traits: ['Honest', 'Direct', 'Strong-willed', 'Dutiful'],
     color: 'slate',
-    emoji: '📋',
+    emoji: '[BOARD]',
     strengths: ['Honesty', 'Dedication', 'Strong-will', 'Responsibility'],
     challenges: ['Stubbornness', 'Insensitivity', 'Always by the book', 'Judgmental']
   },
@@ -124,7 +124,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Very dedicated and warm protectors, always ready to defend their loved ones.',
     traits: ['Supportive', 'Reliable', 'Patient', 'Imaginative'],
     color: 'cyan',
-    emoji: '🛡️',
+    emoji: '[SHIELD]',
     strengths: ['Support', 'Reliability', 'Patience', 'Practical skills'],
     challenges: ['Humble', 'Shy', 'Take things personally', 'Repress feelings']
   },
@@ -135,7 +135,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Excellent administrators, unsurpassed at managing things or people.',
     traits: ['Dedicated', 'Strong-willed', 'Direct', 'Honest'],
     color: 'amber',
-    emoji: '💼',
+    emoji: '[CASE]',
     strengths: ['Dedication', 'Strong-will', 'Direct', 'Honesty'],
     challenges: ['Inflexible', 'Uncomfortable with unconventional situations', 'Judgmental', 'Too focused on social status']
   },
@@ -146,7 +146,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Extraordinarily caring, social and popular people, always eager to help.',
     traits: ['Strong practical skills', 'Dutiful', 'Very loyal', 'Sensitive'],
     color: 'emerald',
-    emoji: '🤝',
+    emoji: '[SHAKE]',
     strengths: ['Practical skills', 'Loyalty', 'Good at connecting with others', 'Hard-working'],
     challenges: ['Worried about social status', 'Inflexible', 'Reluctant to innovate', 'Vulnerable to criticism']
   },
@@ -159,7 +159,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Bold and practical experimenters, masters of all kinds of tools.',
     traits: ['Tolerant', 'Flexible', 'Charming', 'Unpredictable'],
     color: 'stone',
-    emoji: '🔧',
+    emoji: '[TOOL]',
     strengths: ['Optimistic', 'Creative', 'Practical', 'Spontaneous'],
     challenges: ['Stubborn', 'Insensitive', 'Private', 'Easily bored']
   },
@@ -170,7 +170,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Flexible and charming artists, always ready to explore new possibilities.',
     traits: ['Charming', 'Sensitive', 'Imaginative', 'Passionate'],
     color: 'rose',
-    emoji: '🎪',
+    emoji: '[TENT]',
     strengths: ['Charming', 'Sensitive to others', 'Imaginative', 'Passionate'],
     challenges: ['Fiercely independent', 'Unpredictable', 'Easily stressed', 'Overly competitive']
   },
@@ -181,7 +181,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Smart, energetic and very perceptive people, who truly enjoy living on the edge.',
     traits: ['Bold', 'Rational', 'Practical', 'Original'],
     color: 'yellow',
-    emoji: '⚡',
+    emoji: '[BOLT]',
     strengths: ['Bold', 'Rational and practical', 'Original', 'Perceptive'],
     challenges: ['Insensitive', 'Impatient', 'Risk-prone', 'Unstructured']
   },
@@ -192,7 +192,7 @@ export const MBTI_DATA: Record<MBTIType, MBTIInfo> = {
     description: 'Spontaneous, energetic and enthusiastic people - life is never boring around them.',
     traits: ['Bold', 'Original', 'Aesthetics', 'Showmanship'],
     color: 'lime',
-    emoji: '🎉',
+    emoji: '[PARTY]',
     strengths: ['Bold', 'Original', 'Practical', 'Observant'],
     challenges: ['Sensitive', 'Conflict-averse', 'Easily bored', 'Poor long-term planning']
   }
@@ -268,4 +268,5 @@ export function getMBTIColorClass(type: MBTIType): string {
   }
   return colorMap[info.color] || 'bg-gray-100 text-gray-800 border-gray-200'
 }
+
 

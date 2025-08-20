@@ -184,3 +184,4 @@ export const preloadRankingComponents = () => {
     import('@/components/rankings/ranking-board');
   }
 };
+

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import { Lock, Zap, AlertTriangle } from 'lucide-react'
 
 interface MBTIProfileProps {
   mbti: MBTI
@@ -45,8 +46,9 @@ export function MBTIProfile({ mbti, showDetails = true, className }: MBTIProfile
           </div>
           
           {mbti.isLocked && (
-            <Badge variant="outline" className="text-xs">
-              🔒 Locked
+            <Badge variant="outline" className="text-xs flex items-center gap-1">
+              <Lock className="w-3 h-3" />
+              Locked
             </Badge>
           )}
         </div>
@@ -77,8 +79,9 @@ export function MBTIProfile({ mbti, showDetails = true, className }: MBTIProfile
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-semibold text-sm mb-2 text-green-700">
-                    💪 Strengths
+                  <h4 className="font-semibold text-sm mb-2 text-green-700 flex items-center gap-1">
+                    <Zap className="w-4 h-4" />
+                    Strengths
                   </h4>
                   <ul className="space-y-1">
                     {info.strengths.map((strength) => (
@@ -91,8 +94,9 @@ export function MBTIProfile({ mbti, showDetails = true, className }: MBTIProfile
                 </div>
 
                 <div>
-                  <h4 className="font-semibold text-sm mb-2 text-orange-700">
-                    ⚠️ Challenges
+                  <h4 className="font-semibold text-sm mb-2 text-orange-700 flex items-center gap-1">
+                    <AlertTriangle className="w-4 h-4" />
+                    Challenges
                   </h4>
                   <ul className="space-y-1">
                     {info.challenges.map((challenge) => (

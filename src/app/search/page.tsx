@@ -154,7 +154,7 @@ export default function SearchPage() {
       setUserTotal(data.total)
     } catch (error) {
       console.error('Error searching users:', error)
-      toast.error('เกิดข้อผิดพลาดในการค้นหาผู้ใช้')
+      toast.error('Error searching users')
     }
   }, [advancedFilters])
   
@@ -211,7 +211,7 @@ export default function SearchPage() {
       setPostPage(page)
     } catch (error) {
       console.error('Error searching posts:', error)
-      toast.error('เกิดข้อผิดพลาดในการค้นหาโพสต์')
+      toast.error('Error searching posts')
     }
   }, [advancedFilters, postCategory, postMbti, postSort])
   
@@ -310,7 +310,7 @@ export default function SearchPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-center text-muted-foreground">
-              {'กรุณาเข้าสู่ระบบเพื่อใช้งานการค้นหา'}
+              {'Please log in to use search'}
             </p>
           </CardContent>
         </Card>
@@ -324,7 +324,7 @@ export default function SearchPage() {
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
           <Search className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">{'ค้นหาขั้นสูง'}</h1>
+          <h1 className="text-2xl font-bold">{'Advanced Search'}</h1>
         </div>
         
         {/* Enhanced Search Input */}
@@ -333,7 +333,7 @@ export default function SearchPage() {
             value={query}
             onChange={setQuery}
             onSelect={handleSearchSelect}
-            placeholder="ค้นหาโพสต์, ผู้ใช้, หรือหัวข้อ..."
+            placeholder="Search posts, users, or topics..."
             className="text-lg"
           />
           
@@ -346,7 +346,7 @@ export default function SearchPage() {
               className="gap-2"
             >
               <SlidersHorizontal className="h-4 w-4" />
-              ตัวกรองขั้นสูง
+              Advanced Filters
               {Object.keys(advancedFilters).filter(key => 
                 key !== 'sortBy' && key !== 'sortOrder' && advancedFilters[key as keyof SearchFilters]
               ).length > 0 && (
@@ -375,11 +375,11 @@ export default function SearchPage() {
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="posts" className="flex items-center space-x-2">
             <FileText className="h-4 w-4" />
-            <span>{'โพสต์'} ({postTotal})</span>
+            <span>{'Posts'} ({postTotal})</span>
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center space-x-2">
             <Users className="h-4 w-4" />
-            <span>{'ผู้ใช้'} ({userTotal})</span>
+            <span>{'Users'} ({userTotal})</span>
           </TabsTrigger>
         </TabsList>
         
@@ -390,19 +390,19 @@ export default function SearchPage() {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <Filter className="h-4 w-4" />
-                <span>{'ตัวกรอง'}</span>
+                <span>{'Filters'}</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{'หมวดหมู่'}</label>
+                  <label className="text-sm font-medium">{'Category'}</label>
                   <Select value={postCategory} onValueChange={setPostCategory}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{'ทั้งหมด'}</SelectItem>
+                      <SelectItem value="all">{'All'}</SelectItem>
                       {POST_CATEGORIES.map(category => (
                         <SelectItem key={category} value={category}>
                           {category}
@@ -419,7 +419,7 @@ export default function SearchPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">{'ทั้งหมด'}</SelectItem>
+                      <SelectItem value="all">{'All'}</SelectItem>
                       {MBTI_TYPES.map(type => (
                         <SelectItem key={type} value={type}>
                           {type}
@@ -430,15 +430,15 @@ export default function SearchPage() {
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">{'เรียงตาม'}</label>
+                  <label className="text-sm font-medium">{'Sort by'}</label>
                   <Select value={postSort} onValueChange={setPostSort}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="recent">{'ล่าสุด'}</SelectItem>
-                      <SelectItem value="popular">{'ยอดนิยม'}</SelectItem>
-                      <SelectItem value="oldest">{'เก่าสุด'}</SelectItem>
+                      <SelectItem value="recent">{'Recent'}</SelectItem>
+                      <SelectItem value="popular">{'Popular'}</SelectItem>
+                      <SelectItem value="oldest">{'Oldest'}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -468,7 +468,7 @@ export default function SearchPage() {
                       {isLoading ? (
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       ) : null}
-                      {'โหลดเพิ่มเติม'}
+                      {'Load More'}
                     </Button>
                   </div>
                 )}
@@ -477,7 +477,7 @@ export default function SearchPage() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-center text-muted-foreground">
-                    {'ไม่พบโพสต์ที่ตรงกับการค้นหา'} "{query}"
+                    {'No posts found matching'} "{query}"
                   </p>
                 </CardContent>
               </Card>
@@ -485,7 +485,7 @@ export default function SearchPage() {
               <Card>
                 <CardContent className="pt-6">
                   <p className="text-center text-muted-foreground">
-                    {'กรอกคำค้นหาเพื่อเริ่มต้น'}
+                    {'Enter search terms to get started'}
                   </p>
                 </CardContent>
               </Card>
@@ -524,9 +524,9 @@ export default function SearchPage() {
                         </p>
                         
                         <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
-                          <span>{user.stats.posts} {'โพสต์'}</span>
-                          <span>{user.stats.followers} {'ผู้ติดตาม'}</span>
-                          <span>{user.stats.following} {'กำลังติดตาม'}</span>
+                          <span>{user.stats.posts} {'Posts'}</span>
+                          <span>{user.stats.followers} {'Followers'}</span>
+                          <span>{user.stats.following} {'Following'}</span>
                         </div>
                       </div>
                     </div>
@@ -537,7 +537,7 @@ export default function SearchPage() {
                       size="sm"
                       onClick={() => router.push(`/profile/${user.username}`)}
                     >
-                      {'ดูโปรไฟล์'}
+                      {'View Profile'}
                     </Button>
                   </CardContent>
                 </Card>
@@ -547,7 +547,7 @@ export default function SearchPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-center text-muted-foreground">
-                  {'ไม่พบผู้ใช้ที่ตรงกับการค้นหา'} "{query}"
+                  {'No users found matching'} "{query}"
                 </p>
               </CardContent>
             </Card>
@@ -555,7 +555,7 @@ export default function SearchPage() {
             <Card>
               <CardContent className="pt-6">
                 <p className="text-center text-muted-foreground">
-                  {'กรอกคำค้นหาเพื่อเริ่มต้น'}
+                  {'Enter search terms to get started'}
                 </p>
               </CardContent>
             </Card>

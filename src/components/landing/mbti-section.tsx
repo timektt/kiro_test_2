@@ -164,12 +164,12 @@ export function MBTISection() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span>✓ 60 carefully crafted questions</span>
-                      <span>✓ Detailed personality report</span>
+                      <span>&bull; 60 carefully crafted questions</span>
+                <span>&bull; Detailed personality report</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span>✓ Compatibility insights</span>
-                      <span>✓ Growth recommendations</span>
+                      <span>&bull; Compatibility insights</span>
+                <span>&bull; Growth recommendations</span>
                     </div>
                     <InteractiveLinkButton href="/auth/signup" className="w-full mt-4">
                       Start Assessment
@@ -186,3 +186,4 @@ export function MBTISection() {
 }
 
 export default MBTISection
+

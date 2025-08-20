@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+﻿import { render, screen, fireEvent } from '@testing-library/react'
 import { useTheme } from 'next-themes'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
 
@@ -111,3 +111,4 @@ describe('ThemeToggle', () => {
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
 })
+

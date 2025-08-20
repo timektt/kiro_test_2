@@ -1,15 +1,57 @@
-import { renderHook, act } from '@testing-library/react'
+﻿import { renderHook, act } from '@testing-library/react'
 import { useFeedStore } from '@/stores/feed-store'
 
-// Mock API calls
+// Mock the API hook
 jest.mock('@/hooks/use-api', () => ({
-  useApi: () => ({
-    get: jest.fn(),
-    post: jest.fn(),
-    put: jest.fn(),
-    delete: jest.fn(),
-  }),
+  useApi: jest.fn(),
 }))
+
+// Mock fetch
+global.fetch = jest.fn()
+
+// Test data
+const mockPosts = [
+  {
+    id: 'post-1',
+    content: 'First test post',
+    imageUrl: null,
+    createdAt: new Date('2023-01-01'),
+    updatedAt: new Date('2023-01-01'),
+    authorId: 'author-1',
+    likes: [],
+    comments: [],
+    author: {
+      id: 'author-1',
+      username: 'author1',
+      name: 'Author One',
+      image: null,
+    },
+    _count: {
+      likes: 5,
+      comments: 3,
+    },
+  },
+  {
+    id: 'post-2',
+    content: 'Second test post',
+    imageUrl: 'https://example.com/image.jpg',
+    createdAt: new Date('2023-01-02'),
+    updatedAt: new Date('2023-01-02'),
+    authorId: 'author-2',
+    likes: [],
+    comments: [],
+    author: {
+      id: 'author-2',
+      username: 'author2',
+      name: 'Author Two',
+      image: 'https://example.com/avatar.jpg',
+    },
+    _count: {
+      likes: 10,
+      comments: 7,
+    },
+  },
+]
 
 describe('Feed Store', () => {
   const mockPosts = [
@@ -529,3 +571,4 @@ describe('Feed Store', () => {
     })
   })
 })
+

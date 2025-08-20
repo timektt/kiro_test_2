@@ -17,3 +17,4 @@ export default async function AdminPage() {
   return <AdminPageClient adminUser={adminUser} />
 }
 
+

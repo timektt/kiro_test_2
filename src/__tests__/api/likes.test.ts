@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+﻿import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { POST, DELETE, GET } from '@/app/api/posts/[postId]/like/route'
 import { prisma } from '@/lib/prisma'
@@ -260,3 +260,4 @@ describe('/api/posts/[postId]/like', () => {
     })
   })
 })
+

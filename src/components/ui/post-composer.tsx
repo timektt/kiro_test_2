@@ -249,7 +249,7 @@ export const PostComposer = memo<PostComposerProps>(function PostComposer({
                 data-emoji-button
                 onClick={() => {
                   // Simple emoji picker - add a random emoji
-                  const emojis = ['😊', '👍', '❤️', '🎉', '🔥', '💯', '✨', '🚀']
+                  const emojis = [':)', ':thumbsup:', ':heart:', ':party:', ':fire:', ':100:', ':sparkles:', ':rocket:']
                   const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)]
                   addEmoji(randomEmoji)
                 }}

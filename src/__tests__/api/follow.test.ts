@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+﻿import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { POST, DELETE, GET } from '@/app/api/users/[userId]/follow/route'
 import { GET as getFollowers } from '@/app/api/users/[userId]/followers/route'
@@ -426,3 +426,4 @@ describe('/api/users/[userId]/following', () => {
     expect(data.error).toBe('Unauthorized')
   })
 })
+

@@ -53,10 +53,10 @@ export function ChatHeader({ chat, onlineUsers, isConnected }: ChatHeaderProps) 
       ).length
       
       const memberCount = chat._count.participants
-      const onlineText = onlineCount > 0 ? ` • ${onlineCount} คนออนไลน์` : ''
+      const onlineText = onlineCount > 0 ? ` &bull; ${onlineCount} online` : ''
       return {
-        name: chat.name || `กลุ่ม ${memberCount} คน`,
-      subtitle: `${memberCount} สมาชิก${onlineText}`,
+        name: chat.name || `Group ${memberCount} members`,
+      subtitle: `${memberCount} members${onlineText}`,
         avatar: null,
         isOnline: onlineCount > 0
       }
@@ -68,8 +68,8 @@ export function ChatHeader({ chat, onlineUsers, isConnected }: ChatHeaderProps) 
     )
 
     if (!otherParticipant) {
-      const unknownName = 'ไม่ทราบชื่อ'
-const notConnected = 'ไม่ได้เชื่อมต่อ'
+      const unknownName = 'Unknown'
+const notConnected = 'Not connected'
       return {
         name: unknownName,
         subtitle: notConnected,
@@ -80,8 +80,8 @@ const notConnected = 'ไม่ได้เชื่อมต่อ'
 
     const isOnline = onlineUsers.has(otherParticipant.user.id)
     
-    const onlineText = 'ออนไลน์'
-const offlineText = 'ออฟไลน์'
+    const onlineText = 'Online'
+const offlineText = 'Offline'
     
     return {
       name: otherParticipant.user.name || otherParticipant.user.username,
@@ -119,7 +119,7 @@ const offlineText = 'ออฟไลน์'
             <h2 className="font-semibold text-lg truncate">{name}</h2>
             {!isConnected && (
               <Badge variant="destructive" className="text-xs">
-                ไม่ได้เชื่อมต่อ
+                Disconnected
               </Badge>
             )}
           </div>
@@ -166,21 +166,21 @@ const offlineText = 'ออฟไลน์'
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem>
               <Info className="h-4 w-4 mr-2" />
-              ข้อมูลแชท
+              Chat Info
             </DropdownMenuItem>
             
             {chat.type === 'GROUP' && (
               <>
                 <DropdownMenuItem>
                   <UserPlus className="h-4 w-4 mr-2" />
-                  เพิ่มสมาชิก
+                  Add Member
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
               </>
             )}
             
             <DropdownMenuItem className="text-destructive">
-              {chat.type === 'GROUP' ? 'ออกจากกลุ่ม' : 'ลบแชท'}
+              {chat.type === 'GROUP' ? 'Leave Group' : 'Delete Chat'}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+﻿import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { GET, PUT, DELETE } from '@/app/api/notifications/route'
 import { GET as getNotification, PUT as updateNotification, DELETE as deleteNotification } from '@/app/api/notifications/[notificationId]/route'
@@ -454,3 +454,4 @@ describe('/api/notifications/[notificationId]', () => {
     })
   })
 })
+

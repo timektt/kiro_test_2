@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react'
+﻿import { renderHook, waitFor } from '@testing-library/react'
 import { useProfileVisibility, useBlockUser, useReportUser, getVisibleProfileInfo, canPerformAction } from '@/hooks/use-privacy'
 import type { User } from '@/types'
 

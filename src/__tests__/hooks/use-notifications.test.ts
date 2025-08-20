@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react'
+﻿import { renderHook, waitFor } from '@testing-library/react'
 import { useNotifications } from '@/hooks/use-notifications'
 import useSWR from 'swr'
 
@@ -288,3 +288,4 @@ describe('useNotifications', () => {
     expect(unreadNotifications[0].id).toBe('notification-1')
   })
 })
+

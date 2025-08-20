@@ -196,3 +196,4 @@ export class QueryOptimizer {
 
 export default prismaPool
 
+

@@ -61,7 +61,7 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
       setPage(pageNum)
     } catch (error) {
       console.error('Error loading blocked users:', error)
-      toast.error('เกิดข้อผิดพลาดในการโหลดรายการผู้ใช้ที่ถูกบล็อก')
+      toast.error('Failed to load blocked users list')
     } finally {
       setIsLoading(false)
     }
@@ -88,11 +88,11 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
       setBlockedUsers(prev => prev.filter(blocked => blocked.user.id !== userId))
       setTotal(prev => prev - 1)
       
-      toast.success(`ยกเลิกการบล็อก ${username} เรียบร้อยแล้ว`)
+      toast.success(`Successfully unblocked ${username}`)
       onUserUnblocked?.(userId)
     } catch (error) {
       console.error('Error unblocking user:', error)
-      toast.error('เกิดข้อผิดพลาดในการยกเลิกการบล็อก')
+      toast.error('Failed to unblock user')
     } finally {
       setUnblockingUsers(prev => {
         const newSet = new Set(prev)
@@ -114,16 +114,16 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <UserX className="h-5 w-5" />
-            ผู้ใช้ที่ถูกบล็อก
+            Blocked Users
           </CardTitle>
           <CardDescription>
-            จัดการรายการผู้ใช้ที่คุณได้บล็อกไว้
+            Manage your blocked users list
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin" />
-            <span className="ml-2">กำลังโหลด...</span>
+            <span className="ml-2">Loading...</span>
           </div>
         </CardContent>
       </Card>
@@ -135,17 +135,17 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <UserX className="h-5 w-5" />
-          ผู้ใช้ที่ถูกบล็อก
+          Blocked Users
         </CardTitle>
         <CardDescription>
-          จัดการรายการผู้ใช้ที่คุณได้บล็อกไว้ ({total} คน)
+          Manage your blocked users list ({total} users)
         </CardDescription>
       </CardHeader>
       <CardContent>
         {blockedUsers.length === 0 ? (
           <div className="text-center py-8">
             <AlertCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">คุณยังไม่ได้บล็อกผู้ใช้คนใด</p>
+            <p className="text-muted-foreground">You haven't blocked any users yet</p>
           </div>
         ) : (
           <div className="space-y-4">
@@ -177,15 +177,14 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
                     )}
                     <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                       <span>
-                        บล็อกเมื่อ {formatDistanceToNow(new Date(blocked.blockedAt), { 
-                          addSuffix: true, 
-                          locale: th 
+                        Blocked {formatDistanceToNow(new Date(blocked.blockedAt), { 
+                          addSuffix: true
                         })}
                       </span>
                       {blocked.reason && (
                         <span className="flex items-center gap-1">
                           <AlertCircle className="h-3 w-3" />
-                          เหตุผล: {blocked.reason}
+                          Reason: {blocked.reason}
                         </span>
                       )}
                     </div>
@@ -200,10 +199,10 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
                   {unblockingUsers.has(blocked.user.id) ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      กำลังยกเลิก...
+                      Unblocking...
                     </>
                   ) : (
-                    'ยกเลิกการบล็อก'
+                    'Unblock'
                   )}
                 </Button>
               </div>
@@ -219,10 +218,10 @@ export default function BlockedUsersList({ onUserUnblocked }: BlockedUsersListPr
                   {isLoading ? (
                     <>
                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      กำลังโหลด...
+                      Loading...
                     </>
                   ) : (
-                    'โหลดเพิ่มเติม'
+                    'Load More'
                   )}
                 </Button>
               </div>

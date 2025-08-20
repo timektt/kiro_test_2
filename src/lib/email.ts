@@ -137,7 +137,7 @@ class EmailService {
   }
 
   async sendWelcomeEmail(to: string, data: WelcomeEmailData): Promise<boolean> {
-    const subject = 'ยินดีต้อนรับสู่ Community Platform!'
+    const subject = 'Welcome to Community Platform!'
     const html = this.generateWelcomeEmailHTML(data)
     const text = this.generateWelcomeEmailText(data)
 
@@ -152,17 +152,17 @@ class EmailService {
   private getNotificationSubject(type: string, senderName: string): string {
     switch (type) {
       case 'like':
-        return `${senderName} ถูกใจโพสต์ของคุณ`
+        return `${senderName} liked your post`
       case 'comment':
-        return `${senderName} แสดงความคิดเห็นในโพสต์ของคุณ`
+        return `${senderName} commented on your post`
       case 'follow':
-        return `${senderName} เริ่มติดตามคุณแล้ว`
+        return `${senderName} started following you`
       case 'mention':
-        return `${senderName} กล่าวถึงคุณในโพสต์`
+        return `${senderName} mentioned you in a post`
       case 'chat':
-        return `${senderName} ส่งข้อความถึงคุณ`
+        return `${senderName} sent you a message`
       default:
-        return 'คุณมีการแจ้งเตือนใหม่'
+        return 'You have a new notification'
     }
   }
 
@@ -170,20 +170,20 @@ class EmailService {
     const { recipientName, senderName, notificationType, contentPreview, actionUrl } = data
     
     const actionText = {
-      like: 'ถูกใจโพสต์ของคุณ',
-      comment: 'แสดงความคิดเห็นในโพสต์ของคุณ',
-      follow: 'เริ่มติดตามคุณแล้ว',
-      mention: 'กล่าวถึงคุณในโพสต์',
-      chat: 'ส่งข้อความถึงคุณ'
-    }[notificationType] || 'มีการแจ้งเตือนใหม่'
+      like: 'liked your post',
+      comment: 'commented on your post',
+      follow: 'started following you',
+      mention: 'mentioned you in a post',
+      chat: 'sent you a message'
+    }[notificationType] || 'sent you a new notification'
 
     return `
       <!DOCTYPE html>
-      <html lang="th">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>การแจ้งเตือน - Community Platform</title>
+        <title>Notification - Community Platform</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
           .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -204,25 +204,25 @@ class EmailService {
           </div>
           
           <div class="content">
-            <h2>สวัสดี ${recipientName}!</h2>
+            <h2>Hello ${recipientName}!</h2>
             
             <div class="notification">
-              <h3>🔔 การแจ้งเตือนใหม่</h3>
+              <h3>[NOTIFICATION] New Notification</h3>
               <p><strong>${senderName}</strong> ${actionText}</p>
               ${contentPreview ? `<div class="preview">"${contentPreview}"</div>` : ''}
             </div>
             
-            <p>คลิกปุ่มด้านล่างเพื่อดูรายละเอียดเพิ่มเติม:</p>
+            <p>Click the button below to view more details:</p>
             
-            <a href="${actionUrl}" class="action-button">ดูรายละเอียด</a>
+            <a href="${actionUrl}" class="action-button">View Details</a>
             
-            <p>หรือคัดลอกลิงก์นี้ไปที่เบราว์เซอร์: <br>
+            <p>Or copy this link to your browser: <br>
             <a href="${actionUrl}">${actionUrl}</a></p>
           </div>
           
           <div class="footer">
-            <p>อีเมลนี้ส่งโดยอัตโนมัติ กรุณาอย่าตอบกลับ</p>
-            <p>© 2024 Community Platform. {'สงวนลิขสิทธิ์'}.</p>
+            <p>This email was sent automatically. Please do not reply.</p>
+            <p>© 2024 Community Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -234,27 +234,27 @@ class EmailService {
     const { recipientName, senderName, notificationType, contentPreview, actionUrl } = data
     
     const actionText = {
-      like: 'ถูกใจโพสต์ของคุณ',
-      comment: 'แสดงความคิดเห็นในโพสต์ของคุณ',
-      follow: 'เริ่มติดตามคุณแล้ว',
-      mention: 'กล่าวถึงคุณในโพสต์',
-      chat: 'ส่งข้อความถึงคุณ'
-    }[notificationType] || 'มีการแจ้งเตือนใหม่'
+      like: 'liked your post',
+      comment: 'commented on your post',
+      follow: 'started following you',
+      mention: 'mentioned you in a post',
+      chat: 'sent you a message'
+    }[notificationType] || 'sent you a new notification'
 
     return `
-สวัสดี ${recipientName}!
+Hello ${recipientName}!
 
-การแจ้งเตือนใหม่:
+New Notification:
 ${senderName} ${actionText}
 
 ${contentPreview ? (() => {
-  const contentLabel = 'เนื้อหา: '
+  const contentLabel = 'Content: '
   return `${contentLabel}"${contentPreview}"\n\n`
 })() : ''}
-ดูรายละเอียดเพิ่มเติม: ${actionUrl}
+View more details: ${actionUrl}
 
 ---
-อีเมลนี้ส่งโดยอัตโนมัติ กรุณาอย่าตอบกลับ
+This email was sent automatically. Please do not reply.
 © 2024 Community Platform
     `
   }
@@ -264,11 +264,11 @@ ${contentPreview ? (() => {
 
     return `
       <!DOCTYPE html>
-      <html lang="th">
+      <html lang="en">
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>ยินดีต้อนรับ - Community Platform</title>
+        <title>Welcome - Community Platform</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4; }
           .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
@@ -280,7 +280,7 @@ ${contentPreview ? (() => {
           .action-button:hover { background-color: #059669; }
           .features { background-color: #f8fafc; padding: 20px; border-radius: 6px; margin: 20px 0; }
           .feature-item { margin: 10px 0; padding-left: 20px; position: relative; }
-          .feature-item:before { content: '✓'; position: absolute; left: 0; color: #10b981; font-weight: bold; }
+          .feature-item:before { content: '\u2022'; position: absolute; left: 0; color: #10b981; font-weight: bold; }
           .footer { text-align: center; padding: 20px 0; border-top: 1px solid #e0e0e0; color: #666; font-size: 14px; }
         </style>
       </head>
@@ -292,39 +292,39 @@ ${contentPreview ? (() => {
           
           <div class="content">
             <div class="welcome-box">
-              <h1>🎉 ยินดีต้อนรับ ${recipientName}!</h1>
-              <p>ขอบคุณที่เข้าร่วมชุมชนของเรา</p>
+              <h1>[WELCOME] Welcome ${recipientName}!</h1>
+              <p>Thank you for joining our community</p>
             </div>
             
-            <p>สวัสดี <strong>@${username}</strong>!</p>
+            <p>Hello <strong>@${username}</strong>!</p>
             
-            <p>เราดีใจมากที่คุณได้เข้าร่วม Community Platform ชุมชนที่ผู้คนสามารถแบ่งปันประสบการณ์ ความคิดเห็น และเชื่อมต่อกันผ่าน MBTI personality types</p>
+            <p>We're excited that you've joined Community Platform, a community where people can share experiences, thoughts, and connect through MBTI personality types</p>
             
             <div class="features">
-              <h3>🌟 คุณสมบัติที่น่าสนใจ:</h3>
+              <h3>[FEATURES] Exciting Features:</h3>
               <ul style="list-style: none; padding: 0;">
-                <li>📝 สร้างและแบ่งปันโพสต์ของคุณ</li>
-                <li>🧠 เชื่อมต่อกับผู้คนที่มี MBTI Type เดียวกัน</li>
-                <li>💬 แชทแบบเรียลไทม์</li>
-                <li>👥 ติดตามผู้ใช้ที่คุณสนใจ</li>
-                <li>🔔 รับการแจ้งเตือนเมื่อมีกิจกรรมใหม่</li>
+                <li>&bull; Create and share your posts</li>
+                <li>&bull; Connect with people who have the same MBTI Type</li>
+                <li>&bull; Real-time chat</li>
+                <li>&bull; Follow users you're interested in</li>
+                <li>&bull; Get notifications when there's new activity</li>
               </ul>
             </div>
             
             ${verificationUrl ? `
-              <p>กรุณายืนยันอีเมลของคุณเพื่อเริ่มใช้งานเต็มรูปแบบ:</p>
-               <a href="${verificationUrl}" class="action-button">ยืนยันอีเมล</a>
+              <p>Please verify your email to start using the full features:</p>
+               <a href="${verificationUrl}" class="action-button">Verify Email</a>
             ` : `
-              <p>คุณสามารถเริ่มใช้งานได้ทันที:</p>
-               <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/feed" class="action-button">เริ่มใช้งาน</a>
+              <p>You can start using it right away:</p>
+               <a href="${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/feed" class="action-button">Get Started</a>
             `}
             
-            <p>หากคุณมีคำถามหรือต้องการความช่วยเหลือ สามารถติดต่อทีมสนับสนุนของเราได้ตลอดเวลา</p>
+            <p>If you have any questions or need help, you can contact our support team anytime</p>
           </div>
           
           <div class="footer">
-            <p>ขอบคุณที่เข้าร่วมชุมชนของเรา!</p>
-            <p>© 2024 Community Platform. สงวนลิขสิทธิ์.</p>
+            <p>Thank you for joining our community!</p>
+            <p>© 2024 Community Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -336,32 +336,32 @@ ${contentPreview ? (() => {
     const { recipientName, username, verificationUrl } = data
 
     return `
-{'ยินดีต้อนรับ'} ${recipientName}!
+Welcome ${recipientName}!
 
-{'ขอบคุณที่เข้าร่วม'} Community Platform
+Thank you for joining Community Platform
 
-{'สวัสดี'} @${username}!
+Hello @${username}!
 
-{'เราดีใจมากที่คุณได้เข้าร่วมชุมชนของเรา ที่ผู้คนสามารถแบ่งปันประสบการณ์ ความคิดเห็น และเชื่อมต่อกันผ่าน'} MBTI personality types
+We're excited that you've joined our community where people can share experiences, thoughts, and connect through MBTI personality types
 
-{'สิ่งที่คุณสามารถทำได้'}:
-✓ {'สร้างโพสต์และแบ่งปันความคิดเห็น'}
-✓ {'ค้นหาและเชื่อมต่อกับผู้คนที่มี'} MBTI {'เหมือนกัน'}
-✓ {'แชทแบบเรียลไทม์กับสมาชิกอื่น ๆ'}
-✓ {'ติดตามผู้ใช้ที่น่าสนใจ'}
-✓ {'รับการแจ้งเตือนเมื่อมีกิจกรรมใหม่'}
+What you can do:
+- Create posts and share your thoughts
+- Find and connect with people who have the same MBTI type
+- Real-time chat with other members
+- Follow interesting users
+- Get notifications when there's new activity
 
 ${verificationUrl ? (() => {
-  const verifyText = 'กรุณายืนยันอีเมลของคุณ: '
+  const verifyText = 'Please verify your email: '
   return `${verifyText}${verificationUrl}`
 })() : (() => {
-  const startText = 'เริ่มใช้งาน: '
+  const startText = 'Get started: '
   return `${startText}${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/feed`
 })()}
 
-{'หากคุณมีคำถามหรือต้องการความช่วยเหลือ สามารถติดต่อทีมสนับสนุนของเราได้ตลอดเวลา'}
+If you have any questions or need help, you can contact our support team anytime
 
-{'ขอบคุณที่เข้าร่วมชุมชนของเรา'}!
+Thank you for joining our community!
 © 2024 Community Platform
     `
   }

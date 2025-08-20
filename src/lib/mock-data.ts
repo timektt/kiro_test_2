@@ -136,7 +136,7 @@ export const mockPosts: Array<Post & {
 }> = [
   {
     id: '1',
-    content: 'Welcome to our community platform! Excited to connect with everyone here and share knowledge. 🚀\n\nLooking forward to building amazing things together!',
+    content: 'Welcome to our community platform! Excited to connect with everyone here and share knowledge. [ROCKET]\n\nLooking forward to building amazing things together!',
     imageUrl: null,
     authorId: '1',
     isPublic: true,
@@ -178,7 +178,7 @@ export const mockPosts: Array<Post & {
   },
   {
     id: '4',
-    content: 'Community update: We\'ve added new features to enhance your experience!\n\n✨ New MBTI integration\n🎯 Improved ranking system\n📱 Better mobile experience\n\nLet us know what you think!',
+    content: 'Community update: We\'ve added new features to enhance your experience!\n\n- New MBTI integration\n- Improved ranking system\n- Better mobile experience\n\nLet us know what you think!',
     imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop',
     authorId: '4',
     isPublic: true,
@@ -206,7 +206,7 @@ export const mockPosts: Array<Post & {
   },
   {
     id: '6',
-    content: 'Just discovered this amazing color palette generator. Design tools keep getting better!\n\nSharing some inspiration for fellow designers 🎨',
+    content: 'Just discovered this amazing color palette generator. Design tools keep getting better!\n\nSharing some inspiration for fellow designers [PALETTE]',
     imageUrl: 'https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=600&h=400&fit=crop',
     authorId: '2',
     isPublic: true,
@@ -242,4 +242,5 @@ export function getMockPosts(limit = 10, offset = 0) {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(offset, offset + limit)
 }
+
 

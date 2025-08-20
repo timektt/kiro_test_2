@@ -32,7 +32,7 @@ export function SearchAutocomplete({
   value,
   onChange,
   onSelect,
-  placeholder = 'ค้นหาผู้ใช้, โพสต์, หรือแท็ก...',
+  placeholder = 'Search users, posts, or tags...',
   className
 }: SearchAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false)
@@ -74,7 +74,7 @@ export function SearchAutocomplete({
         id: `recent-${index}`,
         type: 'recent',
         title: search,
-        subtitle: 'ค้นหาล่าสุด'
+        subtitle: 'Recent search'
       }))
       
       setSuggestions(recentSuggestions)
@@ -218,7 +218,7 @@ export function SearchAutocomplete({
           <CardContent className="p-0">
             {isLoading ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                กำลังค้นหา...
+                Searching...
               </div>
             ) : suggestions.length > 0 ? (
               <>
@@ -226,7 +226,7 @@ export function SearchAutocomplete({
                 {suggestions.some(s => s.type === 'recent') && (
                   <div className="flex items-center justify-between p-3 border-b">
                     <span className="text-sm font-medium text-muted-foreground">
-                      ค้นหาล่าสุด
+                      Recent Searches
                     </span>
                     <Button
                       variant="ghost"
@@ -234,7 +234,7 @@ export function SearchAutocomplete({
                       onClick={clearRecentSearches}
                       className="h-6 text-xs"
                     >
-                      ล้างทั้งหมด
+                      Clear all
                     </Button>
                   </div>
                 )}
@@ -291,11 +291,11 @@ export function SearchAutocomplete({
               </>
             ) : value.trim() ? (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                ไม่พบผลการค้นหาสำหรับ "{value}"
+                No results found for "{value}"
               </div>
             ) : (
               <div className="p-4 text-center text-sm text-muted-foreground">
-                เริ่มพิมพ์เพื่อค้นหา
+                Start typing to search
               </div>
             )}
           </CardContent>
