@@ -76,3 +76,9 @@ coverage/
 *.orig
 *.sublime-project
 *.sublime-workspace
+
+# 🔧 TypeScript Build Info
+tsconfig.tsbuildinfo
+
+# 🛠️ Scripts & Tools
+fix-quotes.ps1

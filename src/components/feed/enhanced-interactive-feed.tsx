@@ -17,6 +17,7 @@ import { useDebounce } from '@/hooks/use-debounce'
 import { useFeedStore } from '@/stores/feed-store'
 import { useUIStore } from '@/stores/ui-store'
 import { cn } from '@/lib/utils'
+import type { Post, User } from '@/types'
 
 interface EnhancedInteractiveFeedProps {
   currentUserId: string
@@ -73,9 +74,8 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({
   // Fetch posts using the custom hook
   const { posts, pagination, isLoading, error, mutate } = usePosts({
     type: feedType,
-    sort: sortBy,
+    sort: sortBy === 'trending' ? 'popular' : sortBy as 'recent' | 'popular',
     mbti: mbtiFilter || undefined,
-    search: debouncedSearchQuery || undefined,
   })
   
   // Load more posts hook
@@ -103,10 +103,9 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({
     const basePosts = allLoadedPosts.length > 0 ? allLoadedPosts : posts
     if (!debouncedSearchQuery) return basePosts
     
-    return basePosts.filter(post => 
+    return basePosts.filter((post: Post & { author: User & { mbti?: { type: string } | null }; _count: { likes: number; comments: number } }) => 
       post.content?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-      post.author?.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
-      post.tags?.some((tag: string) => tag.toLowerCase().includes(debouncedSearchQuery.toLowerCase()))
+      post.author?.name?.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
     )
   }, [allLoadedPosts, posts, debouncedSearchQuery])
   
@@ -141,14 +140,16 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({
     }
   }, [filteredPosts.length, displayPosts.length, shouldUseVirtualization, debouncedSearchQuery])
   
-  // Memoized render function for virtual list
+
+
+  // Virtual list item renderer
   const renderVirtualItem = useCallback(({ index, style }: { index: number; style: React.CSSProperties }) => {
     const post = displayPosts[index]
     if (!post) return null
-    
+
     return (
-      <div style={style}>
-        <div className="px-2 pb-4">
+      <div style={style} className="px-4">
+        <div className="pb-4">
           <MemoizedPostItem
             key={post.id}
             post={post}
@@ -159,7 +160,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({
         </div>
       </div>
     )
-  }, [displayPosts, currentUserId, handleLike])
+  }, [displayPosts, currentUserId])
   
   // Handle filter changes
   const handleFilterChange = useCallback((filter: string) => {
@@ -483,6 +484,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({
             <div className="border rounded-lg overflow-hidden">
               <List
                 height={CONTAINER_HEIGHT}
+                width="100%"
                 itemCount={displayPosts.length}
                 itemSize={ITEM_HEIGHT}
                 className="scrollbar-thin scrollbar-thumb-muted scrollbar-track-background"
@@ -503,7 +505,7 @@ export const EnhancedInteractiveFeed = memo<EnhancedInteractiveFeedProps>(({
           ) : (
             /* Regular List for Smaller Datasets */
             <>
-              {displayPosts.map((post) => (
+              {displayPosts.map((post: Post & { author: User & { mbti?: { type: string } | null }; _count: { likes: number; comments: number } }) => (
                 <MemoizedPostItem
                   key={post.id}
                   post={post}

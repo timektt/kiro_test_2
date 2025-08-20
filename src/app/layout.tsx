@@ -4,7 +4,7 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { SessionProvider } from '@/components/providers/session-provider';
 import { StoreProvider } from '@/components/providers/store-provider';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from 'next-themes';
 import { ErrorBoundary } from '@/components/ui/error-boundary';
 import { Navbar } from '@/components/layout/navbar';
 import { MobileNav } from '@/components/layout/mobile-nav';
@@ -42,10 +42,13 @@ export const metadata: Metadata = {
   publisher: 'Community Platform',
   applicationName: 'Community Platform',
   referrer: 'origin-when-cross-origin',
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
   metadataBase: new URL(process.env.NEXTAUTH_URL || 'http://localhost:3000'),
   alternates: {
@@ -80,19 +83,25 @@ export const metadata: Metadata = {
     creator: '@communityplatform',
     site: '@communityplatform',
   },
-  robots: {
-    index: true,
-    follow: true,
-    nocache: false,
-    googleBot: {
-      index: true,
-      follow: true,
-      noimageindex: false,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
+  verification: {
+    google: 'google-site-verification',
+    yandex: 'yandex-verification',
+    yahoo: 'yahoo-site-verification',
   },
+  other: {
+    'msapplication-TileColor': '#2563eb',
+    'theme-color': '#ffffff',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'format-detection': 'telephone=no',
+    'mobile-web-app-capable': 'yes',
+    'msapplication-config': '/browserconfig.xml',
+    'msapplication-tap-highlight': 'no',
+    'max-video-preview': -1,
+    'max-image-preview': 'large',
+    'max-snippet': -1,
+  },
+  manifest: '/manifest.json',
   category: 'social',
   classification: 'Social Network',
 };
@@ -102,35 +111,44 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await getServerSession(authOptions);
+  let session;
+  try {
+    session = await getServerSession(authOptions);
+  } catch (error) {
+    console.error('Error getting server session:', error);
+    session = null;
+  }
 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <ErrorBoundary>
-          <ThemeProvider
-            defaultTheme="system"
-            storageKey="community-platform-theme"
-          >
-            <SessionProvider session={session}>
-              <StoreProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SessionProvider session={session}>
+            <StoreProvider
+              userId={session?.user?.id ?? ''}
+              username={session?.user?.username ?? ''}
+            >
+              <ErrorBoundary>
                 <div className="min-h-screen bg-background">
                   <Navbar />
-                  <main className="pb-16 md:pb-0" role="main">
-                    <ErrorBoundary>{children}</ErrorBoundary>
-                  </main>
-                  <MobileNav
-                    userId={session?.user?.id ?? ''}
-                    username={session?.user?.username ?? ''}
-                    notificationCount={session ? 3 : 0}
+                  <main className="flex-1">{children}</main>
+                  <MobileNav 
+                    userId={session?.user?.id}
+                    username={session?.user?.username}
                   />
                 </div>
-              </StoreProvider>
-            </SessionProvider>
-          </ThemeProvider>
-        </ErrorBoundary>
-        <AnalyticsProvider />
+              </ErrorBoundary>
+              <AnalyticsProvider />
+            </StoreProvider>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
 }
+
