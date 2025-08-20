@@ -105,6 +105,9 @@ model User {
   reports         Report[] @relation("UserReports")
   reportedAgainst Report[] @relation("UserReported")
   reviewedReports Report[] @relation("AdminReviews")
+  
+  // Demo Analytics relation
+  demoAnalytics   DemoAnalytics[]
 
   @@index([email])
   @@index([username])
@@ -415,6 +418,31 @@ model Report {
   @@map("reports")
 }
 
+// Demo Analytics Model
+model DemoAnalytics {
+  id        String   @id @default(cuid())
+  event     String   // Event type: "demo_start", "step_change", "demo_complete", etc.
+  step      Int?     // Current step number (0-based)
+  stepTitle String?  // Title of the current step
+  duration  Int?     // Duration in milliseconds
+  completed Boolean? // Whether the demo was completed
+  timestamp DateTime @default(now())
+  userAgent String?  // Browser user agent
+  sessionId String?  // Session identifier
+  userId    String?  // Optional user ID if logged in
+  ipAddress String?  // Client IP address
+  
+  // Optional user relation
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@index([event])
+  @@index([sessionId])
+  @@index([userId])
+  @@index([timestamp])
+  @@index([event, timestamp])
+  @@map("demo_analytics")
+}
+
 // Note: SQLite doesn't support enums, so we use String types instead
 // Valid values for role: "USER", "ADMIN", "MODERATOR"
 // Valid values for notification type: "LIKE", "COMMENT", "FOLLOW", "MENTION", "SYSTEM", "CHAT_MESSAGE"
@@ -429,3 +457,4 @@ model Report {
 // Valid values for report reason: "SPAM", "HARASSMENT", "INAPPROPRIATE_CONTENT", "FAKE_ACCOUNT", "OTHER"
 // Valid values for report status: "PENDING", "REVIEWED", "RESOLVED", "DISMISSED"
 // Valid values for report priority: "LOW", "MEDIUM", "HIGH", "URGENT"
+// Valid values for demo analytics event: "demo_start", "step_change", "demo_complete", "demo_pause", "demo_restart", "demo_exit", "user_interaction"
