@@ -1,4 +1,4 @@
-﻿import React from 'react'
+import React from 'react'
 import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { EnhancedInteractiveFeed } from '@/components/feed/enhanced-interactive-feed'
 import { useFeedStore } from '@/stores/feed-store'

@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { EmptyState } from '@/components/ui/empty-state'
 import { useUIStore } from '@/stores/ui-store'
+import { fmtNumber, fmtDate } from '@/lib/format'
 
 interface AdminDashboardProps {
   adminUser: {
@@ -213,7 +214,7 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
                 <Icon className={`h-4 w-4 ${stat.color} flex-shrink-0`} />
               </CardHeader>
               <CardContent>
-                <div className="text-xl sm:text-2xl font-bold">{stat.value.toLocaleString()}</div>
+                <div className="text-xl sm:text-2xl font-bold">{fmtNumber(stat.value)}</div>
                 <p className="text-xs text-muted-foreground">
                   {stat.change}
                 </p>
@@ -246,7 +247,7 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm">{activity.message}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(activity.timestamp).toLocaleString()}
+                        {fmtDate(activity.timestamp)}
                       </p>
                     </div>
                   </div>

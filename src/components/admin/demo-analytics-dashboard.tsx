@@ -38,6 +38,7 @@ import {
 import { fetchDemoAnalytics } from '@/hooks/use-demo-analytics'
 import { format } from 'date-fns'
 import { cn } from '@/lib/utils'
+import { fmtNumber } from '@/lib/format'
 
 interface AnalyticsSummary {
   totalEvents: number
@@ -258,7 +259,7 @@ export function DemoAnalyticsDashboard() {
             <Play className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{summary.demoStarts.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{fmtNumber(summary.demoStarts)}</div>
             <p className="text-xs text-muted-foreground">
               {summary.uniqueSessions} unique sessions
             </p>

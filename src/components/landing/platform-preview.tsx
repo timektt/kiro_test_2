@@ -19,6 +19,7 @@ import {
   Brain
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { fmtNumber, fmtDate } from '@/lib/format'
 
 interface MockPost {
   id: string
@@ -248,7 +249,7 @@ export function PlatformPreview() {
                 <span className="font-medium text-sm">{user.name}</span>
                 <Badge variant="outline" className="text-xs">{user.mbti}</Badge>
               </div>
-              <p className="text-xs text-muted-foreground">{user.points.toLocaleString()} points</p>
+              <p className="text-xs text-muted-foreground">{fmtNumber(user.points)} points</p>
             </div>
             <TrendingUp className="w-4 h-4 text-green-500" />
           </div>

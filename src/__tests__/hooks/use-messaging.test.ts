@@ -1,4 +1,4 @@
-﻿import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { useChats, useSendMessage, useMessages } from '@/hooks/use-messaging'
 import { useUIStore } from '@/stores/ui-store'
 

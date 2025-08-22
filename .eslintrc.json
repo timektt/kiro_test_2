@@ -3,6 +3,21 @@
   "rules": {
     "prefer-const": "error",
     "no-unused-vars": "warn",
-    "react/no-unescaped-entities": "warn"
-  }
+    "react/no-unescaped-entities": "warn",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.property.name=/^toLocale(String|DateString|TimeString)$/]",
+        "message": "Direct use of .toLocaleString(), .toLocaleDateString(), or .toLocaleTimeString() is not allowed. Use format utilities from @/lib/format instead."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/lib/format.ts"],
+      "rules": {
+        "no-restricted-syntax": "off"
+      }
+    }
+  ]
 }

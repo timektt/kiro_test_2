@@ -18,35 +18,36 @@ export async function GET(request: NextRequest) {
     const monitor = PerformanceMonitor.getInstance()
     const stats = monitor.getAllStats()
     
-    // Get system metrics
+    // Get system metrics with data guards
+    const memoryUsage = process.memoryUsage()
     const systemMetrics = {
-      uptime: process.uptime(),
+      uptime: process.uptime() || 0,
       memory: {
-        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
-        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024),
-        external: Math.round(process.memoryUsage().external / 1024 / 1024),
-        rss: Math.round(process.memoryUsage().rss / 1024 / 1024),
+        used: Math.round((memoryUsage?.heapUsed || 0) / 1024 / 1024),
+        total: Math.round((memoryUsage?.heapTotal || 0) / 1024 / 1024),
+        external: Math.round((memoryUsage?.external || 0) / 1024 / 1024),
+        rss: Math.round((memoryUsage?.rss || 0) / 1024 / 1024),
         unit: 'MB'
       },
       cpu: {
-        loadAverage: process.platform !== 'win32' ? require('os').loadavg() : [0, 0, 0],
-        platform: process.platform,
-        arch: process.arch
+        loadAverage: process.platform !== 'win32' ? (require('os').loadavg() || [0, 0, 0]) : [0, 0, 0],
+        platform: process.platform || 'unknown',
+        arch: process.arch || 'unknown'
       },
       node: {
-        version: process.version,
-        env: process.env.NODE_ENV
+        version: process.version || 'unknown',
+        env: process.env.NODE_ENV || 'unknown'
       }
     }
     
     const metricsData = {
       timestamp: new Date().toISOString(),
       system: systemMetrics,
-      performance: stats,
+      performance: stats || {},
       summary: {
-        totalRequests: Object.keys(stats).filter(key => key.startsWith('api_')).length,
-        dbQueries: stats.db_query?.count || 0,
-        avgResponseTime: calculateAverageResponseTime(stats)
+        totalRequests: Object.keys(stats || {}).filter(key => key.startsWith('api_')).length,
+        dbQueries: stats?.db_query?.count || 0,
+        avgResponseTime: calculateAverageResponseTime(stats || {})
       }
     }
     

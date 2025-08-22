@@ -3,6 +3,7 @@
 import { forwardRef } from 'react'
 import { MessageItem } from './message-item'
 import { cn } from '@/lib/utils'
+import { fmtDate } from '@/lib/format'
 
 interface ChatMessage {
   id: string
@@ -89,11 +90,7 @@ const yesterdayText = 'Yesterday'
       } else if (date.toDateString() === yesterday.toDateString()) {
         return yesterdayText
       } else {
-        return date.toLocaleDateString('th-TH', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-        })
+        return fmtDate(date.toISOString())
       }
     }
 

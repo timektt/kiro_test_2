@@ -1,4 +1,4 @@
-﻿import { createMocks } from 'node-mocks-http'
+import { createMocks } from 'node-mocks-http'
 import { GET } from '@/app/api/admin/users/route'
 import { getServerSession } from 'next-auth'
 

@@ -60,33 +60,29 @@ const benefits = [
 
 export function MBTISection() {
   return (
-    <section className="py-20 lg:py-32 bg-gradient-to-br from-primary/5 to-secondary/5">
+    <section className="py-24 bg-gradient-to-br from-background via-background to-muted/20">
       <div className="container mx-auto px-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Section Header */}
-          <div className="text-center space-y-4 mb-16">
-            <Badge variant="outline" className="mb-4">
-              <Brain className="w-4 h-4 mr-2" />
-              MBTI Integration
-            </Badge>
-            <h2 className="text-3xl md:text-5xl font-bold">
-              Discover your personality,
-              <span className="block text-primary">find your people</span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Our platform uses the Myers-Briggs Type Indicator to help you understand yourself better 
-              and connect with compatible personalities in meaningful ways.
-            </p>
+        <div className="text-center mb-16">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-primary/10 rounded-full mb-6">
+            <Brain className="w-8 h-8 text-primary" />
           </div>
+          <h2 className="text-4xl font-bold mb-4">
+            Discover Your <span className="text-primary">Personality Type</span>
+          </h2>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+            Join thousands of users who have discovered their MBTI personality type and found their perfect community matches
+          </p>
+        </div>
 
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            {/* Left Column - MBTI Types */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold mb-6">Popular Personality Types</h3>
-                <div className="grid gap-4">
-                  {mbtiTypes.map((mbti, index) => (
-                    <Card key={index} className="group hover:shadow-md transition-all duration-300">
+        <div className="grid lg:grid-cols-2 gap-12 items-start">
+          {/* Left Column - MBTI Types */}
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-2xl font-bold mb-6">Popular Personality Types</h3>
+              <div className="space-y-4">
+                {mbtiTypes.map((mbti) => {
+                  return (
+                    <Card key={mbti.type} className="group hover:shadow-md transition-all duration-200 cursor-pointer">
                       <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
@@ -113,71 +109,66 @@ export function MBTISection() {
                         </div>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+                  )}
+                )}
+              </div>
 
-                <div className="mt-6 text-center">
-                  <InteractiveLinkButton href="/mbti-types" variant="outline">
-                    View All 16 Types
-                  </InteractiveLinkButton>
-                </div>
+              <div className="mt-6 text-center">
+                <InteractiveLinkButton href="/mbti-types" variant="outline">
+                  View All 16 Types
+                </InteractiveLinkButton>
               </div>
             </div>
+          </div>
 
-            {/* Right Column - Benefits */}
-            <div className="space-y-8">
-              <div>
-                <h3 className="text-2xl font-bold mb-6">Why MBTI Matters</h3>
-                <div className="space-y-6">
-                  {benefits.map((benefit, index) => {
-                    const Icon = benefit.icon
-                    return (
-                      <div key={index} className="flex items-start gap-4">
-                        <div className="p-3 rounded-xl bg-primary/10 flex-shrink-0">
-                          <Icon className="h-6 w-6 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-lg mb-2">
-                            {benefit.title}
-                          </h4>
-                          <p className="text-muted-foreground">
-                            {benefit.description}
-                          </p>
+          {/* Right Column - Benefits */}
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-2xl font-bold mb-6">Why MBTI Matters</h3>
+              <div className="space-y-6">
+                {benefits.map((benefit, index) => {
+                  const IconComponent = benefit.icon
+                  return (
+                    <div key={index} className="flex gap-4">
+                      <div className="flex-shrink-0">
+                        <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                          <IconComponent className="w-6 h-6 text-primary" />
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
+                      <div>
+                        <h4 className="font-semibold mb-2">{benefit.title}</h4>
+                        <p className="text-muted-foreground">{benefit.description}</p>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
-
-              {/* MBTI Assessment CTA */}
-              <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="h-5 w-5" />
-                    Take the Assessment
-                  </CardTitle>
-                  <CardDescription>
-                    Discover your personality type with our comprehensive MBTI assessment
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span>&bull; 60 carefully crafted questions</span>
-                <span>&bull; Detailed personality report</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span>&bull; Compatibility insights</span>
-                <span>&bull; Growth recommendations</span>
-                    </div>
-                    <InteractiveLinkButton href="/auth/signup" className="w-full mt-4">
-                      Start Assessment
-                    </InteractiveLinkButton>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
+
+            {/* Assessment CTA */}
+            <Card className="bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20">
+              <CardHeader>
+                <CardTitle className="text-xl">Take the Assessment</CardTitle>
+                <CardDescription>
+                  Discover your personality type with our comprehensive MBTI assessment
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-sm">
+                    <span>&bull; 60 carefully crafted questions</span>
+                    <span>&bull; Detailed personality report</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span>&bull; Compatibility insights</span>
+                    <span>&bull; Growth recommendations</span>
+                  </div>
+                  <InteractiveLinkButton href="/auth/signup" className="w-full mt-4">
+                    Start Assessment
+                  </InteractiveLinkButton>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
@@ -186,4 +177,3 @@ export function MBTISection() {
 }
 
 export default MBTISection
-

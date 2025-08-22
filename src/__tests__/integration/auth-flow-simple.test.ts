@@ -1,4 +1,4 @@
-﻿import { createMocks } from 'node-mocks-http'
+import { createMocks } from 'node-mocks-http'
 import { POST } from '@/app/api/auth/register/route'
 
 // Mock Prisma

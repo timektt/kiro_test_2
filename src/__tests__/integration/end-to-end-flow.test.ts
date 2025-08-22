@@ -1,4 +1,4 @@
-﻿/**
+/**
  * End-to-End Flow Integration Test
  * Tests complete user journeys from authentication to content interaction
  */

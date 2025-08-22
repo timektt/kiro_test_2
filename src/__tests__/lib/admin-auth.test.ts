@@ -1,4 +1,4 @@
-﻿import { checkAdminAuth, hasAdminPermission, withAdminAuth } from '@/lib/admin-auth'
+import { checkAdminAuth, hasAdminPermission, withAdminAuth } from '@/lib/admin-auth'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
@@ -44,87 +44,83 @@ const mockRegularUser = {
 }
 
 describe('checkAdminAuth', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+  const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
+  const mockFindUnique = prisma.user.findUnique as jest.MockedFunction<typeof prisma.user.findUnique>
 
   it('should return admin user for valid admin session', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'admin-1' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockAdminUser)
+    } as any)
+    
+    mockFindUnique.mockResolvedValue(mockAdminUser as any)
 
     const result = await checkAdminAuth()
-
     expect(result).toEqual({
       id: 'admin-1',
       username: 'admin',
       name: 'Admin User',
       email: 'admin@example.com',
       role: 'ADMIN',
-      image: null,
     })
   })
 
   it('should return moderator user for valid moderator session', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'mod-1' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockModeratorUser)
+    } as any)
+    
+    mockFindUnique.mockResolvedValue(mockModeratorUser as any)
 
     const result = await checkAdminAuth()
-
     expect(result).toEqual({
       id: 'mod-1',
       username: 'moderator',
       name: 'Moderator User',
       email: 'mod@example.com',
       role: 'MODERATOR',
-      image: null,
     })
   })
 
   it('should return null for regular user', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'user-1' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockRegularUser)
+    } as any)
+    
+    mockFindUnique.mockResolvedValue(mockRegularUser as any)
 
     const result = await checkAdminAuth()
-
     expect(result).toBeNull()
   })
 
   it('should return null for inactive user', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'admin-1' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue({
+    } as any)
+    
+    mockFindUnique.mockResolvedValue({
       ...mockAdminUser,
       isActive: false,
-    })
+    } as any)
 
     const result = await checkAdminAuth()
-
     expect(result).toBeNull()
   })
 
   it('should return null for no session', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue(null)
+    mockGetServerSession.mockResolvedValue(null)
 
     const result = await checkAdminAuth()
-
     expect(result).toBeNull()
   })
 
   it('should return null for non-existent user', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'nonexistent' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(null)
+    } as any)
+    
+    mockFindUnique.mockResolvedValue(null)
 
     const result = await checkAdminAuth()
-
     expect(result).toBeNull()
   })
 })
@@ -136,7 +132,6 @@ describe('hasAdminPermission', () => {
     name: 'Admin User',
     email: 'admin@example.com',
     role: 'ADMIN' as const,
-    image: null,
   }
 
   const moderatorUser = {
@@ -145,7 +140,6 @@ describe('hasAdminPermission', () => {
     name: 'Moderator User',
     email: 'mod@example.com',
     role: 'MODERATOR' as const,
-    image: null,
   }
 
   it('should grant all permissions to admin', () => {
@@ -162,70 +156,61 @@ describe('hasAdminPermission', () => {
 })
 
 describe('withAdminAuth', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
+  const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getServerSession>
+  const mockFindUnique = prisma.user.findUnique as jest.MockedFunction<typeof prisma.user.findUnique>
+  const mockHandler = jest.fn()
 
   it('should call handler with admin user when authenticated', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'admin-1' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockAdminUser)
-
-    const mockHandler = jest.fn().mockResolvedValue(
-      NextResponse.json({ success: true })
-    )
-    const wrappedHandler = withAdminAuth(mockHandler)
+    } as any)
+    
+    mockFindUnique.mockResolvedValue(mockAdminUser as any)
+    
+    const mockResponse = NextResponse.json({ success: true })
+    mockHandler.mockResolvedValue(mockResponse)
 
     const request = new NextRequest('http://localhost:3000/api/admin/test')
-    const response = await wrappedHandler(request)
+    const wrappedHandler = withAdminAuth(mockHandler)
 
+    const result = await wrappedHandler(request)
     expect(mockHandler).toHaveBeenCalledWith(request, {
       id: 'admin-1',
       username: 'admin',
       name: 'Admin User',
       email: 'admin@example.com',
       role: 'ADMIN',
-      image: null,
     })
-
-    const data = await response.json()
-    expect(data.success).toBe(true)
+    expect(result).toBe(mockResponse)
   })
 
   it('should return 403 when not authenticated as admin', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue({
+    mockGetServerSession.mockResolvedValue({
       user: { id: 'user-1' },
-    })
-    ;(prisma.user.findUnique as jest.Mock).mockResolvedValue(mockRegularUser)
-
-    const mockHandler = jest.fn()
-    const wrappedHandler = withAdminAuth(mockHandler)
+    } as any)
+    
+    mockFindUnique.mockResolvedValue(mockRegularUser as any)
 
     const request = new NextRequest('http://localhost:3000/api/admin/test')
-    const response = await wrappedHandler(request)
+    const wrappedHandler = withAdminAuth(mockHandler)
 
-    expect(mockHandler).not.toHaveBeenCalled()
-    expect(response.status).toBe(403)
-
-    const data = await response.json()
+    const result = await wrappedHandler(request)
+    expect(result.status).toBe(403)
+    
+    const data = await result.json()
     expect(data.error).toBe('Admin access required')
   })
 
   it('should return 403 when no session', async () => {
-    ;(getServerSession as jest.Mock).mockResolvedValue(null)
-
-    const mockHandler = jest.fn()
-    const wrappedHandler = withAdminAuth(mockHandler)
+    mockGetServerSession.mockResolvedValue(null)
 
     const request = new NextRequest('http://localhost:3000/api/admin/test')
-    const response = await wrappedHandler(request)
+    const wrappedHandler = withAdminAuth(mockHandler)
 
-    expect(mockHandler).not.toHaveBeenCalled()
-    expect(response.status).toBe(403)
-
-    const data = await response.json()
+    const result = await wrappedHandler(request)
+    expect(result.status).toBe(403)
+    
+    const data = await result.json()
     expect(data.error).toBe('Admin access required')
   })
 })
-

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { TrendingUp, Users, MessageSquare, Heart } from 'lucide-react'
+import { fmtNumber } from '@/lib/format'
 
 interface QuickStatsProps {
   stats?: {
@@ -24,7 +25,7 @@ export function QuickStats({
   const statItems = [
     {
       label: 'Active Users',
-      value: stats.activeUsers.toLocaleString(),
+      value: fmtNumber(stats.activeUsers),
       icon: Users,
       color: 'text-blue-500',
       bgColor: 'bg-blue-500/10',
@@ -38,7 +39,7 @@ export function QuickStats({
     },
     {
       label: 'Total Likes',
-      value: stats.totalLikes.toLocaleString(),
+      value: fmtNumber(stats.totalLikes),
       icon: Heart,
       color: 'text-red-500',
       bgColor: 'bg-red-500/10',

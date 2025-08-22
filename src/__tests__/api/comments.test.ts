@@ -1,4 +1,4 @@
-﻿import { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { GET, POST } from '@/app/api/posts/[postId]/comments/route'
 import { GET as getComment, PUT, DELETE } from '@/app/api/comments/[commentId]/route'

@@ -12,6 +12,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { formatDate, formatRelativeTime } from '@/lib/utils'
+import { fmtNumber } from '@/lib/format'
 import type { User } from '@/types'
 
 interface ProfileActivityProps {
@@ -114,7 +115,7 @@ export function ProfileActivity({ user, className }: ProfileActivityProps) {
                     </div>
                     <div className="space-y-1">
                       <div className={`text-2xl font-bold ${stat.color}`}>
-                        {stat.value.toLocaleString()}
+                        {fmtNumber(stat.value)}
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {stat.label}

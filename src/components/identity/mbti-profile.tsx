@@ -8,6 +8,7 @@ import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
 import { Lock, Zap, AlertTriangle } from 'lucide-react'
+import { fmtDate } from '@/lib/format'
 
 interface MBTIProfileProps {
   mbti: MBTI
@@ -114,7 +115,7 @@ export function MBTIProfile({ mbti, showDetails = true, className }: MBTIProfile
 
             <div className="text-xs text-muted-foreground">
               <div className="flex items-center justify-between">
-                <span>Assigned on {mbti.assignedAt.toLocaleDateString()}</span>
+                <span>Assigned on {fmtDate(mbti.assignedAt)}</span>
                 {mbti.description && (
                   <span className="italic">"{mbti.description}"</span>
                 )}

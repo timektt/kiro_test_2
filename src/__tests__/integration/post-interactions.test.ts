@@ -43,566 +43,549 @@ const mockGetServerSession = getServerSession as jest.MockedFunction<typeof getS
 
 describe('Post Interactions Integration Tests', () => {
   const mockUser = {
-    id: 'user-123',
+    id: 'user-1',
     username: 'testuser',
     name: 'Test User',
     email: 'test@example.com',
     role: 'USER',
   }
 
-  const mockSession = {
-    user: mockUser,
-    expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
+  const mockPost = {
+    id: 'post-1',
+    title: 'Test Post',
+    content: 'This is a test post',
+    authorId: 'user-1',
+    createdAt: new Date('2023-01-01'),
+    updatedAt: new Date('2023-01-01'),
+    author: mockUser,
+    _count: {
+      likes: 0,
+      comments: 0,
+    },
   }
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetServerSession.mockResolvedValue(mockSession as any)
+    mockGetServerSession.mockResolvedValue({
+      user: mockUser,
+    } as any)
   })
 
-  describe('Post Creation Flow', () => {
-    it('should create a post successfully', async () => {
-      const postData = {
-        content: 'This is a test post content',
-        imageUrl: 'https://example.com/image.jpg',
-      }
-
-      const createdPost = {
-        id: 'post-123',
-        ...postData,
-        authorId: mockUser.id,
-        isPublic: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        author: mockUser,
-        _count: { likes: 0, comments: 0 },
-      }
-
+  describe('Post Creation', () => {
+    it('should create a new post successfully', async () => {
       mockPrisma.post.create.mockResolvedValue(mockPost as any)
 
       const request = new NextRequest('http://localhost:3000/api/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData),
+        body: JSON.stringify({
+          title: 'Test Post',
+          content: 'This is a test post',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       const response = await createPostHandler(request)
-      const responseData = await response.json()
+      const data = await response.json()
 
       expect(response.status).toBe(201)
-      expect(responseData.success).toBe(true)
-      expect(responseData.post).toEqual(expect.objectContaining({
-        id: mockPost.id,
-        content: mockPost.content,
-        imageUrl: mockPost.imageUrl,
-        author: expect.objectContaining({
-          id: mockUser.id,
-          username: mockUser.username,
-        }),
-      }))
-
+      expect(data.post).toEqual(mockPost)
       expect(mockPrisma.post.create).toHaveBeenCalledWith({
         data: {
-          content: postData.content,
-          imageUrl: postData.imageUrl,
-          authorId: mockUser.id,
-        },
-        include: expect.objectContaining({
-          author: expect.any(Object),
-          _count: expect.any(Object),
-        }),
-      })
-    })
-
-    it('should validate post content', async () => {
-      const invalidPostData = {
-        content: '', // Empty content
-      }
-
-      const request = new NextRequest('http://localhost:3000/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(invalidPostData),
-      })
-
-      const response = await createPostHandler(request)
-      const responseData = await response.json()
-
-      expect(response.status).toBe(400)
-      expect(responseData.success).toBe(false)
-      expect(responseData.errors).toBeDefined()
-    })
-
-    it('should require authentication for post creation', async () => {
-      mockGetServerSession.mockResolvedValue(null)
-
-      const postData = {
-        content: 'This should fail without auth',
-      }
-
-      const request = new NextRequest('http://localhost:3000/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData),
-      })
-
-      const response = await createPostHandler(request)
-      const responseData = await response.json()
-
-      expect(response.status).toBe(401)
-      expect(responseData.success).toBe(false)
-      expect(responseData.error).toBe('Unauthorized')
-    })
-  })
-
-  describe('Post Feed Retrieval', () => {
-    it('should retrieve posts with pagination', async () => {
-      const mockPosts = [
-        {
-          id: 'post-1',
-          content: 'First post',
+          title: 'Test Post',
+          content: 'This is a test post',
           authorId: 'user-1',
-          isPublic: true,
-          createdAt: new Date(),
-          author: { id: 'user-1', username: 'user1', name: 'User One' },
-          _count: { likes: 5, comments: 2 },
         },
-        {
-          id: 'post-2',
-          content: 'Second post',
-          authorId: 'user-2',
-          isPublic: true,
-          createdAt: new Date(),
-          author: { id: 'user-2', username: 'user2', name: 'User Two' },
-          _count: { likes: 3, comments: 1 },
-        },
-      ]
-
-      const mockLikes = [{ postId: 'post-1' }] // User liked post-1
-
-      mockPrisma.post.findMany.mockResolvedValue(mockPosts as any)
-      mockPrisma.post.count.mockResolvedValue(10)
-      mockPrisma.like.findMany.mockResolvedValue(mockLikes as any)
-
-      const request = new NextRequest('http://localhost:3000/api/posts?page=1&limit=2')
-
-      const response = await getPostsHandler(request)
-      const responseData = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(responseData.success).toBe(true)
-      expect(responseData.posts).toHaveLength(2)
-      expect(responseData.posts[0].isLiked).toBe(true) // post-1 is liked
-      expect(responseData.posts[1].isLiked).toBe(false) // post-2 is not liked
-      expect(responseData.pagination).toEqual({
-        page: 1,
-        limit: 2,
-        total: 10,
-        hasMore: true,
-      })
-    })
-
-    it('should handle empty feed', async () => {
-      mockPrisma.post.findMany.mockResolvedValue([])
-      mockPrisma.post.count.mockResolvedValue(0)
-      mockPrisma.like.findMany.mockResolvedValue([])
-
-      const request = new NextRequest('http://localhost:3000/api/posts')
-
-      const response = await getPostsHandler(request)
-      const responseData = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(responseData.success).toBe(true)
-      expect(responseData.posts).toEqual([])
-      expect(responseData.pagination.total).toBe(0)
-      expect(responseData.pagination.hasMore).toBe(false)
-    })
-  })
-
-  describe('Like System', () => {
-    it('should like a post successfully', async () => {
-      const postId = 'post-123'
-      const mockPost = {
-        id: postId,
-        content: 'Test post',
-        authorId: 'author-123',
-        author: { id: 'author-123', username: 'author' },
-      }
-
-      const mockLike = {
-        id: 'like-123',
-        postId,
-        userId: mockUser.id,
-        createdAt: new Date(),
-      }
-
-      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
-      mockPrisma.like.findUnique.mockResolvedValue(null) // Not already liked
-      mockPrisma.like.create.mockResolvedValue(mockLike as any)
-      mockPrisma.notification.create.mockResolvedValue({} as any)
-
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/like`, {
-        method: 'POST',
-      })
-
-      const response = await likeHandler(request, { params: { postId } })
-      const responseData = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(responseData.success).toBe(true)
-      expect(responseData.liked).toBe(true)
-
-      expect(mockPrisma.like.create).toHaveBeenCalledWith({
-        data: {
-          postId,
-          userId: mockUser.id,
-        },
-      })
-
-      // Should create notification for post author
-      expect(mockPrisma.notification.create).toHaveBeenCalledWith({
-        data: {
-          type: 'LIKE',
-          message: expect.stringContaining('liked your post'),
-          userId: 'author-123',
-          relatedId: postId,
-        },
-      })
-    })
-
-    it('should unlike a post successfully', async () => {
-      const postId = 'post-123'
-      const mockPost = {
-        id: postId,
-        content: 'Test post',
-        authorId: 'author-123',
-      }
-
-      const mockLike = {
-        id: 'like-123',
-        postId,
-        userId: mockUser.id,
-      }
-
-      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
-      mockPrisma.like.findUnique.mockResolvedValue(mockLike as any)
-      mockPrisma.like.delete.mockResolvedValue(mockLike as any)
-
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/like`, {
-        method: 'DELETE',
-      })
-
-      const response = await unlikeHandler(request, { params: { postId } })
-      const responseData = await response.json()
-
-      expect(response.status).toBe(200)
-      expect(responseData.success).toBe(true)
-      expect(responseData.liked).toBe(false)
-
-      expect(mockPrisma.like.delete).toHaveBeenCalledWith({
-        where: {
-          postId_userId: {
-            postId,
-            userId: mockUser.id,
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
           },
         },
       })
     })
 
-    it('should prevent duplicate likes', async () => {
-      const postId = 'post-123'
-      const mockPost = {
-        id: postId,
-        content: 'Test post',
-        authorId: 'author-123',
-      }
+    it('should return 401 when user is not authenticated', async () => {
+      mockGetServerSession.mockResolvedValue(null)
 
-      const existingLike = {
-        id: 'like-123',
-        postId,
-        userId: mockUser.id,
-      }
-
-      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
-      mockPrisma.like.findUnique.mockResolvedValue(existingLike as any)
-
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/like`, {
+      const request = new NextRequest('http://localhost:3000/api/posts', {
         method: 'POST',
+        body: JSON.stringify({
+          title: 'Test Post',
+          content: 'This is a test post',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
-      const response = await likeHandler(request, { params: { postId } })
-      const responseData = await response.json()
+      const response = await createPostHandler(request)
+      const data = await response.json()
 
-      expect(response.status).toBe(200)
-      expect(responseData.success).toBe(true)
-      expect(responseData.liked).toBe(true)
-      expect(responseData.message).toBe('Post already liked')
-
-      expect(mockPrisma.like.create).not.toHaveBeenCalled()
+      expect(response.status).toBe(401)
+      expect(data.error).toBe('Unauthorized')
+      expect(mockPrisma.post.create).not.toHaveBeenCalled()
     })
 
-    it('should handle non-existent post', async () => {
-      const postId = 'non-existent-post'
-
-      mockPrisma.post.findUnique.mockResolvedValue(null)
-
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/like`, {
+    it('should return 400 for invalid post data', async () => {
+      const request = new NextRequest('http://localhost:3000/api/posts', {
         method: 'POST',
+        body: JSON.stringify({
+          title: '', // Empty title should be invalid
+          content: 'This is a test post',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
-      const response = await likeHandler(request, { params: { postId } })
-      const responseData = await response.json()
+      const response = await createPostHandler(request)
+      const data = await response.json()
 
-      expect(response.status).toBe(404)
-      expect(responseData.success).toBe(false)
-      expect(responseData.error).toBe('Post not found')
+      expect(response.status).toBe(400)
+      expect(data.error).toBe('Validation failed')
+      expect(mockPrisma.post.create).not.toHaveBeenCalled()
     })
   })
 
-  describe('Comment System', () => {
-    it('should create a comment successfully', async () => {
-      const postId = 'post-123'
-      const commentData = {
-        content: 'This is a test comment',
-      }
+  describe('Post Retrieval', () => {
+    it('should fetch posts successfully', async () => {
+      const mockPosts = [mockPost]
+      mockPrisma.post.findMany.mockResolvedValue(mockPosts as any)
 
-      const mockPost = {
-        id: postId,
-        content: 'Test post',
-        authorId: 'author-123',
-        author: { id: 'author-123', username: 'author' },
-      }
+      const request = new NextRequest('http://localhost:3000/api/posts')
+      const response = await getPostsHandler(request)
+      const data = await response.json()
 
-      const mockComment = {
-        id: 'comment-123',
-        content: commentData.content,
-        postId,
-        authorId: mockUser.id,
+      expect(response.status).toBe(200)
+      expect(data.posts).toEqual(mockPosts)
+      expect(mockPrisma.post.findMany).toHaveBeenCalledWith({
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 20,
+        skip: 0,
+      })
+    })
+
+    it('should handle pagination correctly', async () => {
+      const mockPosts = [mockPost]
+      mockPrisma.post.findMany.mockResolvedValue(mockPosts as any)
+
+      const request = new NextRequest('http://localhost:3000/api/posts?page=2&limit=10')
+      const response = await getPostsHandler(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.posts).toEqual(mockPosts)
+      expect(mockPrisma.post.findMany).toHaveBeenCalledWith({
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              likes: true,
+              comments: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 10,
+        skip: 10,
+      })
+    })
+  })
+
+  describe('Post Likes', () => {
+    it('should like a post successfully', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
+      mockPrisma.like.findUnique.mockResolvedValue(null)
+      mockPrisma.like.create.mockResolvedValue({
+        id: 'like-1',
+        userId: 'user-1',
+        postId: 'post-1',
         createdAt: new Date(),
-        updatedAt: new Date(),
-        author: mockUser,
-      }
+      } as any)
+      mockPrisma.notification.create.mockResolvedValue({} as any)
 
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'POST',
+      })
+
+      const response = await likeHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(mockPrisma.like.create).toHaveBeenCalledWith({
+        data: {
+          userId: 'user-1',
+          postId: 'post-1',
+        },
+      })
+      expect(mockPrisma.notification.create).toHaveBeenCalled()
+    })
+
+    it('should not create duplicate likes', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
+      mockPrisma.like.findUnique.mockResolvedValue({
+        id: 'like-1',
+        userId: 'user-1',
+        postId: 'post-1',
+      } as any)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'POST',
+      })
+
+      const response = await likeHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(400)
+      expect(data.error).toBe('Post already liked')
+      expect(mockPrisma.like.create).not.toHaveBeenCalled()
+    })
+
+    it('should unlike a post successfully', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
+      mockPrisma.like.findUnique.mockResolvedValue({
+        id: 'like-1',
+        userId: 'user-1',
+        postId: 'post-1',
+      } as any)
+      mockPrisma.like.delete.mockResolvedValue({} as any)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'DELETE',
+      })
+
+      const response = await unlikeHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(200)
+      expect(data.success).toBe(true)
+      expect(mockPrisma.like.delete).toHaveBeenCalledWith({
+        where: {
+          userId_postId: {
+            userId: 'user-1',
+            postId: 'post-1',
+          },
+        },
+      })
+    })
+
+    it('should return 404 when trying to unlike non-existent like', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
+      mockPrisma.like.findUnique.mockResolvedValue(null)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'DELETE',
+      })
+
+      const response = await unlikeHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(404)
+      expect(data.error).toBe('Like not found')
+      expect(mockPrisma.like.delete).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Post Comments', () => {
+    const mockComment = {
+      id: 'comment-1',
+      content: 'This is a test comment',
+      authorId: 'user-1',
+      postId: 'post-1',
+      createdAt: new Date('2023-01-01'),
+      updatedAt: new Date('2023-01-01'),
+      author: mockUser,
+    }
+
+    it('should create a comment successfully', async () => {
       mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
       mockPrisma.comment.create.mockResolvedValue(mockComment as any)
       mockPrisma.notification.create.mockResolvedValue({} as any)
 
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/comments`, {
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(commentData),
+        body: JSON.stringify({
+          content: 'This is a test comment',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
-      const response = await commentHandler(request, { params: { postId } })
-      const responseData = await response.json()
+      const response = await commentHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
 
       expect(response.status).toBe(201)
-      expect(responseData.success).toBe(true)
-      expect(responseData.comment).toEqual(expect.objectContaining({
-        id: mockComment.id,
-        content: mockComment.content,
-        author: expect.objectContaining({
-          id: mockUser.id,
-          username: mockUser.username,
-        }),
-      }))
-
+      expect(data.comment).toEqual(mockComment)
       expect(mockPrisma.comment.create).toHaveBeenCalledWith({
         data: {
-          content: commentData.content,
-          postId,
-          authorId: mockUser.id,
+          content: 'This is a test comment',
+          authorId: 'user-1',
+          postId: 'post-1',
         },
-        include: expect.objectContaining({
-          author: expect.any(Object),
-        }),
-      })
-
-      // Should create notification for post author
-      expect(mockPrisma.notification.create).toHaveBeenCalledWith({
-        data: {
-          type: 'COMMENT',
-          message: expect.stringContaining('commented on your post'),
-          userId: 'author-123',
-          relatedId: postId,
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              image: true,
+            },
+          },
         },
       })
+      expect(mockPrisma.notification.create).toHaveBeenCalled()
     })
 
-    it('should retrieve comments with pagination', async () => {
-      const postId = 'post-123'
-      const mockComments = [
-        {
-          id: 'comment-1',
-          content: 'First comment',
-          postId,
-          authorId: 'user-1',
-          createdAt: new Date(),
-          author: { id: 'user-1', username: 'user1', name: 'User One' },
-        },
-        {
-          id: 'comment-2',
-          content: 'Second comment',
-          postId,
-          authorId: 'user-2',
-          createdAt: new Date(),
-          author: { id: 'user-2', username: 'user2', name: 'User Two' },
-        },
-      ]
-
+    it('should fetch comments successfully', async () => {
+      const mockComments = [mockComment]
       mockPrisma.comment.findMany.mockResolvedValue(mockComments as any)
-      mockPrisma.comment.count.mockResolvedValue(5)
 
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/comments?page=1&limit=2`)
-
-      const response = await getCommentsHandler(request, { params: { postId } })
-      const responseData = await response.json()
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/comments')
+      const response = await getCommentsHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
 
       expect(response.status).toBe(200)
-      expect(responseData.success).toBe(true)
-      expect(responseData.comments).toHaveLength(2)
-      expect(responseData.pagination).toEqual({
-        page: 1,
-        limit: 2,
-        total: 5,
-        hasMore: true,
+      expect(data.comments).toEqual(mockComments)
+      expect(mockPrisma.comment.findMany).toHaveBeenCalledWith({
+        where: {
+          postId: 'post-1',
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              username: true,
+              name: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: 'asc',
+        },
       })
     })
 
-    it('should validate comment content', async () => {
-      const postId = 'post-123'
-      const invalidCommentData = {
-        content: '', // Empty content
-      }
+    it('should return 400 for empty comment content', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
 
-      const request = new NextRequest(`http://localhost:3000/api/posts/${postId}/comments`, {
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/comments', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(invalidCommentData),
+        body: JSON.stringify({
+          content: '', // Empty content should be invalid
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
-      const response = await commentHandler(request, { params: { postId } })
-      const responseData = await response.json()
+      const response = await commentHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
 
       expect(response.status).toBe(400)
-      expect(responseData.success).toBe(false)
-      expect(responseData.errors).toBeDefined()
-    })
-  })
-
-  describe('Complete Post Interaction Flow', () => {
-    it('should handle complete post lifecycle', async () => {
-      // 1. Create a post
-      const postData = {
-        content: 'Integration test post',
-        imageUrl: 'https://example.com/image.jpg',
-      }
-
-      const mockPost = {
-        id: 'post-integration',
-        ...postData,
-        authorId: mockUser.id,
-        isPublic: true,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        author: mockUser,
-        _count: { likes: 0, comments: 0 },
-      }
-
-      mockPrisma.post.create.mockResolvedValue(mockPost as any)
-
-      const createRequest = new NextRequest('http://localhost:3000/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData),
-      })
-
-      const createResponse = await createPostHandler(createRequest)
-      expect(createResponse.status).toBe(201)
-
-      // 2. Like the post
-      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any)
-      mockPrisma.like.findUnique.mockResolvedValue(null)
-      mockPrisma.like.create.mockResolvedValue({
-        id: 'like-integration',
-        postId: mockPost.id,
-        userId: mockUser.id,
-        createdAt: new Date(),
-      } as any)
-
-      const likeRequest = new NextRequest(`http://localhost:3000/api/posts/${mockPost.id}/like`, {
-        method: 'POST',
-      })
-
-      const likeResponse = await likeHandler(likeRequest, { params: { postId: mockPost.id } })
-      expect(likeResponse.status).toBe(200)
-
-      // 3. Comment on the post
-      const commentData = { content: 'Great post!' }
-      mockPrisma.comment.create.mockResolvedValue({
-        id: 'comment-integration',
-        content: commentData.content,
-        postId: mockPost.id,
-        authorId: mockUser.id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        author: mockUser,
-      } as any)
-
-      const commentRequest = new NextRequest(`http://localhost:3000/api/posts/${mockPost.id}/comments`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(commentData),
-      })
-
-      const commentResponse = await commentHandler(commentRequest, { params: { postId: mockPost.id } })
-      expect(commentResponse.status).toBe(201)
-
-      // 4. Verify all interactions were recorded
-      expect(mockPrisma.post.create).toHaveBeenCalled()
-      expect(mockPrisma.like.create).toHaveBeenCalled()
-      expect(mockPrisma.comment.create).toHaveBeenCalled()
-      expect(mockPrisma.notification.create).toHaveBeenCalledTimes(2) // Like + Comment notifications
+      expect(data.error).toBe('Validation failed')
+      expect(mockPrisma.comment.create).not.toHaveBeenCalled()
     })
   })
 
   describe('Error Handling', () => {
     it('should handle database errors gracefully', async () => {
-      const postData = {
-        content: 'This will cause a database error',
-      }
+      mockPrisma.post.findMany.mockRejectedValue(new Error('Database connection failed'))
 
-      mockPrisma.post.create.mockRejectedValue(new Error('Database connection failed'))
-
-      const request = new NextRequest('http://localhost:3000/api/posts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(postData),
-      })
-
-      const response = await createPostHandler(request)
-      const responseData = await response.json()
+      const request = new NextRequest('http://localhost:3000/api/posts')
+      const response = await getPostsHandler(request)
+      const data = await response.json()
 
       expect(response.status).toBe(500)
-      expect(responseData.success).toBe(false)
-      expect(responseData.error).toBe('Internal server error')
+      expect(data.error).toBe('Internal server error')
     })
 
-    it('should handle malformed JSON requests', async () => {
+    it('should return 404 for non-existent post', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(null)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/non-existent/like', {
+        method: 'POST',
+      })
+
+      const response = await likeHandler(request, { params: { postId: 'non-existent' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(404)
+      expect(data.error).toBe('Post not found')
+    })
+
+    it('should handle malformed JSON gracefully', async () => {
       const request = new NextRequest('http://localhost:3000/api/posts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: 'invalid json',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       const response = await createPostHandler(request)
-      const responseData = await response.json()
+      const data = await response.json()
 
       expect(response.status).toBe(400)
-      expect(responseData.success).toBe(false)
-      expect(responseData.error).toContain('Invalid JSON')
+      expect(data.error).toBe('Invalid JSON')
+    })
+  })
+
+  describe('Authorization', () => {
+    it('should prevent unauthorized users from creating posts', async () => {
+      mockGetServerSession.mockResolvedValue(null)
+
+      const request = new NextRequest('http://localhost:3000/api/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+          title: 'Test Post',
+          content: 'This is a test post',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const response = await createPostHandler(request)
+      const data = await response.json()
+
+      expect(response.status).toBe(401)
+      expect(data.error).toBe('Unauthorized')
+    })
+
+    it('should prevent unauthorized users from liking posts', async () => {
+      mockGetServerSession.mockResolvedValue(null)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'POST',
+      })
+
+      const response = await likeHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(401)
+      expect(data.error).toBe('Unauthorized')
+    })
+
+    it('should prevent unauthorized users from commenting', async () => {
+      mockGetServerSession.mockResolvedValue(null)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/comments', {
+        method: 'POST',
+        body: JSON.stringify({
+          content: 'This is a test comment',
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const response = await commentHandler(request, { params: { postId: 'post-1' } })
+      const data = await response.json()
+
+      expect(response.status).toBe(401)
+      expect(data.error).toBe('Unauthorized')
+    })
+  })
+
+  describe('Notification Creation', () => {
+    it('should create notification when post is liked', async () => {
+      const postByAnotherUser = {
+        ...mockPost,
+        authorId: 'author-2',
+        author: {
+          id: 'author-2',
+          username: 'author',
+          name: 'Post Author',
+          email: 'author@example.com',
+        },
+      }
+
+      mockPrisma.post.findUnique.mockResolvedValue(postByAnotherUser as any)
+      mockPrisma.like.findUnique.mockResolvedValue(null)
+      mockPrisma.like.create.mockResolvedValue({
+        id: 'like-1',
+        userId: 'user-1',
+        postId: 'post-1',
+        createdAt: new Date(),
+      } as any)
+      mockPrisma.notification.create.mockResolvedValue({} as any)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'POST',
+      })
+
+      await likeHandler(request, { params: { postId: 'post-1' } })
+
+      expect(mockPrisma.notification.create).toHaveBeenCalledWith({
+        data: {
+          type: 'LIKE',
+          userId: 'author-2', // Post author should receive notification
+          fromUserId: 'user-1', // User who liked the post
+          postId: 'post-1',
+          message: 'Test User liked your post',
+        },
+      })
+    })
+
+    it('should not create notification when user likes own post', async () => {
+      mockPrisma.post.findUnique.mockResolvedValue(mockPost as any) // Post by same user
+      mockPrisma.like.findUnique.mockResolvedValue(null)
+      mockPrisma.like.create.mockResolvedValue({
+        id: 'like-1',
+        userId: 'user-1',
+        postId: 'post-1',
+        createdAt: new Date(),
+      } as any)
+
+      const request = new NextRequest('http://localhost:3000/api/posts/post-1/like', {
+        method: 'POST',
+      })
+
+      await likeHandler(request, { params: { postId: 'post-1' } })
+
+      expect(mockPrisma.notification.create).not.toHaveBeenCalled()
     })
   })
 })
-

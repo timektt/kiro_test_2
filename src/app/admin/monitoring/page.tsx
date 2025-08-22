@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { RefreshCw, Activity, Database, Server, AlertTriangle } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { redirect } from 'next/navigation'
+import { fmtNumber, fmtDate } from '@/lib/format'
 
 interface SystemMetrics {
   uptime: number
@@ -191,7 +192,7 @@ export default function MonitoringPage() {
 
       {lastUpdated && (
         <p className="text-sm text-muted-foreground">
-          Last updated: {lastUpdated.toLocaleString()}
+          Last updated: {fmtDate(lastUpdated.toISOString())}
         </p>
       )}
 
@@ -236,10 +237,10 @@ export default function MonitoringPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {health?.memory.used || 0} {health?.memory.unit || 'MB'}
+              {fmtNumber(health?.memory.used || 0)} {health?.memory.unit || 'MB'}
             </div>
             <p className="text-xs text-muted-foreground">
-              of {health?.memory.total || 0} {health?.memory.unit || 'MB'}
+              of {fmtNumber(health?.memory.total || 0)} {health?.memory.unit || 'MB'}
             </p>
           </CardContent>
         </Card>
@@ -251,10 +252,10 @@ export default function MonitoringPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {metrics?.summary.avgResponseTime || 0}ms
+              {fmtNumber(metrics?.summary.avgResponseTime || 0)}ms
             </div>
             <p className="text-xs text-muted-foreground">
-              {metrics?.summary.totalRequests || 0} requests tracked
+              {fmtNumber(metrics?.summary.totalRequests || 0)} requests tracked
             </p>
           </CardContent>
         </Card>
@@ -284,28 +285,28 @@ export default function MonitoringPage() {
                       <div key={endpoint} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium">{endpoint.replace('api_', '').replace(/_/g, ' ')}</h4>
-                          <Badge variant="outline">{stats.count} requests</Badge>
+                          <Badge variant="outline">{fmtNumber(stats.count)} requests</Badge>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-sm">
                           <div>
                             <p className="text-muted-foreground">Avg</p>
-                            <p className="font-medium">{stats.avg}ms</p>
+                            <p className="font-medium">{fmtNumber(stats.avg)}ms</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">P50</p>
-                            <p className="font-medium">{stats.p50}ms</p>
+                            <p className="font-medium">{fmtNumber(stats.p50)}ms</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">P95</p>
-                            <p className="font-medium">{stats.p95}ms</p>
+                            <p className="font-medium">{fmtNumber(stats.p95)}ms</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Min</p>
-                            <p className="font-medium">{stats.min}ms</p>
+                            <p className="font-medium">{fmtNumber(stats.min)}ms</p>
                           </div>
                           <div>
                             <p className="text-muted-foreground">Max</p>
-                            <p className="font-medium">{stats.max}ms</p>
+                            <p className="font-medium">{fmtNumber(stats.max)}ms</p>
                           </div>
                         </div>
                       </div>
@@ -351,19 +352,19 @@ export default function MonitoringPage() {
               <CardContent className="space-y-2">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Heap Used:</span>
-                  <span>{metrics?.system.memory.used} MB</span>
+                  <span>{fmtNumber(metrics?.system.memory.used)} MB</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Heap Total:</span>
-                  <span>{metrics?.system.memory.total} MB</span>
+                  <span>{fmtNumber(metrics?.system.memory.total)} MB</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">External:</span>
-                  <span>{metrics?.system.memory.external} MB</span>
+                  <span>{fmtNumber(metrics?.system.memory.external)} MB</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">RSS:</span>
-                  <span>{metrics?.system.memory.rss} MB</span>
+                  <span>{fmtNumber(metrics?.system.memory.rss)} MB</span>
                 </div>
               </CardContent>
             </Card>

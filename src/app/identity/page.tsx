@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Edit, Lock, Unlock } from 'lucide-react'
 import Link from 'next/link'
+import { fmtNumber, fmtDate } from '@/lib/format'
 
 export default function IdentityPage() {
   const { data: session } = useSession()
@@ -215,11 +216,7 @@ export default function IdentityPage() {
                 <div>
                   <h4 className="font-medium">Assigned Date</h4>
                   <p className="text-sm text-muted-foreground">
-                    {mbti.assignedAt.toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
+                    {fmtDate(mbti.assignedAt)}
                   </p>
                 </div>
               </CardContent>

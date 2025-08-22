@@ -222,7 +222,7 @@ class EmailService {
           
           <div class="footer">
             <p>This email was sent automatically. Please do not reply.</p>
-            <p>© 2024 Community Platform. All rights reserved.</p>
+            <p>&copy; 2024 Community Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -255,7 +255,7 @@ View more details: ${actionUrl}
 
 ---
 This email was sent automatically. Please do not reply.
-© 2024 Community Platform
+(c) 2024 Community Platform
     `
   }
 
@@ -324,7 +324,7 @@ This email was sent automatically. Please do not reply.
           
           <div class="footer">
             <p>Thank you for joining our community!</p>
-            <p>© 2024 Community Platform. All rights reserved.</p>
+            <p>&copy; 2024 Community Platform. All rights reserved.</p>
           </div>
         </div>
       </body>
@@ -362,7 +362,7 @@ ${verificationUrl ? (() => {
 If you have any questions or need help, you can contact our support team anytime
 
 Thank you for joining our community!
-© 2024 Community Platform
+(c) 2024 Community Platform
     `
   }
 }

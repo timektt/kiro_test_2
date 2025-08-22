@@ -24,66 +24,83 @@ interface SearchAutocompleteProps {
   value: string
   onChange: (value: string) => void
   onSelect?: (suggestion: SearchSuggestion) => void
+  onSubmit?: (query: string) => void
   placeholder?: string
   className?: string
+  disabled?: boolean
+  showHistory?: boolean
+  maxSuggestions?: number
 }
 
 export function SearchAutocomplete({
   value,
   onChange,
   onSelect,
+  onSubmit,
   placeholder = 'Search users, posts, or tags...',
-  className
+  className,
+  disabled = false,
+  showHistory = true,
+  maxSuggestions = 8,
 }: SearchAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState(-1)
-  const [recentSearches, setRecentSearches] = useState<string[]>([])
+  const [searchHistory, setSearchHistory] = useState<SearchSuggestion[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   
   const inputRef = useRef<HTMLInputElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const debouncedValue = useDebounce(value, 300)
 
-  // Load recent searches from localStorage
+  // Load search history from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem('search-history')
-    if (saved) {
+    if (showHistory) {
       try {
-        setRecentSearches(JSON.parse(saved))
+        const saved = localStorage.getItem('search-history')
+        if (saved) {
+          setSearchHistory(JSON.parse(saved).slice(0, 5))
+        }
       } catch (error) {
         console.error('Error loading search history:', error)
       }
     }
-  }, [])
+  }, [showHistory])
 
-  // Save search to history
-  const saveToHistory = useCallback((query: string) => {
-    if (!query.trim()) return
+  // Save to search history
+  const saveToHistory = useCallback((suggestion: SearchSuggestion) => {
+    if (!showHistory) return
     
-    const updated = [query, ...recentSearches.filter(s => s !== query)].slice(0, 10)
-    setRecentSearches(updated)
-    localStorage.setItem('search-history', JSON.stringify(updated))
-  }, [recentSearches])
+    try {
+      const updated = [suggestion, ...searchHistory.filter(item => item.id !== suggestion.id)].slice(0, 5)
+      setSearchHistory(updated)
+      localStorage.setItem('search-history', JSON.stringify(updated))
+    } catch (error) {
+      console.error('Error saving search history:', error)
+    }
+  }, [searchHistory, showHistory])
 
-  // Fetch suggestions
+  // Get initial suggestions (recent searches)
+  const getInitialSuggestions = useCallback(() => {
+    if (!showHistory || searchHistory.length === 0) return []
+    
+    return searchHistory.map(item => ({
+      ...item,
+      type: 'recent' as const,
+      subtitle: 'Recent search'
+    }))
+  }, [searchHistory, showHistory])
+
+  // Fetch suggestions from API
   const fetchSuggestions = useCallback(async (query: string) => {
     if (!query.trim()) {
-      // Show recent searches and trending when no query
-      const recentSuggestions: SearchSuggestion[] = recentSearches.map((search, index) => ({
-        id: `recent-${index}`,
-        type: 'recent',
-        title: search,
-        subtitle: 'Recent search'
-      }))
-      
-      setSuggestions(recentSuggestions)
+      setSuggestions(getInitialSuggestions())
       return
     }
 
     setIsLoading(true)
     try {
-      const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}&limit=8`)
+      const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}&limit=${maxSuggestions}`)
       if (!response.ok) throw new Error('Failed to fetch suggestions')
       
       const data = await response.json()
@@ -94,7 +111,7 @@ export function SearchAutocomplete({
     } finally {
       setIsLoading(false)
     }
-  }, [recentSearches])
+  }, [maxSuggestions, getInitialSuggestions])
 
   // Handle debounced search
   useEffect(() => {
@@ -104,7 +121,7 @@ export function SearchAutocomplete({
   }, [debouncedValue, isOpen, fetchSuggestions])
 
   // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!isOpen) return
 
     switch (e.key) {
@@ -123,31 +140,39 @@ export function SearchAutocomplete({
         if (selectedIndex >= 0 && suggestions[selectedIndex]) {
           handleSelect(suggestions[selectedIndex])
         } else if (value.trim()) {
-          saveToHistory(value)
-          setIsOpen(false)
+          handleSubmit()
         }
         break
       case 'Escape':
         setIsOpen(false)
         setSelectedIndex(-1)
+        inputRef.current?.blur()
         break
     }
-  }
+  }, [isOpen, suggestions, selectedIndex, value])
 
   // Handle suggestion selection
-  const handleSelect = (suggestion: SearchSuggestion) => {
+  const handleSelect = useCallback((suggestion: SearchSuggestion) => {
     onChange(suggestion.title)
-    saveToHistory(suggestion.title)
+    saveToHistory(suggestion)
     setIsOpen(false)
     setSelectedIndex(-1)
     onSelect?.(suggestion)
-  }
+  }, [onChange, saveToHistory, onSelect])
 
-  // Handle input focus
-  const handleFocus = () => {
-    setIsOpen(true)
-    fetchSuggestions(value)
-  }
+  // Handle form submission
+  const handleSubmit = useCallback(() => {
+    if (value.trim()) {
+      const suggestion: SearchSuggestion = {
+        id: Date.now().toString(),
+        type: 'recent',
+        title: value.trim()
+      }
+      saveToHistory(suggestion)
+      setIsOpen(false)
+      onSubmit?.(value.trim())
+    }
+  }, [value, saveToHistory, onSubmit])
 
   // Handle click outside
   useEffect(() => {
@@ -162,16 +187,16 @@ export function SearchAutocomplete({
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
-  // Clear recent searches
-  const clearRecentSearches = () => {
-    setRecentSearches([])
+  // Clear search history
+  const clearHistory = useCallback(() => {
+    setSearchHistory([])
     localStorage.removeItem('search-history')
-    fetchSuggestions(value)
-  }
+    setSuggestions([])
+  }, [])
 
-  // Get suggestion icon
-  const getSuggestionIcon = (suggestion: SearchSuggestion) => {
-    switch (suggestion.type) {
+  // Get icon for suggestion type
+  const getSuggestionIcon = (type: SearchSuggestion['type']) => {
+    switch (type) {
       case 'user':
         return <User className="h-4 w-4" />
       case 'post':
@@ -186,86 +211,77 @@ export function SearchAutocomplete({
   }
 
   return (
-    <div ref={containerRef} className={cn('relative', className)}>
+    <div ref={containerRef} className={cn('relative w-full', className)}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           ref={inputRef}
+          type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          onFocus={handleFocus}
           onKeyDown={handleKeyDown}
+          onFocus={() => {
+            setIsOpen(true)
+            if (!value.trim()) {
+              setSuggestions(getInitialSuggestions())
+            }
+          }}
           placeholder={placeholder}
           className="pl-10 pr-10"
+          disabled={disabled}
         />
         {value && (
           <Button
+            type="button"
             variant="ghost"
             size="sm"
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+            className="absolute right-1 top-1/2 h-7 w-7 -translate-y-1/2 p-0"
             onClick={() => {
               onChange('')
               inputRef.current?.focus()
             }}
           >
-            <X className="h-3 w-3" />
+            <X className="h-4 w-4" />
           </Button>
         )}
       </div>
 
-      {isOpen && (
-        <Card className="absolute top-full left-0 right-0 z-50 mt-1 max-h-96 overflow-y-auto">
+      {isOpen && (suggestions.length > 0 || isLoading) && (
+        <Card className="absolute top-full z-50 mt-1 w-full shadow-lg">
           <CardContent className="p-0">
             {isLoading ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                Searching...
+              <div className="flex items-center justify-center py-4">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                <span className="ml-2 text-sm text-muted-foreground">Searching...</span>
               </div>
-            ) : suggestions.length > 0 ? (
+            ) : (
               <>
-                {/* Recent searches header */}
-                {suggestions.some(s => s.type === 'recent') && (
-                  <div className="flex items-center justify-between p-3 border-b">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      Recent Searches
-                    </span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearRecentSearches}
-                      className="h-6 text-xs"
-                    >
-                      Clear all
-                    </Button>
-                  </div>
-                )}
-                
-                {/* Suggestions list */}
-                <div className="py-1">
+                <div className="max-h-80 overflow-y-auto">
                   {suggestions.map((suggestion, index) => (
-                    <button
+                    <div
                       key={suggestion.id}
                       className={cn(
-                        'w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-accent transition-colors',
-                        selectedIndex === index && 'bg-accent'
+                        'flex cursor-pointer items-center gap-3 px-4 py-3 hover:bg-muted',
+                        selectedIndex === index && 'bg-muted'
                       )}
                       onClick={() => handleSelect(suggestion)}
                     >
-                      {suggestion.image ? (
+                      <div className="flex-shrink-0 text-muted-foreground">
+                        {getSuggestionIcon(suggestion.type)}
+                      </div>
+                      
+                      {suggestion.image && (
                         <Avatar className="h-6 w-6">
                           <AvatarImage src={suggestion.image} />
                           <AvatarFallback className="text-xs">
-                            {suggestion.title[0]?.toUpperCase()}
+                            {suggestion.title.charAt(0).toUpperCase()}
                           </AvatarFallback>
                         </Avatar>
-                      ) : (
-                        <div className="flex h-6 w-6 items-center justify-center text-muted-foreground">
-                          {getSuggestionIcon(suggestion)}
-                        </div>
                       )}
                       
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium truncate">
+                          <span className="truncate text-sm font-medium">
                             {suggestion.title}
                           </span>
                           {suggestion.mbti && (
@@ -273,30 +289,36 @@ export function SearchAutocomplete({
                               {suggestion.mbti}
                             </Badge>
                           )}
-                          {suggestion.category && (
-                            <Badge variant="outline" className="text-xs">
-                              {suggestion.category}
-                            </Badge>
-                          )}
                         </div>
                         {suggestion.subtitle && (
-                          <p className="text-xs text-muted-foreground truncate">
+                          <p className="truncate text-xs text-muted-foreground">
                             {suggestion.subtitle}
                           </p>
                         )}
                       </div>
-                    </button>
+                      
+                      {suggestion.category && (
+                        <Badge variant="outline" className="text-xs">
+                          {suggestion.category}
+                        </Badge>
+                      )}
+                    </div>
                   ))}
                 </div>
+                
+                {showHistory && searchHistory.length > 0 && suggestions.some(s => s.type === 'recent') && (
+                  <div className="border-t px-4 py-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearHistory}
+                      className="h-auto p-1 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      Clear history
+                    </Button>
+                  </div>
+                )}
               </>
-            ) : value.trim() ? (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                No results found for "{value}"
-              </div>
-            ) : (
-              <div className="p-4 text-center text-sm text-muted-foreground">
-                Start typing to search
-              </div>
             )}
           </CardContent>
         </Card>

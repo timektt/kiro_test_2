@@ -46,6 +46,7 @@ import {
 import { EmptyState } from '@/components/ui/empty-state'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { cn } from '@/lib/utils'
+import { fmtNumber, fmtDate } from '@/lib/format'
 import { useUIStore } from '@/stores/ui-store'
 
 interface Post {
@@ -206,7 +207,7 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
   }
 
   const formatDate = (date: Date) => {
-    return new Date(date).toLocaleString()
+    return fmtDate(date)
   }
 
   const truncateText = (text: string, maxLength: number = 100) => {
@@ -332,7 +333,7 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
                           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs text-muted-foreground">
                             <span>{post._count.likes} likes</span>
                             <span>{post._count.comments} comments</span>
-                            <span className="hidden sm:inline">{formatDate(post.createdAt)}</span>
+                            <span className="hidden sm:inline">{fmtDate(post.createdAt)}</span>
                           </div>
                         </div>
                       </div>
@@ -435,8 +436,8 @@ export function ContentModeration({ adminUser }: ContentModerationProps) {
                             On post: "{truncateText(comment.post.content, 40)}&quot;
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            <span className="hidden sm:inline">{formatDate(comment.createdAt)}</span>
-                            <span className="sm:hidden">{new Date(comment.createdAt).toLocaleDateString()}</span>
+                            <span className="hidden sm:inline">{fmtDate(comment.createdAt)}</span>
+                            <span className="sm:hidden">{fmtDate(comment.createdAt, { dateOnly: true })}</span>
                           </div>
                         </div>
                       </div>

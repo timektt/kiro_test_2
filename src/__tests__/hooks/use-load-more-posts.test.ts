@@ -1,4 +1,4 @@
-﻿import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { act } from 'react'
 import { useLoadMorePosts } from '@/hooks/use-load-more-posts'
 

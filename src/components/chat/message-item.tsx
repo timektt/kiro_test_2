@@ -14,6 +14,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { th } from 'date-fns/locale'
 import { MoreHorizontal, Reply, Copy, Trash2, Check, CheckCheck, Paperclip } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { fmtTime } from '@/lib/format'
 
 interface ChatMessage {
   id: string
@@ -84,11 +85,7 @@ export function MessageItem({
 
   const formatTime = (dateString: string) => {
     try {
-      const date = new Date(dateString)
-      return date.toLocaleTimeString('th-TH', {
-        hour: '2-digit',
-        minute: '2-digit'
-      })
+      return fmtTime(dateString)
     } catch {
       return ''
     }

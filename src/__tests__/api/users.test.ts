@@ -1,4 +1,4 @@
-﻿import { createMocks } from 'node-mocks-http'
+import { createMocks } from 'node-mocks-http'
 import { GET, PUT } from '@/app/api/users/[userId]/route'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'

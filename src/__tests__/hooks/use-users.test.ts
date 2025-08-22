@@ -1,4 +1,4 @@
-﻿import { renderHook, waitFor } from '@testing-library/react'
+import { renderHook, waitFor } from '@testing-library/react'
 import { useCurrentUser, useUser, useUpdateProfile, useFollowUser } from '@/hooks/use-users'
 import { useUserStore } from '@/stores/user-store'
 import { useUIStore } from '@/stores/ui-store'

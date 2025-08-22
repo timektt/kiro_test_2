@@ -109,13 +109,14 @@ export async function GET(request: NextRequest) {
       take: limit,
     })
     
-    // Calculate summary statistics
+    // Calculate summary statistics with data guards
+    const safeAnalytics = analytics || []
     const summary = {
-      totalEvents: analytics.length,
-      uniqueUsers: new Set(analytics.filter(a => a.userId).map(a => a.userId)).size,
-      uniqueSessions: new Set(analytics.filter(a => a.sessionId).map(a => a.sessionId)).size,
-      demoStarts: analytics.filter(a => a.event === 'demo_started').length,
-      demoCompletions: analytics.filter(a => a.event === 'demo_completed').length,
+      totalEvents: safeAnalytics.length || 0,
+      uniqueUsers: new Set(safeAnalytics.filter(a => a?.userId).map(a => a.userId)).size || 0,
+      uniqueSessions: new Set(safeAnalytics.filter(a => a?.sessionId).map(a => a.sessionId)).size || 0,
+      demoStarts: safeAnalytics.filter(a => a?.event === 'demo_started').length || 0,
+      demoCompletions: safeAnalytics.filter(a => a?.event === 'demo_completed').length || 0,
       completionRate: 0,
       averageDuration: 0,
       stepViews: {} as Record<number, number>,
@@ -123,38 +124,39 @@ export async function GET(request: NextRequest) {
       popularInteractions: {} as Record<string, number>,
     }
     
-    // Calculate completion rate
+    // Calculate completion rate with data guards
     if (summary.demoStarts > 0) {
-      summary.completionRate = (summary.demoCompletions / summary.demoStarts) * 100
+      summary.completionRate = Math.round((summary.demoCompletions / summary.demoStarts) * 100) || 0
     }
     
-    // Calculate average duration
-    const completedEvents = analytics.filter(a => a.event === 'demo_completed' && a.duration)
+    // Calculate average duration with data guards
+    const completedEvents = safeAnalytics.filter(a => a?.event === 'demo_completed' && typeof a?.duration === 'number')
     if (completedEvents.length > 0) {
-      summary.averageDuration = completedEvents.reduce((sum, e) => sum + (e.duration || 0), 0) / completedEvents.length
+      const totalDuration = completedEvents.reduce((sum, e) => sum + (e.duration || 0), 0)
+      summary.averageDuration = Math.round(totalDuration / completedEvents.length) || 0
     }
     
-    // Count step views
-    analytics.filter(a => a.event === 'demo_step_viewed' && a.step !== null).forEach(a => {
+    // Count step views with data guards
+    safeAnalytics.filter(a => a?.event === 'demo_step_viewed' && typeof a?.step === 'number').forEach(a => {
       const step = a.step!
       summary.stepViews[step] = (summary.stepViews[step] || 0) + 1
     })
     
-    // Count drop-off points
-    analytics.filter(a => a.event === 'demo_exited' && !a.completed && a.step !== null).forEach(a => {
+    // Count drop-off points with data guards
+    safeAnalytics.filter(a => a?.event === 'demo_exited' && !a?.completed && typeof a?.step === 'number').forEach(a => {
       const step = a.step!
       summary.dropOffPoints[step] = (summary.dropOffPoints[step] || 0) + 1
     })
     
-    // Count popular interactions
-    analytics.filter(a => a.event === 'demo_interaction' && a.stepTitle).forEach(a => {
+    // Count popular interactions with data guards
+    safeAnalytics.filter(a => a?.event === 'demo_interaction' && a?.stepTitle).forEach(a => {
       const interaction = a.stepTitle!
       summary.popularInteractions[interaction] = (summary.popularInteractions[interaction] || 0) + 1
     })
     
     return NextResponse.json({
       summary,
-      events: analytics,
+      events: safeAnalytics,
     })
     
   } catch (error) {

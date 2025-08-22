@@ -1,8 +1,8 @@
 'use client'
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import { createContext, useContext, useState, useCallback, type ReactNode } from 'react'
 
-interface PostComposerState {
+export type PostComposerState = {
   isVisible: boolean
   content: string
   selectedImage: File | null
@@ -10,7 +10,7 @@ interface PostComposerState {
   isSubmitting: boolean
 }
 
-interface PostComposerContextType {
+export type PostComposerContextType = {
   state: PostComposerState
   showComposer: () => void
   hideComposer: () => void
@@ -23,7 +23,7 @@ interface PostComposerContextType {
   focusComposer: () => void
 }
 
-const PostComposerContext = createContext<PostComposerContextType | undefined>(undefined)
+export const PostComposerContext = createContext<PostComposerContextType | undefined>(undefined)
 
 const initialState: PostComposerState = {
   isVisible: false,
@@ -33,7 +33,7 @@ const initialState: PostComposerState = {
   isSubmitting: false
 }
 
-export function PostComposerProvider({ children }: { children: ReactNode }) {
+export function PostComposerContextProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<PostComposerState>(initialState)
 
   const showComposer = useCallback(() => {
@@ -49,18 +49,23 @@ export function PostComposerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const setSelectedImage = useCallback((file: File | null) => {
-    setState(prev => {
-      // Clean up previous preview URL
-      if (prev.imagePreview) {
-        URL.revokeObjectURL(prev.imagePreview)
+    if (file) {
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setState(prev => ({
+          ...prev,
+          selectedImage: file,
+          imagePreview: e.target?.result as string
+        }))
       }
-      
-      return {
+      reader.readAsDataURL(file)
+    } else {
+      setState(prev => ({
         ...prev,
-        selectedImage: file,
-        imagePreview: file ? URL.createObjectURL(file) : null
-      }
-    })
+        selectedImage: null,
+        imagePreview: null
+      }))
+    }
   }, [])
 
   const addEmoji = useCallback((emoji: string) => {
@@ -71,25 +76,15 @@ export function PostComposerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const clearImage = useCallback(() => {
-    setState(prev => {
-      if (prev.imagePreview) {
-        URL.revokeObjectURL(prev.imagePreview)
-      }
-      return {
-        ...prev,
-        selectedImage: null,
-        imagePreview: null
-      }
-    })
+    setState(prev => ({
+      ...prev,
+      selectedImage: null,
+      imagePreview: null
+    }))
   }, [])
 
   const resetComposer = useCallback(() => {
-    setState(prev => {
-      if (prev.imagePreview) {
-        URL.revokeObjectURL(prev.imagePreview)
-      }
-      return initialState
-    })
+    setState(initialState)
   }, [])
 
   const setSubmitting = useCallback((submitting: boolean) => {
@@ -134,4 +129,4 @@ export function usePostComposer() {
   return context
 }
 
-export default PostComposerContext
+// Removed default export to prevent import misuse

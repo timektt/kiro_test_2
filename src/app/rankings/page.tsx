@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { TrendingUp, Users, Trophy, Activity, Heart, FileText, MessageCircle, UserCheck, Star, Crown, BarChart } from 'lucide-react'
+import { fmtNumber } from '@/lib/format'
 
 // Dynamic import for ranking board
 const RankingBoard = dynamic(
@@ -32,7 +33,7 @@ const StatsOverview = memo(({ stats }: { stats: any }) => (
             <Users className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <div className="text-2xl font-bold">{stats.totalUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{fmtNumber(stats.totalUsers)}</div>
             <div className="text-sm text-muted-foreground">Total Users</div>
           </div>
         </div>
@@ -46,7 +47,7 @@ const StatsOverview = memo(({ stats }: { stats: any }) => (
             <Activity className="w-5 h-5 text-green-600" />
           </div>
           <div>
-            <div className="text-2xl font-bold">{stats.activeUsers.toLocaleString()}</div>
+            <div className="text-2xl font-bold">{fmtNumber(stats.activeUsers)}</div>
             <div className="text-sm text-muted-foreground">Active Users</div>
           </div>
         </div>
@@ -157,7 +158,7 @@ export default function RankingsPage() {
                       <div className="flex justify-between text-sm">
                         <span>Top Score</span>
                         <Badge variant="secondary">
-                          {categoryStats.topScore.toLocaleString()}
+                          {fmtNumber(categoryStats.topScore)}
                         </Badge>
                       </div>
                     </CardContent>
@@ -194,7 +195,7 @@ export default function RankingsPage() {
                           </div>
                           <div className="text-right">
                             <div className="font-semibold">
-                              {performer.totalScore.toLocaleString()}
+                              {fmtNumber(performer.totalScore)}
                             </div>
                             <div className="text-xs text-muted-foreground">
                               {performer.categories} categories
@@ -233,7 +234,7 @@ export default function RankingsPage() {
                               {update.topUser.name || update.topUser.username}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {update.topUser.score.toLocaleString()} pts
+                              {fmtNumber(update.topUser.score)} pts
                             </div>
                           </div>
                         </div>

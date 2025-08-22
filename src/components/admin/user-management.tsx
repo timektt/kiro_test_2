@@ -46,6 +46,7 @@ import { EmptyState } from '@/components/ui/empty-state'
 import { LoadingFeed } from '@/components/ui/loading-feed'
 import { cn } from '@/lib/utils'
 import { useUIStore } from '@/stores/ui-store'
+import { fmtDate } from '@/lib/format'
 
 
 interface User {
@@ -362,7 +363,7 @@ export function UserManagement({ adminUser }: UserManagementProps) {
                         <span>{user._count.posts} posts</span>
                         <span>{user._count.followers} followers</span>
                         <span className="hidden sm:inline">{user._count.following} following</span>
-                        <span className="hidden sm:inline">Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+                        <span className="hidden sm:inline">Joined {fmtDate(user.createdAt)}</span>
                       </div>
                     </div>
                   </div>

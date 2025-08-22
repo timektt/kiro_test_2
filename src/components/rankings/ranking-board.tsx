@@ -12,6 +12,7 @@ import { UserBadge } from '@/components/ui/user-badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Trophy, Medal, Award, TrendingUp, BarChart } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { fmtNumber, fmtDate } from '@/lib/format'
 
 interface RankingBoardProps {
   rankings: Record<string, Record<string, Ranking[]>>
@@ -179,7 +180,7 @@ function TopRankingCard({ ranking }: { ranking: Ranking }) {
           
           <div className="text-right">
             <div className="text-2xl font-bold">
-              {ranking.score.toLocaleString()}
+              {fmtNumber(ranking.score)}
             </div>
             <div className="text-xs text-muted-foreground">
               points
@@ -228,7 +229,7 @@ function RankingRow({ ranking }: { ranking: Ranking }) {
       
       <div className="text-right">
         <div className="font-semibold">
-          {ranking.score.toLocaleString()}
+          {fmtNumber(ranking.score)}
         </div>
         <div className="text-xs text-muted-foreground">
           pts

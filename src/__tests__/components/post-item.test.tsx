@@ -1,4 +1,4 @@
-﻿import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { PostItem } from '@/components/ui/post-item'
 
 const mockPost = {

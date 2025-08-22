@@ -54,130 +54,135 @@ interface CTASectionProps {
 
 export function CTASection({ session }: CTASectionProps) {
   return (
-    <section className="py-20 lg:py-32 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
+    <section className="py-24 bg-gradient-to-br from-primary/5 via-background to-secondary/5">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Main CTA */}
-          <div className="text-center space-y-8 mb-16">
-            <Badge variant="secondary" className="mb-4 px-4 py-2">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Header */}
+          <div className="mb-12">
+            <Badge variant="outline" className="mb-4 px-3 py-1">
               <Sparkles className="w-4 h-4 mr-2" />
-              Ready to get started?
+              Join the Community
             </Badge>
-            
-            <h2 className="text-3xl md:text-5xl font-bold">
-              Your personality tribe
-              <span className="block text-primary">is waiting for you</span>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Ready to Find Your
+              <span className="text-primary block mt-2">Perfect Match?</span>
             </h2>
-            
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of people who have already discovered meaningful connections 
-              through personality-based matching. It&apos;s free to start!
+              Connect with like-minded individuals, discover your personality type, and build meaningful relationships in our thriving community.
             </p>
+          </div>
 
-            {/* Quick Stats */}
-            <div className="flex items-center justify-center gap-8 py-8">
-              {quickStats.map((stat, index) => {
-                const Icon = stat.icon
-                return (
-                  <div key={index} className="text-center">
-                    <div className="flex items-center justify-center gap-2 mb-1">
-                      <Icon className="h-5 w-5 text-primary" />
-                      <span className="text-2xl font-bold text-primary">
-                        {stat.value}
-                      </span>
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-8 mb-12">
+            {quickStats.map((stat, index) => {
+              const IconComponent = stat.icon
+              return (
+                <div key={index} className="text-center">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-primary/10 rounded-full mb-3">
+                    <IconComponent className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">
+                      {stat.value}
                     </div>
                     <span className="text-sm text-muted-foreground">
                       {stat.label}
                     </span>
                   </div>
-                )
-              })}
-            </div>
-
-            {/* Primary CTA */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              {session ? (
-                // Authenticated user - show feed and profile buttons
-                <>
-                  <ServerButton asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                    <Link href="/feed">
-                      Go to Feed
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </ServerButton>
-                  
-                  <ServerButton variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                    <Link href={`/profile/${session?.user?.username || session?.user?.id || 'profile'}`}>
-                      View Profile
-                    </Link>
-                  </ServerButton>
-                </>
-              ) : (
-                // Unauthenticated user - show signup/signin buttons
-                <>
-                  <ServerButton asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                    <Link href="/auth/signup">
-                      Join the Community
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Link>
-                  </ServerButton>
-                  
-                  <ServerButton variant="outline" asChild size="lg" className="text-lg px-8 py-6 rounded-full">
-                    <Link href="/auth/signin">
-                      Sign In
-                    </Link>
-                  </ServerButton>
-                </>
-              )}
-            </div>
+                </div>
+              )
+            })}
           </div>
 
-          {/* Auth Options - only show for unauthenticated users */}
-          {!session && (
-            <Card className="bg-background/50 backdrop-blur-sm border-2">
-              <CardContent className="p-8">
-                <div className="text-center mb-8">
-                  <h3 className="text-2xl font-bold mb-2">Multiple Ways to Join</h3>
-                  <p className="text-muted-foreground">
-                    Choose your preferred sign-up method and get started in seconds
-                  </p>
-                </div>
+          {/* Primary CTA */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {session ? (
+              <Link
+                href="/feed"
+                className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              >
+                Go to Feed
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/auth/signup"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  Get Started Free
+                  <ArrowRight className="ml-2 w-5 h-5" />
+                </Link>
+                <Link
+                  href="/auth/signin"
+                  className="inline-flex items-center justify-center px-8 py-4 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-lg font-semibold transition-colors"
+                >
+                  Sign In
+                </Link>
+              </>
+            )}
+          </div>
 
-              <div className="grid md:grid-cols-3 gap-6">
+          {/* Auth Options */}
+          {!session && (
+            <div className="mt-12">
+              <p className="text-sm text-muted-foreground mb-6">Choose your preferred sign-up method</p>
+              <div className="grid md:grid-cols-3 gap-4 max-w-2xl mx-auto">
                 {authOptions.map((option, index) => {
-                  const Icon = option.icon
+                  const IconComponent = option.icon
                   return (
-                    <div key={index} className="text-center p-6 rounded-lg border bg-background/50 hover:bg-background/80 transition-colors">
-                      <div className={`inline-flex p-4 rounded-full ${option.bgColor} mb-4`}>
-                        <Icon className={`h-6 w-6 ${option.color}`} />
-                      </div>
-                      <h4 className="font-semibold mb-2">{option.provider}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {option.description}
-                      </p>
-                    </div>
+                    <Card key={index} className="group hover:shadow-md transition-all duration-200 cursor-pointer">
+                      <CardContent className="p-6 text-center">
+                        <div className={`inline-flex items-center justify-center w-12 h-12 ${option.bgColor} rounded-full mb-4`}>
+                          <IconComponent className={`w-6 h-6 ${option.color}`} />
+                        </div>
+                        <h3 className="font-semibold mb-2">{option.provider}</h3>
+                        <p className="text-sm text-muted-foreground">{option.description}</p>
+                      </CardContent>
+                    </Card>
                   )
                 })}
               </div>
-
-              <div className="text-center mt-8 pt-8 border-t">
-                <p className="text-sm text-muted-foreground">
-                  By signing up, you agree to our{' '}
-                  <Link href="/terms" className="text-primary hover:underline">
-                    Terms of Service
-                  </Link>{' '}
-                  and{' '}
-                  <Link href="/privacy" className="text-primary hover:underline">
-                    Privacy Policy
-                  </Link>
-                </p>
-              </div>
-              </CardContent>
-            </Card>
+            </div>
           )}
 
-          {/* Security & Trust */}
-          <div className="text-center mt-12 space-y-4">
+          {/* Features Highlight */}
+          <div className="mt-16 p-8 bg-muted/50 rounded-2xl">
+            <h3 className="text-2xl font-bold mb-6">What You'll Get</h3>
+            <div className="grid md:grid-cols-2 gap-6 text-left">
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm">Comprehensive MBTI personality assessment</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm">Smart compatibility matching system</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm">Real-time chat and messaging</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm">Privacy-focused community features</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm">Personalized content recommendations</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <span className="text-sm">Advanced search and filtering options</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Trust Indicators */}
+          <div className="mt-12">
             <div className="flex items-center justify-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>

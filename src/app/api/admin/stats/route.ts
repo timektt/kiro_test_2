@@ -66,18 +66,21 @@ export const GET = createAdminHandler('SYSTEM_SETTINGS')(
         }),
       ])
 
+      // Add data guards to ensure all values are numbers
+      const safeData = {
+        totalUsers: totalUsers || 0,
+        activeUsers: activeUsers || 0,
+        totalPosts: totalPosts || 0,
+        totalComments: totalComments || 0,
+        totalLikes: totalLikes || 0,
+        pendingReports: pendingReports || 0,
+        newUsersToday: newUsersToday || 0,
+        postsToday: postsToday || 0,
+      }
+
       return NextResponse.json({
         success: true,
-        data: {
-          totalUsers,
-          activeUsers,
-          totalPosts,
-          totalComments,
-          totalLikes,
-          pendingReports,
-          newUsersToday,
-          postsToday,
-        },
+        data: safeData,
       })
     } catch (error) {
       console.error('Error fetching admin stats:', error)

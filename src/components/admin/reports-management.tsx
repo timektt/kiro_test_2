@@ -10,6 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import { useAdminReports, useReportStats } from '@/hooks/use-reports'
 import { cn } from '@/lib/utils'
+import { fmtNumber, fmtDate } from '@/lib/format'
 
 const STATUS_COLORS = {
   PENDING: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
@@ -81,13 +82,7 @@ export function ReportsManagement() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
+    return fmtDate(dateString)
   }
 
   const getReportTarget = (report: any) => {
@@ -135,7 +130,7 @@ export function ReportsManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total Reports</p>
-                  <p className="text-2xl font-bold">{stats.total}</p>
+                  <p className="text-2xl font-bold">{fmtNumber(stats.total)}</p>
                 </div>
                 <FileText className="h-8 w-8 text-gray-400" />
               </div>
@@ -147,7 +142,7 @@ export function ReportsManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Pending</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.pending}</p>
+                  <p className="text-2xl font-bold text-yellow-600">{fmtNumber(stats.pending)}</p>
                 </div>
                 <Clock className="h-8 w-8 text-yellow-400" />
               </div>
@@ -159,7 +154,7 @@ export function ReportsManagement() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Resolved</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.resolved}</p>
+                  <p className="text-2xl font-bold text-green-600">{fmtNumber(stats.resolved)}</p>
                 </div>
                 <CheckCircle className="h-8 w-8 text-green-400" />
               </div>
@@ -270,7 +265,7 @@ export function ReportsManagement() {
                                 {report.priority}
                               </Badge>
                               <span className="text-xs text-gray-500">
-                                {formatDate(report.createdAt)}
+                                {fmtDate(report.createdAt)}
                               </span>
                             </div>
                             

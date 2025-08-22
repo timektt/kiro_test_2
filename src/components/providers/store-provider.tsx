@@ -4,7 +4,6 @@ import { useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useUserStore } from '@/stores/user-store';
 import { useUIStore } from '@/stores/ui-store';
-import { ToastProvider } from '@/components/ui/toast-provider';
 
 interface StoreProviderProps {
   children: React.ReactNode;
@@ -67,9 +66,9 @@ export function StoreProvider({ children, userId, username }: StoreProviderProps
   }, [session, status, addToast]);
 
   return (
-    <ToastProvider>
+    <>
       {children}
-    </ToastProvider>
+    </>
   );
 }
 export default StoreProvider

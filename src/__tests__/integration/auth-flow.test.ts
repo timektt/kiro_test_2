@@ -1,4 +1,4 @@
-﻿import { NextRequest } from 'next/server'
+import { NextRequest } from 'next/server'
 import { POST as registerHandler } from '@/app/api/auth/register/route'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'

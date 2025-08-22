@@ -1,4 +1,4 @@
-﻿import { renderHook, waitFor, act } from '@testing-library/react'
+import { renderHook, waitFor, act } from '@testing-library/react'
 import { usePosts } from '@/hooks/use-posts'
 import { useFeedStore } from '@/stores/feed-store'
 import { useUIStore } from '@/stores/ui-store'
